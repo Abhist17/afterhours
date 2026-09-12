@@ -35,6 +35,26 @@ type Source =
   | { kind: "wallet"; balances: Balances; real?: boolean };
 
 const ADDRESS_KEY = "afterhours-address";
+const RECENT_KEY = "afterhours-recent";
+const RECENT_MAX = 5;
+
+function readRecent(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    const list = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(list) ? list.filter((x): x is string => typeof x === "string" && isValidAddress(x)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function remember(address: string): string[] {
+  const next = [address, ...readRecent().filter((a) => a !== address)].slice(0, RECENT_MAX);
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {}
+  return next;
+}
 
 /** The desk in reading order; the nav, the panel numbers and the number keys all follow it. */
 const SECTIONS: Section[] = [
@@ -70,6 +90,7 @@ function Desk() {
   const [targets, setTargets] = useState<Target[]>([]);
   const [rpcOpen, setRpcOpen] = useState(false);
   const [rpcDraft, setRpcDraft] = useState("");
+  const [recent, setRecent] = useState<string[]>([]);
   const now = useNow(60_000);
   const mounted = useMounted();
   const { toggle: toggleTheme } = useTheme();
@@ -141,6 +162,7 @@ function Desk() {
       if (seq !== readSeq.current) return false;
       setSource({ kind: "wallet", balances, real });
       setAddress(trimmed);
+      if (!real) setRecent(remember(trimmed));
       try {
         localStorage.setItem(ADDRESS_KEY, trimmed);
         const url = new URL(window.location.href);
@@ -169,6 +191,7 @@ function Desk() {
   // so the desk is never empty, and a judge can be sent straight to a
   // real wallet.
   useEffect(() => {
+    setRecent(readRecent());
     const params = new URLSearchParams(window.location.search);
     const linked = params.get("address");
     const book = params.get("book");
@@ -217,6 +240,15 @@ function Desk() {
     if (!history || !quotes || !source) return null;
     return analyse(amounts, quotes.prices, history, now);
   }, [history, quotes, amounts, now, source]);
+
+  // A link that names a panel (#stress) lands on it once the panels exist.
+  const landed = useRef(false);
+  useEffect(() => {
+    if (!analysis || landed.current) return;
+    landed.current = true;
+    const id = window.location.hash.slice(1);
+    if (id && SECTIONS.some((s) => s.id === id)) setTimeout(() => scrollToPanel(id), 50);
+  }, [analysis]);
 
   const market = useMemo(() => marketStatus(now), [now]);
   const sample = source?.kind === "sample" ? SAMPLES.find((s) => s.key === source.key) : null;
@@ -268,7 +300,7 @@ function Desk() {
               </Button>
             </form>
 
-            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
+            <div className="print-hide mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
               <span className="mr-1">or open</span>
               <Button
                 size="sm"
@@ -286,13 +318,45 @@ function Desk() {
               ))}
             </div>
 
+            {recent.filter((r) => r !== REAL_BOOK.address).length > 0 && (
+              <div className="print-hide mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary">
+                <span className="mr-1">recent</span>
+                {recent
+                  .filter((r) => r !== REAL_BOOK.address)
+                  .map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => void loadWallet(r)}
+                      disabled={loadingWallet}
+                      className={`numeric rounded-md border px-1.5 py-0.5 transition-colors hover:text-text ${viewing === r ? "border-brand text-text" : "border-border"}`}
+                      title={r}
+                    >
+                      {shortAddress(r, 5)}
+                    </button>
+                  ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.removeItem(RECENT_KEY);
+                    } catch {}
+                    setRecent([]);
+                  }}
+                  className="underline decoration-border-strong underline-offset-2 hover:text-text"
+                >
+                  forget
+                </button>
+              </div>
+            )}
+
             {walletError && (
               <div className="mt-3 max-w-2xl">
                 <Notice tone="error">{walletError}</Notice>
               </div>
             )}
 
-            <div className="mt-3 text-[11px] text-tertiary">
+            <div className="print-hide mt-3 text-[11px] text-tertiary">
               {rpcOpen ? (
                 <form
                   className="flex flex-col gap-2 sm:flex-row sm:items-center"
@@ -485,6 +549,7 @@ function Desk() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-tertiary">
                 <a href="https://github.com/Abhist17/afterhours" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Source</a>
                 <button type="button" onClick={() => setHelpOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">How the numbers are made</button>
+                <button type="button" onClick={() => window.print()} className="underline decoration-border-strong underline-offset-2 hover:text-text">Print this desk</button>
                 <a href="https://github.com/Abhist17/afterhours/blob/main/docs/SUBMISSION.md" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Submission notes</a>
                 <span className="hidden items-center gap-1 sm:inline-flex">
                   <kbd className="numeric rounded border border-border px-1 text-[10px]">/</kbd> address

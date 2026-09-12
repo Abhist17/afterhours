@@ -309,3 +309,66 @@ body {
     color: inherit;
   }
 }
+
+/* ── Print: the desk as a one-column report ────────────────────── */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #f6f7fa;
+    --surface: #ffffff;
+    --surface-hover: #f2f4f9;
+    --surface-active: #e8ebf3;
+    --border: #d9dde8;
+    --border-strong: #b9c0d2;
+    --text: #111420;
+    --text-secondary: #3f4558;
+    --text-tertiary: #6b7189;
+    --brand: #3f47c9;
+    --calm: #1f8a63;
+    --watch: #8a6410;
+    --elevated: #a34f1c;
+    --severe: #a83434;
+    --asset-1: #1f8f88;
+    --asset-2: #8a6410;
+    --asset-3: #a54a72;
+    --asset-4: #5b6f88;
+    --card-light: transparent;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: var(--text);
+  }
+  header,
+  nav[aria-label="Sections"],
+  form,
+  button,
+  select,
+  input,
+  .print-hide,
+  [role="dialog"] {
+    display: none !important;
+  }
+  .hero-glow {
+    background-image: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  main,
+  main > div {
+    max-width: none !important;
+  }
+  .card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border-radius: 6px;
+  }
+  .enter {
+    animation: none !important;
+  }
+  .grid.xl\:grid-cols-\[minmax\(0\,1\.35fr\)_minmax\(0\,1fr\)\] {
+    grid-template-columns: 1fr !important;
+  }
+  a[href]::after {
+    content: "";
+  }
+}
