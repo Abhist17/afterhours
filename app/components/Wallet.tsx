@@ -78,8 +78,8 @@ export function ConnectButton({ onConnected }: { onConnected?: (address: string)
 
   return (
     <span className="relative">
-      <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} disabled={connecting}>
-        {connecting ? "Connecting…" : "Connect wallet"}
+      <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} disabled={connecting} className="shrink-0 whitespace-nowrap">
+        {connecting ? "Connecting…" : <span>Connect<span className="hidden sm:inline"> wallet</span></span>}
       </Button>
       {open && (
         <span className="card absolute right-0 top-full z-30 mt-1 flex min-w-44 flex-col gap-0.5 p-1.5 shadow-lg">

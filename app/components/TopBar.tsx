@@ -60,10 +60,11 @@ export function MarketPill({ market }: { market: MarketStatus }) {
   const reason = market.reason === "weekend" ? "weekend" : market.reason === "holiday" ? "holiday" : "overnight";
 
   return (
-    <span className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1">
+    <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-border px-2 py-1 sm:gap-2 sm:px-2.5">
       <Dot color={market.open ? "var(--calm)" : "var(--watch)"} pulse={market.open} />
       <span className="text-[11px] font-medium text-secondary">
-        {market.open ? "NYSE open" : `NYSE closed · ${reason}`}
+        {market.open ? "NYSE open" : "NYSE closed"}
+        <span className="hidden sm:inline">{market.open ? "" : ` · ${reason}`}</span>
       </span>
       {mounted && (
         <span className="numeric hidden text-[11px] text-tertiary sm:inline">
@@ -87,20 +88,21 @@ export function TopBar({
 }) {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <Logo />
-        <span className="ml-auto" />
-        {market && <MarketPill market={market} />}
-        {connect}
-        <Button variant="ghost" size="sm" onClick={onOpenHelp} className="shrink-0">
-          <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
-            <circle cx="7" cy="7" r="5.9" stroke="currentColor" strokeWidth="1.2" fill="none" />
-            <path d="M5.3 5.2a1.75 1.75 0 1 1 2.3 1.7c-.4.2-.6.5-.6.9v.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
-            <circle cx="7" cy="10.3" r="0.75" fill="currentColor" />
-          </svg>
-          <span className="hidden sm:inline">How it works</span>
-        </Button>
-        <ThemeToggle />
+        <span className="ml-auto flex items-center gap-2 sm:gap-3">
+          {market && <MarketPill market={market} />}
+          {connect}
+          <Button variant="ghost" size="sm" onClick={onOpenHelp} className="shrink-0">
+            <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
+              <circle cx="7" cy="7" r="5.9" stroke="currentColor" strokeWidth="1.2" fill="none" />
+              <path d="M5.3 5.2a1.75 1.75 0 1 1 2.3 1.7c-.4.2-.6.5-.6.9v.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+              <circle cx="7" cy="10.3" r="0.75" fill="currentColor" />
+            </svg>
+            <span className="hidden sm:inline">How it works</span>
+          </Button>
+          <ThemeToggle />
+        </span>
       </div>
     </header>
   );
