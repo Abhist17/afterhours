@@ -10,6 +10,13 @@ import { Button } from "./ui";
 /** Drift inside this band is noise; outside it is a trade. */
 const DEFAULT_BAND = 0.05;
 
+/** Percentage points with a sign, and never "-0.0". */
+function signedPp(fraction: number): string {
+  const pp = Math.round(fraction * 1000) / 10;
+  if (pp === 0) return "0.0pp";
+  return `${pp > 0 ? "+" : "−"}${Math.abs(pp).toFixed(1)}pp`;
+}
+
 const PRESETS: { key: string; label: string; build: (a: Analysis) => Target[] }[] = [
   {
     key: "current",
@@ -182,7 +189,7 @@ export function Drift({
                 <span className="numeric text-secondary">
                   {pct(l.actual * 100, 0)} <span className="text-tertiary">vs</span> {pct(l.target * 100, 0)}
                   <span className="ml-2" style={{ color: outside ? (l.drift > 0 ? "var(--elevated)" : "var(--watch)") : "var(--text-tertiary)" }}>
-                    {l.drift > 0 ? "+" : ""}{(l.drift * 100).toFixed(1)}pp
+                    {signedPp(l.drift)}
                   </span>
                 </span>
               </div>

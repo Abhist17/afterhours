@@ -199,6 +199,23 @@ describe("driftAgainst", () => {
     const d = driftAgainst({ A: 50, B: 50 }, [{ symbol: "A", weight: 0.3 }, { symbol: "B", weight: 0.3 }]);
     expect(d.maxDrift).toBeCloseTo(0, 9);
   });
+
+  it("lists the largest drift first, and a book at target by size", () => {
+    const values = { A: 60, B: 30, C: 10 };
+    const atTarget = driftAgainst(values, [
+      { symbol: "C", weight: 0.1 },
+      { symbol: "A", weight: 0.6 },
+      { symbol: "B", weight: 0.3 },
+    ]);
+    expect(atTarget.lines.map((l) => l.symbol)).toEqual(["A", "B", "C"]);
+
+    const drifted = driftAgainst(values, [
+      { symbol: "A", weight: 0.6 },
+      { symbol: "B", weight: 0.1 },
+      { symbol: "C", weight: 0.3 },
+    ]);
+    expect(drifted.lines.map((l) => l.symbol)).toEqual(["B", "C", "A"]);
+  });
 });
 
 describe("blendedScore", () => {

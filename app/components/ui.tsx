@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 /* ── Surfaces ─────────────────────────────────────────────────── */
 
@@ -99,6 +99,34 @@ export function Tag({ children, color, subtle = false }: { children: ReactNode; 
 
 export function Dot({ color, pulse = false }: { color: string; pulse?: boolean }) {
   return <span className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${pulse ? "breathe" : ""}`} style={{ backgroundColor: color }} />;
+}
+
+/** Any view is a link. One click puts it on the clipboard. */
+export function CopyLink({ label = "Copy link" }: { label?: string }) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(t);
+  }, [copied]);
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          setCopied(true);
+        } catch {}
+      }}
+      className="inline-flex items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-tertiary transition-colors hover:border-border-strong hover:text-text"
+      aria-live="polite"
+    >
+      <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M5 7.2a2.2 2.2 0 0 0 3.1 0l1.7-1.7a2.2 2.2 0 0 0-3.1-3.1l-.7.7M7 4.8a2.2 2.2 0 0 0-3.1 0L2.2 6.5a2.2 2.2 0 0 0 3.1 3.1l.7-.7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+      </svg>
+      {copied ? "Copied" : label}
+    </button>
+  );
 }
 
 /* ── States ───────────────────────────────────────────────────── */

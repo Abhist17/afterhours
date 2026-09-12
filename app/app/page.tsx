@@ -23,7 +23,7 @@ import { WhatIf } from "@/components/WhatIf";
 import { HowItWorks } from "@/components/HowItWorks";
 import { OnChain } from "@/components/OnChain";
 import { WalletContext, ConnectButton } from "@/components/Wallet";
-import { Panel, PanelHeader, Button, Input, Notice, Skeleton, Tag } from "@/components/ui";
+import { Panel, PanelHeader, Button, Input, Notice, Skeleton, Tag, CopyLink } from "@/components/ui";
 
 type Source =
   | { kind: "sample"; key: string; amounts: Record<string, number> }
@@ -309,8 +309,11 @@ function Desk() {
                   <span>{sample?.blurb} Synthetic holdings, real prices.</span>
                 </>
               )}
-              <span className="ml-auto">
-                quotes {quotes?.stale ? "from history" : "live"} · history {history?.source === "live" ? "hourly" : "bundled"}, {timeAgo(history?.generatedAt ?? 0)}
+              <span className="ml-auto flex items-center gap-3">
+                <span>
+                  quotes {quotes?.stale ? "from history" : "live"} · history {history?.source === "live" ? "hourly" : "bundled"}, {timeAgo(history?.generatedAt ?? 0)}
+                </span>
+                <CopyLink />
               </span>
             </div>
 
@@ -410,6 +413,7 @@ function Desk() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-tertiary">
                 <a href="https://github.com/Abhist17/afterhours" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Source</a>
                 <button type="button" onClick={() => setHelpOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">How the numbers are made</button>
+                <a href="https://github.com/Abhist17/afterhours/blob/main/docs/SUBMISSION.md" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Submission notes</a>
                 <span className="ml-auto">Built for Stocklana · by the author of Sentra</span>
               </div>
               <p className="mt-3 text-[11px] leading-relaxed text-tertiary">

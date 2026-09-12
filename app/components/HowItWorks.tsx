@@ -13,12 +13,12 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: "The score",
     body:
-      "One number, 0 to 100: the 95% one-day Value at Risk as a share of the book, plus a penalty for concentration. VaR is the loss exceeded on about one day in twenty; the covariance behind it is exponentially weighted over thirty days of hourly returns, with the decay rescaled so its memory is seventeen days, not seventeen hours. Two models run — normal-curve and historical — and the more conservative one headlines.",
+      "One number, 0 to 100: the book's annualised volatility, in percent, plus a penalty for concentration — a dominant position or too few effective names. Volatility because it is the figure equity holders already carry in their heads: an index fund runs near 18, a single large-cap 30 to 45, a crypto-heavy book past 60. Value at Risk stays in dollars: the loss exceeded on about one day in twenty, from a covariance exponentially weighted over thirty days of hourly returns, with the decay rescaled so its memory is seventeen days rather than seventeen hours. Two models run — normal-curve and historical — and the more conservative one headlines.",
   },
   {
     title: "Beta, sleeves, and the crypto that is not called crypto",
     body:
-      "Every position gets a beta to SPYx on the same estimator. The book is split into tokenized stocks, crypto and cash, each with its share of value beside its share of risk — the bars disagree, and where they disagree is what to act on. Coinbase, Strategy, Robinhood and Circle are stocks on paper and crypto beta in practice; the desk counts them with SOL.",
+      "Every position gets a beta to SPYx on the same estimator. The book is split into tokenized stocks, crypto and cash, each with its share of value beside its share of risk — the bars disagree, and where they disagree is what to act on. Coinbase, Strategy, Robinhood, Circle and the coin-treasury companies are stocks on paper and crypto beta in practice; the desk counts them with SOL.",
   },
   {
     title: "The backtest",

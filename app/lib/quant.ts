@@ -537,7 +537,12 @@ export function driftAgainst(
     lines.push({ symbol, target, actual, drift, tradeUsd });
   }
 
-  lines.sort((a, b) => Math.abs(b.drift) - Math.abs(a.drift));
+  // Largest drift first; within a tenth of a point, largest position first,
+  // so a book at its target lists by size rather than by rounding noise.
+  lines.sort((a, b) => {
+    const gap = Math.abs(b.drift) - Math.abs(a.drift);
+    return Math.abs(gap) > 0.0005 ? gap : b.actual - a.actual;
+  });
   const turnoverUsd = gross / 2;
   return { lines, maxDrift, turnoverUsd, turnoverPct: total > 0 ? turnoverUsd / total : 0 };
 }
