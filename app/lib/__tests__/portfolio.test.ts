@@ -114,6 +114,22 @@ describe("analyse", () => {
     expect(b.holdings.map((h) => h.symbol)).toEqual(["SPYx"]);
   });
 
+  it("keeps a position with a quote but no history in the book, and says the model does not cover it", () => {
+    // A freshly listed xStock: the feed quotes it today, but the thirty-day
+    // file has no series for it yet.
+    const { SPCXx: _dropped, ...without } = history.series;
+    void _dropped;
+    const b = analyse({ SPYx: 5, SPCXx: 20 }, prices, { ...history, series: without }, END);
+    const spcx = b.holdings.find((h) => h.symbol === "SPCXx")!;
+    expect(spcx.value).toBeGreaterThan(0);
+    expect(spcx.riskShare).toBeNull();
+    expect(spcx.beta).toBeNull();
+    expect(b.risk.uncovered).toEqual(["SPCXx"]);
+    expect(b.risk.coverage).toBeCloseTo(b.holdings.find((h) => h.symbol === "SPYx")!.weight, 9);
+    // The rest of the book is still scored.
+    expect(b.risk.headlineVarUsd).toBeGreaterThan(0);
+  });
+
   it("handles an empty wallet without NaN", () => {
     const b = analyse({}, prices, history, END);
     expect(b.total).toBe(0);

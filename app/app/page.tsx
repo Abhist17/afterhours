@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { loadHistory, lastPrices, type History } from "@/lib/history";
+import { loadHistoryProgressive, lastPrices, type History } from "@/lib/history";
 import { fetchLivePrices, type Quotes } from "@/lib/prices";
 import { readBalances, isValidAddress, resolveRpcUrl, setRpcUrl, usingPublicRpc, type Balances } from "@/lib/balances";
 import { analyse } from "@/lib/portfolio";
@@ -53,21 +53,27 @@ function Desk() {
   const now = useNow(60_000);
   const mounted = useMounted();
 
-  // History once, quotes on a timer. Quotes fall back to the last point of
-  // the history and say so; nothing here waits on a server.
+  // History paints from the bundled copy and upgrades to the hourly file;
+  // quotes are asked for once the first history is in, then on a timer.
+  // Quotes fall back to the last point of the history and say so; nothing
+  // here waits on a server.
   useEffect(() => {
     let cancelled = false;
-    loadHistory()
-      .then(async (h) => {
-        if (cancelled) return;
+    let quotesRequested = false;
+    const stop = loadHistoryProgressive({
+      onHistory: (h) => {
         setHistory(h);
-        setQuotes(await fetchLivePrices(lastPrices(h)));
-      })
-      .catch((err) => {
-        if (!cancelled) setHistoryError(err instanceof Error ? err.message : "Could not load price history");
-      });
+        if (quotesRequested) return;
+        quotesRequested = true;
+        void fetchLivePrices(lastPrices(h)).then((q) => {
+          if (!cancelled) setQuotes(q);
+        });
+      },
+      onError: (message) => setHistoryError(message),
+    });
     return () => {
       cancelled = true;
+      stop();
     };
   }, []);
 

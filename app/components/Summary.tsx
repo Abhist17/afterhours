@@ -15,7 +15,7 @@ export function Summary({ a }: { a: Analysis }) {
   const beta = a.risk.beta;
   const closed = !a.market.open && a.overnight.counted > 0;
 
-  const metrics = [
+  const metrics: { label: string; value: string; detail: string; color?: string }[] = [
     {
       label: "Book",
       value: usd(a.total),
@@ -24,7 +24,10 @@ export function Summary({ a }: { a: Analysis }) {
     {
       label: "Value at Risk · 1d",
       value: usd(a.risk.headlineVarUsd),
-      detail: `Expected shortfall ${usd(a.risk.headlineEsUsd)} · 95% · ${a.risk.headlineModel}`,
+      detail:
+        a.risk.coverage < 0.995 && a.risk.uncovered.length > 0
+          ? `Expected shortfall ${usd(a.risk.headlineEsUsd)} · 95% · covers ${pct(a.risk.coverage * 100, 0)} of the book`
+          : `Expected shortfall ${usd(a.risk.headlineEsUsd)} · 95% · ${a.risk.headlineModel}`,
     },
     {
       label: "Beta to S&P 500",
@@ -41,6 +44,7 @@ export function Summary({ a }: { a: Analysis }) {
     {
       label: closed ? "Since the close" : "Overnight exposure",
       value: closed ? signedUsd(a.overnight.moveUsd) : usd(a.overnight.equityValue),
+      color: closed ? (a.overnight.moveUsd < 0 ? "var(--severe)" : a.overnight.moveUsd > 0 ? "var(--calm)" : undefined) : undefined,
       detail: closed
         ? `${signedPct(a.overnight.movePct)} across ${a.overnight.counted} stock${a.overnight.counted === 1 ? "" : "s"} · the market opens to this`
         : `${pct(a.overnight.equityShare * 100, 0)} of the book keeps trading after 4pm ET`,
@@ -65,7 +69,7 @@ export function Summary({ a }: { a: Analysis }) {
           {metrics.map((m) => (
             <div key={m.label} className="min-w-0 bg-surface px-5 py-4">
               <dt className="label">{m.label}</dt>
-              <dd className="numeric mt-1.5 truncate text-lg font-medium leading-none text-text xl:text-xl">{m.value}</dd>
+              <dd className="numeric mt-1.5 truncate text-lg font-medium leading-none text-text xl:text-xl" style={m.color ? { color: m.color } : undefined}>{m.value}</dd>
               <p className="mt-1.5 text-[11px] leading-snug text-tertiary">{m.detail}</p>
             </div>
           ))}
