@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { BAND_THRESHOLDS } from "@/lib/format";
 import { Button } from "./ui";
 
@@ -21,9 +21,24 @@ const SECTIONS: { title: string; body: string }[] = [
       "Every position gets a beta to SPYx on the same estimator. The book is split into tokenized stocks, crypto and cash, each with its share of value beside its share of risk — the bars disagree, and where they disagree is what to act on. Coinbase, Strategy, Robinhood, Circle and the coin-treasury companies are stocks on paper and crypto beta in practice; the desk counts them with SOL.",
   },
   {
-    title: "The backtest",
+    title: "Where the moves happen",
     body:
-      "The current allocation, scored at every hour of the last thirty days as if it had been held throughout, with a covariance that has only seen what was known by then. It says how risky this shape of book has been. Your wallet's own record is what you anchor on-chain.",
+      "Every hourly return is sorted by whether the NYSE was open in the middle of that hour. The share of the book's variance that fell in closed hours is the premise as a number; the per-hour comparison is the fair one, since closed hours outnumber open ones nearly three to one. The gap bars are the move from the last print before each close to the first after the next open — what was actually carried across each night and weekend.",
+  },
+  {
+    title: "The backtest, and the model's own record",
+    body:
+      "The current allocation, scored at every hour of the last thirty days as if it had been held throughout, with a covariance that has only seen what was known by then; its value and its drawdown on the same axis. Under it, every day's VaR forecast is marked against the move that followed: at 95% about one day in twenty should breach. Many more, and the model is too calm for this book.",
+  },
+  {
+    title: "Stress",
+    body:
+      "Factor shocks move every position by its beta to the factor — SPYx for the index, SOL for crypto — on the same estimator as the VaR. Two rows are not hypothetical: the worst day and the worst close-to-open the window actually had, at today's weights. The custom shock sums the two betas, which overlap, so read it as a ceiling.",
+  },
+  {
+    title: "Rebalance quotes",
+    body:
+      "Each order the drift panel proposes is sized at the last feed print, then quoted live on Jupiter for that exact size: what the swap would fetch on-chain now, its price impact, and the venues it routes through. The desk never trades; Jupiter opens with the pair prefilled.",
   },
   {
     title: "Targets, drift, and what if",
@@ -79,6 +94,23 @@ export function HowItWorks({ open, onClose }: { open: boolean; onClose: () => vo
               );
             })}
           </ul>
+        </section>
+        <section className="mt-5 border-t border-border pt-4">
+          <h3 className="label mb-2.5">Keys</h3>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px] text-tertiary">
+            {[
+              ["/", "focus the address"],
+              ["1 – 9, 0", "jump to a panel"],
+              ["?", "this sheet"],
+              ["t", "light or dark"],
+              ["esc", "close"],
+            ].map(([k, v]) => (
+              <Fragment key={k}>
+                <dt><kbd className="numeric rounded border border-border px-1 text-[10px] text-text">{k}</kbd></dt>
+                <dd>{v}</dd>
+              </Fragment>
+            ))}
+          </dl>
         </section>
         <p className="mt-5 border-t border-border pt-3 text-[11px] leading-relaxed text-tertiary">
           Every figure is a model estimate built from thirty days of prices. It is not investment advice, and a model that has never seen a crash cannot price one.

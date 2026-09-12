@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 export function Panel({ children, className = "", delay, id }: { children: ReactNode; className?: string; delay?: number; id?: string }) {
   return (
-    <section id={id} className={`card enter overflow-hidden ${className}`} style={delay ? { animationDelay: `${delay}ms` } : undefined}>
+    <section id={id} data-panel="" className={`card enter overflow-hidden ${className}`} style={delay ? { animationDelay: `${delay}ms` } : undefined}>
       {children}
     </section>
   );
@@ -64,9 +64,10 @@ export function Button({ variant = "secondary", size = "md", className = "", ...
   return <button className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...props} />;
 }
 
-export function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className = "", ref, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { ref?: React.Ref<HTMLInputElement> }) {
   return (
     <input
+      ref={ref}
       className={`h-9 w-full rounded-lg border border-border bg-bg-subtle px-3 text-[13px] text-text transition-colors placeholder:text-tertiary hover:border-border-strong focus:border-focus focus:outline-none ${className}`}
       {...props}
     />

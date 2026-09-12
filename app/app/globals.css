@@ -14,15 +14,16 @@
 
 :root {
   /* Surfaces */
-  --bg: #0b0d12;
-  --bg-subtle: #0f1219;
-  --surface: #141823;
-  --surface-hover: #1a1f2c;
-  --surface-active: #212739;
+  --bg: #090b10;
+  --bg-subtle: #0e1118;
+  --surface: #12161f;
+  --surface-hover: #181d28;
+  --surface-active: #1f2533;
 
   /* Hairlines */
-  --border: #232a3a;
-  --border-strong: #323b50;
+  --border: #222938;
+  --border-strong: #313a4e;
+  --card-light: rgb(255 255 255 / 0.035);
 
   /* Type */
   --text: #eef0f6;
@@ -84,6 +85,8 @@
   --asset-4: #5b6f88;
   --asset-other: #858ba0;
 
+  --card-light: rgb(255 255 255 / 0.6);
+
   --shadow-sm: 0 1px 2px rgb(16 18 30 / 0.06);
   --shadow-md: 0 8px 24px -8px rgb(16 18 30 / 0.14);
 }
@@ -116,6 +119,7 @@
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", "JetBrains Mono",
     Menlo, Consolas, monospace;
+  --font-display: var(--font-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
 }
 
 /* ── Base ──────────────────────────────────────────────────────── */
@@ -155,15 +159,33 @@ body {
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--card-light);
 }
 
-/* The hero's backdrop: one soft light, a desk lamp after the close. */
+/* The headline face. */
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* A definition on hover: dotted, never underlined like a link. */
+@utility term {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+/* The hero's backdrop: one soft light, a desk lamp after the close, over
+   a faint grid — graph paper, since the page is about measuring. */
 @utility hero-glow {
-  background-image: radial-gradient(
-    60% 90% at 15% 0%,
-    color-mix(in srgb, var(--brand) 16%, transparent),
-    transparent 70%
-  );
+  background-image:
+    radial-gradient(60% 90% at 15% 0%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 70%),
+    linear-gradient(to right, color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px);
+  background-size: auto, 48px 48px, 48px 48px;
+  background-position: 0 0, -1px -1px, -1px -1px;
 }
 
 /* ── Motion ────────────────────────────────────────────────────── */
@@ -212,6 +234,34 @@ body {
   background-color: var(--surface-hover);
   border-radius: 10px;
   animation: skeleton 1.4s ease-in-out infinite;
+}
+
+/* A readout that follows the pointer over a chart. */
+.readout {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+
+/* Sections offset their anchor below the sticky bars. */
+[data-panel] {
+  scroll-margin-top: 96px;
+}
+
+.thin-scroll {
+  scrollbar-width: none;
+}
+.thin-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

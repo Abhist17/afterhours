@@ -1,0 +1,14 @@
+{
+  "name": "Afterhours — risk desk for tokenized stocks on Solana",
+  "short_name": "Afterhours",
+  "description": "What your xStocks can lose tomorrow, what they've done since Wall Street closed, and how far your book has drifted — read from your wallet, scored in your browser, recorded on-chain by you.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#090b10",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
