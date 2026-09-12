@@ -15,7 +15,7 @@
 
 </div>
 
-![The Afterhours desk reading a real $21M xStocks wallet on mainnet: the New York session ring, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, and a what-if moving half of MSTRx into SPYx](docs/desk.png)
+![The Afterhours desk reading a real $21M xStocks wallet on mainnet: the New York session ring, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, a what-if moving half of MSTRx into SPYx, and the book under an S&P 500 −2% shock, position by position](docs/desk.png)
 
 <div align="center">
 <sub>A real wallet, not ours — eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
@@ -49,13 +49,16 @@ sit next to them — and scores the book in the browser:
 | **Score** | Annualised volatility plus a concentration penalty, 0–100. An index book runs near 18; a single large-cap 30–45; a crypto-heavy book past 60. Every figure on the page is computed in the tab from thirty days of hourly prices. |
 | **Value at Risk** | The 95% one-day loss in dollars, with Expected Shortfall — parametric and historical, the more conservative one headlines. |
 | **Beta to the S&P 500** | For the book and for every position, on the same estimator, against SPYx. |
-| **Since the close** | While the NYSE is closed: each stock's token move since the last official print, and the sum — *the market opens to this*. |
+| **What you hold** | Every position with a thirty-day sparkline, its share of value beside its share of risk, and — on a click — its full thirty days with the hours the NYSE was closed shaded. |
+| **Trading without the market** | While the NYSE is closed: each stock's token move since the last official print, and the sum — *the market opens to this*. Then every close the window had, as bars; then the share of the book's variance that fell in closed hours, per stock, with the per-hour comparison. |
 | **Stocks, crypto, cash** | Each sleeve's share of value beside its share of risk. Then the sentence a sector label hides: COIN, MSTR, HOOD, CRCL and the coin-treasury companies (STRC, BMNR, DFDV) are equity on paper and crypto beta in practice, and the desk says what share of the book is really riding crypto. |
-| **Risk of this allocation, last 30 days** | The current shape of the book, scored at every hour of the window with an estimator that has seen only what was known by then. |
+| **Thirty days** | The current shape of the book scored at every hour of the window with an estimator that has seen only what was known by then; its value and drawdown on the same axis; and the model marked against what happened — how many days the loss exceeded the VaR. |
 | **Correlation** | Thirty days of hourly returns across what is held, plus the index. The most correlated held pair is named. |
-| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back — sized at the last quote, routed through USDC, with Jupiter prefilled. |
 | **What if** | Move a quarter, a half or all of any position into any other asset and re-score the whole book, instantly. |
-| **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. |
+| **If the market gaps** | The book under an S&P 500 or crypto shock, every position by its beta to the factor — and under the worst day and the worst close-to-open the window actually had. A custom shock with two sliders. |
+| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back — each one quoted live on Jupiter for its exact size, with price impact, route, and the gap to the feed. |
+| **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. The snapshots draw as a line against the limit. |
+| **Risk and return, name by name** | Every asset the desk knows on a volatility-versus-return map; what is held is solid and sized by weight, the book is the ring, thin names are dashed. |
 
 Four sample books are built in for anyone without xStocks yet, labelled
 synthetic, priced live — and one real mainnet wallet, found through the
@@ -66,7 +69,10 @@ it matters, and there is a button to copy it.
 Above it all sits a ring of the New York day: the six and a half hours the
 NYSE is open as a short bright arc, the other seventeen and a half — and
 every weekend — as the time the tokens trade with no market behind them,
-and a dot for now.
+and a dot for now. A section bar under the top bar names the ten panels
+and lights the one in view; the number keys jump to them, `/` goes to the
+address, `?` opens the sheet that explains every figure, and every term
+on the page carries its definition on hover.
 
 ## Where Solana is load-bearing
 
@@ -124,6 +130,8 @@ There is no server. The site is a static export on GitHub Pages:
   from the bundle for anything it lacks, so a first paint never waits on a
   third party and a new listing never sits outside the model.
 - **Arithmetic** — every figure on the page is computed in the tab.
+- **Quotes for trades** — from Jupiter's public quote endpoint, one request
+  per proposed order, from the browser.
 - **On-chain** — signed by the viewer's own wallet.
 
 Nothing sleeps, nothing has a cold start, and nothing about a book leaves the
@@ -192,6 +200,23 @@ verified row.
 - **The backtest** seeds its recursive covariance from the first week's
   sample covariance, so the chart is the book's risk, not the estimator
   filling its memory.
+- **Where the moves happen**: every hourly return is sorted by whether the
+  NYSE was open in the middle of that hour, and the squared returns in each
+  class are summed. The share that fell in closed hours is the premise as a
+  number; the per-hour comparison is the fair one, since closed hours
+  outnumber open ones nearly three to one. Gaps are the move from the last
+  print before a close to the first after the next open.
+- **Stress** moves every position by its beta to the shocked factor — SPYx
+  or SOL — on the same estimator. The worst day is the current weights
+  applied to each asset's actual one-day returns; the worst gap is the
+  deepest close-to-open the equities carried.
+- **The model check** marks each day's VaR forecast against the book's move
+  over the day that followed, in non-overlapping days. About one in twenty
+  should breach at 95%.
+- **Thin names**: a series in which more than 1% of hours move more than 8%
+  is flagged as thinly traded — a stale print can sit for hours as a 40%
+  jump — and its hourly returns are clipped at ±8% inside every estimator.
+  Prices are never altered, and the page says which names were clipped.
 - **Market hours** are computed in `America/New_York` through `Intl`, with
   NYSE holidays and early closes through 2027, so daylight saving is the
   platform's problem.
@@ -207,7 +232,7 @@ git clone https://github.com/Abhist17/afterhours
 cd afterhours/app
 npm install
 npm run dev                 # http://localhost:3000
-npm test                    # 59 tests: quant, market hours, universe, history, portfolio assembly, on-chain encoding
+npm test                    # 82 tests: quant, sessions, scenarios, market hours, universe, history, Jupiter, portfolio, on-chain
 npm run build               # static export to out/
 
 cd ..
@@ -219,10 +244,10 @@ node scripts/example-record.mjs    # a policy and three snapshots from ~/.config
 
 | Layer | Technology |
 |:--|:--|
-| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist · hand-rolled SVG |
+| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist, Geist Mono, Instrument Serif · hand-rolled SVG |
 | Wallet | Wallet Standard via `@solana/wallet-adapter-react` |
 | Program | Rust · Anchor 0.32 |
-| Data | Solana mainnet RPC · CoinGecko · GitHub Actions |
+| Data | Solana mainnet RPC · CoinGecko · Jupiter quote API · GitHub Actions |
 
 ## Not investment advice
 
