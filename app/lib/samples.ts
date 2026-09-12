@@ -1,8 +1,9 @@
 /**
  * Sample books, for a visitor with no xStocks yet — or a reviewer. Labelled
- * synthetic everywhere they appear. The two are chosen to make the
- * product's argument: the first looks diversified across seven tickers and
- * is mostly one bet on crypto beta; the second is fewer names and less risk.
+ * synthetic everywhere they appear. They are chosen to make the product's
+ * argument: the first looks diversified across seven tickers and is mostly
+ * one bet on crypto beta; the second is fewer names and less risk; the
+ * last is a single new listing carrying a third of a book.
  */
 export interface SampleBook {
   key: string;
@@ -29,6 +30,12 @@ export const SAMPLES: SampleBook[] = [
     label: "Magnificent seven",
     blurb: "The seven mega-caps, equal-ish dollars, nothing else.",
     amounts: { AAPLx: 12, MSFTx: 8, GOOGLx: 12, AMZNx: 16, METAx: 6, NVDAx: 18, TSLAx: 11 },
+  },
+  {
+    key: "spacex-and-index",
+    label: "SpaceX, index, cash",
+    blurb: "The summer's IPO beside the S&P 500 and a cash buffer.",
+    amounts: { SPCXx: 30, SPYx: 6, USDC: 2_000 },
   },
 ];
 

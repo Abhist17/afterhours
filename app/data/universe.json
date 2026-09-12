@@ -22,6 +22,17 @@
     "sector": "index"
   },
   {
+    "symbol": "VTIx",
+    "name": "Vanguard Total Market xStock",
+    "underlying": "VTI",
+    "coingeckoId": "vanguard-xstock",
+    "mint": "XsssYEQjzxBCFgvYFFNuhJFBeHNdLWYeUSP8F45cDr9",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "index"
+  },
+  {
     "symbol": "AAPLx",
     "name": "Apple xStock",
     "underlying": "AAPL",
@@ -77,6 +88,39 @@
     "sector": "mega-cap tech"
   },
   {
+    "symbol": "ORCLx",
+    "name": "Oracle xStock",
+    "underlying": "ORCL",
+    "coingeckoId": "oracle-xstock",
+    "mint": "XsjFwUPiLofddX5cWFHW35GCbXcSu1BCUGfxoQAQjeL",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "software"
+  },
+  {
+    "symbol": "PLTRx",
+    "name": "Palantir xStock",
+    "underlying": "PLTR",
+    "coingeckoId": "palantir-xstock",
+    "mint": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "software"
+  },
+  {
+    "symbol": "NFLXx",
+    "name": "Netflix xStock",
+    "underlying": "NFLX",
+    "coingeckoId": "netflix-xstock",
+    "mint": "XsEH7wWfJJu2ZT3UCFeVfALnVA6CP5ur7Ee11KmzVpL",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "software"
+  },
+  {
     "symbol": "NVDAx",
     "name": "NVIDIA xStock",
     "underlying": "NVDA",
@@ -110,6 +154,50 @@
     "sector": "semis"
   },
   {
+    "symbol": "INTCx",
+    "name": "Intel xStock",
+    "underlying": "INTC",
+    "coingeckoId": "intel-xstock",
+    "mint": "XshPgPdXFRWB8tP1j82rebb2Q9rPgGX37RuqzohmArM",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "TSMx",
+    "name": "TSMC xStock",
+    "underlying": "TSM",
+    "coingeckoId": "tsmc-xstock",
+    "mint": "XsafvsGtzFqqHgTnA3aPC83EAMkacU5mcGtcSayhpVV",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "MRVLx",
+    "name": "Marvell xStock",
+    "underlying": "MRVL",
+    "coingeckoId": "marvell-xstock",
+    "mint": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "SNDKx",
+    "name": "Sandisk xStock",
+    "underlying": "SNDK",
+    "coingeckoId": "sandisk-corporation-xstock",
+    "mint": "Xswbpc8UqU6e1j9QZEWCjBMjyvz4twqD7PCy6j2e7jj",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
     "symbol": "TSLAx",
     "name": "Tesla xStock",
     "underlying": "TSLA",
@@ -119,6 +207,17 @@
     "decimals": 8,
     "class": "equity",
     "sector": "ev & auto"
+  },
+  {
+    "symbol": "SPCXx",
+    "name": "SpaceX xStock",
+    "underlying": "SPCX",
+    "coingeckoId": "spacex-xstocks",
+    "mint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "aerospace"
   },
   {
     "symbol": "COINx",
@@ -165,6 +264,116 @@
     "sector": "crypto-linked equity"
   },
   {
+    "symbol": "STRCx",
+    "name": "Strategy STRC Preferred xStock",
+    "underlying": "STRC",
+    "coingeckoId": "strategy-pp-variable-xstock",
+    "mint": "Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "BMNRx",
+    "name": "Bitmine xStock",
+    "underlying": "BMNR",
+    "coingeckoId": "bitmine-xstock",
+    "mint": "XsrBCwaH8c46xiqXBChzobgufRKxQxAWUWbndgBNzFn",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "DFDVx",
+    "name": "DeFi Development xStock",
+    "underlying": "DFDV",
+    "coingeckoId": "dfdv-xstock",
+    "mint": "Xs2yquAgsHByNzx68WJC55WHjHBvG9JsMB7CWjTLyPy",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "MCDx",
+    "name": "McDonald's xStock",
+    "underlying": "MCD",
+    "coingeckoId": "mcdonald-s-xstock",
+    "mint": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "consumer"
+  },
+  {
+    "symbol": "KOx",
+    "name": "Coca-Cola xStock",
+    "underlying": "KO",
+    "coingeckoId": "coca-cola-xstock",
+    "mint": "XsaBXg8dU5cPM6ehmVctMkVqoiRG2ZjMo1cyBJ3AykQ",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "consumer"
+  },
+  {
+    "symbol": "GMEx",
+    "name": "GameStop xStock",
+    "underlying": "GME",
+    "coingeckoId": "gamestop-xstock",
+    "mint": "Xsf9mBktVB9BSU5kf4nHxPq5hCBJ2j2ui3ecFGxPRGc",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "consumer"
+  },
+  {
+    "symbol": "LLYx",
+    "name": "Eli Lilly xStock",
+    "underlying": "LLY",
+    "coingeckoId": "eli-lilly-xstock",
+    "mint": "Xsnuv4omNoHozR6EEW5mXkw8Nrny5rB3jVfLqi6gKMH",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "healthcare"
+  },
+  {
+    "symbol": "UNHx",
+    "name": "UnitedHealth xStock",
+    "underlying": "UNH",
+    "coingeckoId": "unitedhealth-xstock",
+    "mint": "XszvaiXGPwvk2nwb3o9C1CX4K6zH8sez11E6uyup6fe",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "healthcare"
+  },
+  {
+    "symbol": "BRK.Bx",
+    "name": "Berkshire Hathaway xStock",
+    "underlying": "BRK.B",
+    "coingeckoId": "berkshire-hathaway-xstock",
+    "mint": "Xs6B6zawENwAbWVi7w92rjazLuAr5Az59qgWKcNb45x",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "financials"
+  },
+  {
+    "symbol": "XOMx",
+    "name": "Exxon Mobil xStock",
+    "underlying": "XOM",
+    "coingeckoId": "exxon-mobil-xstock",
+    "mint": "XsaHND8sHyfMfsWPj6kSdd5VwvCayZvjYgKmmcNL5qh",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "energy"
+  },
+  {
     "symbol": "GLDx",
     "name": "Gold xStock",
     "underlying": "GLD",
@@ -187,6 +396,17 @@
     "sector": "crypto"
   },
   {
+    "symbol": "cbBTC",
+    "name": "Coinbase Wrapped BTC",
+    "underlying": null,
+    "coingeckoId": "coinbase-wrapped-btc",
+    "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+    "program": "token",
+    "decimals": 8,
+    "class": "crypto",
+    "sector": "crypto"
+  },
+  {
     "symbol": "USDC",
     "name": "USD Coin",
     "underlying": null,
@@ -204,6 +424,17 @@
     "coingeckoId": "tether",
     "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
     "program": "token",
+    "decimals": 6,
+    "class": "cash",
+    "sector": "cash"
+  },
+  {
+    "symbol": "USDG",
+    "name": "Global Dollar",
+    "underlying": null,
+    "coingeckoId": "global-dollar",
+    "mint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+    "program": "token-2022",
     "decimals": 6,
     "class": "cash",
     "sector": "cash"

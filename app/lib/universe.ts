@@ -11,8 +11,13 @@
  *
  * Sectors are coarse on purpose. The one that matters for this product is
  * "crypto-linked equity": COIN, MSTR, HOOD and CRCL are stocks on paper and
- * crypto beta in practice, and a book of SOL plus those four is one bet
- * wearing five tickers.
+ * crypto beta in practice — and STRC, BMNR and DFDV are treasury companies
+ * whose share price is a leveraged claim on the coin they hold. A book of
+ * SOL plus those is one bet wearing several tickers.
+ *
+ * Backed lists several hundred xStocks; this table carries the ones with
+ * real float and turnover on Solana, so every series has thirty days of
+ * hourly prices behind it. Adding one is one verified row.
  */
 
 import rows from "../data/universe.json";
@@ -22,9 +27,15 @@ export type AssetClass = "equity" | "crypto" | "cash";
 export type Sector =
   | "index"
   | "mega-cap tech"
+  | "software"
   | "semis"
   | "ev & auto"
+  | "aerospace"
   | "crypto-linked equity"
+  | "consumer"
+  | "healthcare"
+  | "financials"
+  | "energy"
   | "commodity"
   | "crypto"
   | "cash";

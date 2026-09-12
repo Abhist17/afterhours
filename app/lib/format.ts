@@ -102,10 +102,12 @@ const BANDS: Record<BandKey, RiskBand> = {
   severe: { key: "severe", label: "Severe", color: "var(--severe)", description: "Leverage or memecoin territory" },
 };
 
+/** Banded on the score as printed (one decimal), so "25.0" is never Calm. */
 export function riskBand(score: number): RiskBand {
-  if (score >= 70) return BANDS.severe;
-  if (score >= 45) return BANDS.elevated;
-  if (score >= 25) return BANDS.watch;
+  const s = Math.round(score * 10) / 10;
+  if (s >= 70) return BANDS.severe;
+  if (s >= 45) return BANDS.elevated;
+  if (s >= 25) return BANDS.watch;
   return BANDS.calm;
 }
 
@@ -117,7 +119,7 @@ export const BAND_THRESHOLDS: { at: number; band: RiskBand }[] = [
 ];
 
 // ── Asset colour ─────────────────────────────────────────────────
-// Colour by sleeve, not by ticker: with nineteen assets a per-ticker
+// Colour by sleeve, not by ticker: with forty assets a per-ticker
 // palette would be noise, and the question the page asks — stocks, crypto
 // or cash? — is what the eye should be able to answer at a glance.
 
