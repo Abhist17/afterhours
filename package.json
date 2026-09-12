@@ -1,0 +1,26 @@
+{
+  "name": "afterhours-workspace",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test:program": "anchor test",
+    "test:app": "npm --prefix app test",
+    "typecheck": "npm --prefix app run typecheck",
+    "build:app": "npm --prefix app run build",
+    "refresh-history": "node scripts/refresh-history.mjs"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.2.0",
+    "chai": "^4.3.4",
+    "mocha": "^9.0.3",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

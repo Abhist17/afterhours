@@ -1,0 +1,630 @@
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/afterhours.json`.
+ */
+export type Afterhours = {
+  "address": "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri",
+  "metadata": {
+    "name": "afterhours",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Afterhours — on-chain policy and risk snapshots for tokenized stock portfolios"
+  },
+  "instructions": [
+    {
+      "name": "closePolicy",
+      "docs": [
+        "Closes the policy and returns its rent to the owner."
+      ],
+      "discriminator": [
+        55,
+        42,
+        248,
+        229,
+        222,
+        138,
+        26,
+        252
+      ],
+      "accounts": [
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeSnapshot",
+      "docs": [
+        "Closes a snapshot and returns its rent to the owner."
+      ],
+      "discriminator": [
+        10,
+        135,
+        141,
+        56,
+        1,
+        123,
+        162,
+        186
+      ],
+      "accounts": [
+        {
+          "name": "snapshot",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  110,
+                  97,
+                  112,
+                  115,
+                  104,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "snapshot.timestamp",
+                "account": "snapshot"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createPolicy",
+      "docs": [
+        "Declares the owner's policy. Target weights are in basis points and",
+        "must sum to exactly 10,000 — a policy that does not add up is not a",
+        "policy. Native SOL is identified by the wrapped-SOL mint."
+      ],
+      "discriminator": [
+        27,
+        81,
+        33,
+        27,
+        196,
+        103,
+        246,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "riskLimit",
+          "type": "u8"
+        },
+        {
+          "name": "driftBandBps",
+          "type": "u16"
+        },
+        {
+          "name": "targets",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "target"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "recordSnapshot",
+      "docs": [
+        "Records one reading of the book. When the owner has a policy it is",
+        "passed in read-only and the event says whether the reading breaches",
+        "it; without one the snapshot still lands, and the event still fires."
+      ],
+      "discriminator": [
+        173,
+        85,
+        25,
+        110,
+        31,
+        124,
+        59,
+        136
+      ],
+      "accounts": [
+        {
+          "name": "snapshot",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  110,
+                  97,
+                  112,
+                  115,
+                  104,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "arg",
+                "path": "timestamp"
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "timestamp",
+          "type": "i64"
+        },
+        {
+          "name": "score",
+          "type": "u8"
+        },
+        {
+          "name": "valueUsdCents",
+          "type": "u64"
+        },
+        {
+          "name": "varUsdCents",
+          "type": "u64"
+        },
+        {
+          "name": "driftBps",
+          "type": "u16"
+        },
+        {
+          "name": "equityBps",
+          "type": "u16"
+        },
+        {
+          "name": "marketOpen",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "updatePolicy",
+      "discriminator": [
+        212,
+        245,
+        246,
+        7,
+        163,
+        151,
+        18,
+        57
+      ],
+      "accounts": [
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "riskLimit",
+          "type": "u8"
+        },
+        {
+          "name": "driftBandBps",
+          "type": "u16"
+        },
+        {
+          "name": "targets",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "target"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "policy",
+      "discriminator": [
+        222,
+        135,
+        7,
+        163,
+        235,
+        177,
+        33,
+        68
+      ]
+    },
+    {
+      "name": "snapshot",
+      "discriminator": [
+        137,
+        213,
+        28,
+        133,
+        224,
+        161,
+        48,
+        108
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "snapshotRecorded",
+      "discriminator": [
+        238,
+        89,
+        139,
+        114,
+        10,
+        83,
+        172,
+        36
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "invalidScore",
+      "msg": "Score and risk limit must be between 0 and 100"
+    },
+    {
+      "code": 6001,
+      "name": "invalidShare",
+      "msg": "A share in basis points cannot exceed 10,000"
+    },
+    {
+      "code": 6002,
+      "name": "tooManyTargets",
+      "msg": "A policy needs between 1 and 12 targets"
+    },
+    {
+      "code": 6003,
+      "name": "targetsMustSumToOne",
+      "msg": "Target weights must sum to exactly 10,000 basis points"
+    },
+    {
+      "code": 6004,
+      "name": "duplicateTarget",
+      "msg": "A mint appears twice in the targets"
+    },
+    {
+      "code": 6005,
+      "name": "timestampOutOfRange",
+      "msg": "Timestamp is too far from the cluster clock"
+    }
+  ],
+  "types": [
+    {
+      "name": "policy",
+      "docs": [
+        "What the owner meant their book to be."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "riskLimit",
+            "docs": [
+              "Score at or above which a snapshot counts as a breach (exclusive:",
+              "breached when score > limit)."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "driftBandBps",
+            "docs": [
+              "Largest drift from any target that is still acceptable."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "targets",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "target"
+                }
+              }
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "snapshot",
+      "docs": [
+        "One immutable reading of the book, signed by its owner."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "score",
+            "type": "u8"
+          },
+          {
+            "name": "valueUsdCents",
+            "type": "u64"
+          },
+          {
+            "name": "varUsdCents",
+            "type": "u64"
+          },
+          {
+            "name": "driftBps",
+            "docs": [
+              "Largest drift from any policy target at the time, in basis points."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "equityBps",
+            "docs": [
+              "Share of the book in tokenized stocks, in basis points."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "marketOpen",
+            "docs": [
+              "Whether the NYSE was open — whether the stocks behind the tokens",
+              "were trading — when this was taken."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "snapshotRecorded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "score",
+            "type": "u8"
+          },
+          {
+            "name": "valueUsdCents",
+            "type": "u64"
+          },
+          {
+            "name": "varUsdCents",
+            "type": "u64"
+          },
+          {
+            "name": "driftBps",
+            "type": "u16"
+          },
+          {
+            "name": "equityBps",
+            "type": "u16"
+          },
+          {
+            "name": "marketOpen",
+            "type": "bool"
+          },
+          {
+            "name": "riskLimit",
+            "docs": [
+              "The policy's limits when one exists; absent otherwise, and then",
+              "`breached` is false."
+            ],
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "driftBandBps",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "breached",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "target",
+      "docs": [
+        "One line of a target allocation."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "docs": [
+              "The token mint; wrapped SOL's mint stands for native SOL."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "weightBps",
+            "docs": [
+              "Share of the book, in basis points."
+            ],
+            "type": "u16"
+          }
+        ]
+      }
+    }
+  ]
+};

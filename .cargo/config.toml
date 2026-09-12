@@ -1,0 +1,2 @@
+# Intentionally minimal. Enable anchor-debug per crate, never workspace-wide:
+#   cargo build --features anchor-debug
