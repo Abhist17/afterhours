@@ -21,6 +21,7 @@ import { usd, pct, riskBand, shortAddress, timeAgo, clockTime, dayLabel } from "
 import { useMounted } from "@/lib/hooks";
 import { EXAMPLE_RECORD } from "@/lib/samples";
 import { Button, Notice, Tag } from "./ui";
+import { SnapshotChart } from "./SnapshotChart";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 /** Enough devnet SOL to create a policy or a snapshot, with change. */
@@ -249,6 +250,8 @@ export function OnChain({
               )}
             </p>
           )}
+
+          {snapshots.length >= 2 && <SnapshotChart snapshots={snapshots} riskLimit={policy ? policy.riskLimit : null} />}
 
           {snapshots.length === 0 ? (
             <p className="mt-2 text-[11px] leading-snug text-tertiary">

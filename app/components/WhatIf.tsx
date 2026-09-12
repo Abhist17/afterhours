@@ -7,6 +7,7 @@ import { analyse } from "@/lib/portfolio";
 import { ASSETS, BY_SYMBOL } from "@/lib/universe";
 import { usd, riskBand } from "@/lib/format";
 import { Button } from "./ui";
+import { Term } from "./Term";
 
 const FRACTIONS = [
   { value: 0.25, label: "¼" },
@@ -116,7 +117,7 @@ function Outcome({
       <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
         {rows.map((r) => (
           <div key={r.label} className="min-w-0">
-            <dt className="text-tertiary">{r.label}</dt>
+            <dt className="text-tertiary">{r.label === "Effective assets" ? <Term term="Effective assets">{r.label}</Term> : r.label}</dt>
             <dd className="numeric text-text"><span className="text-tertiary">{r.from}</span><span className="mx-1 text-tertiary" aria-hidden="true">→</span>{r.to}</dd>
           </div>
         ))}

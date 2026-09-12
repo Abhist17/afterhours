@@ -1,9 +1,14 @@
 "use client";
 
+import { Fragment, useState } from "react";
 import type { Analysis } from "@/lib/portfolio";
+import type { History } from "@/lib/history";
 import { usd, price, amount, pct, signedPct, sectorColor } from "@/lib/format";
 import { ASSETS, jupiterSwapUrl } from "@/lib/universe";
 import { EmptyState } from "./ui";
+import { Sparkline } from "./chart";
+import { AssetChart } from "./AssetChart";
+import { Term } from "./Term";
 
 /**
  * Share of risk as a bar, with the position's weight as a tick on it, so
@@ -18,7 +23,18 @@ function RiskBar({ weight, risk, color }: { weight: number; risk: number; color:
   );
 }
 
-export function Holdings({ a }: { a: Analysis }) {
+/** The window thinned to a few dozen points, for a sparkline. */
+function thinned(series: { t: number; price: number }[] | undefined, points = 48): number[] {
+  if (!series || series.length < 3) return [];
+  const step = Math.max(1, Math.floor(series.length / points));
+  const out: number[] = [];
+  for (let i = 0; i < series.length; i += step) out.push(series[i].price);
+  if (out[out.length - 1] !== series[series.length - 1].price) out.push(series[series.length - 1].price);
+  return out;
+}
+
+export function Holdings({ a, history }: { a: Analysis; history: History }) {
+  const [open, setOpen] = useState<string | null>(null);
   if (a.holdings.length === 0) {
     return (
       <EmptyState
@@ -34,6 +50,8 @@ export function Holdings({ a }: { a: Analysis }) {
     );
   }
   const closed = !a.market.open;
+  const thin = new Set(a.thin.map((t) => t.symbol));
+  const thinHeld = a.thin.filter((t) => a.holdings.some((h) => h.symbol === t.symbol));
 
   return (
     <div>
@@ -51,68 +69,101 @@ export function Holdings({ a }: { a: Analysis }) {
           <thead>
             <tr className="border-b border-border">
               <th className="label px-4 py-2.5 text-left font-semibold">Asset</th>
+              <th className="label hidden px-3 py-2.5 text-left font-semibold md:table-cell xl:hidden 2xl:table-cell">30 days</th>
               <th className="label px-3 py-2.5 text-right font-semibold">Amount</th>
               <th className="label px-3 py-2.5 text-right font-semibold">Price</th>
-              <th className="label whitespace-nowrap px-3 py-2.5 text-right font-semibold">{closed ? "Since close" : "Beta"}</th>
+              <th className="label whitespace-nowrap px-3 py-2.5 text-right font-semibold">{closed ? <Term term="Since the close">Since close</Term> : <Term term="Beta">Beta</Term>}</th>
               <th className="label px-3 py-2.5 text-right font-semibold">Value</th>
               <th className="label px-3 py-2.5 text-right font-semibold">Weight</th>
-              <th className="label whitespace-nowrap px-3 py-2.5 text-right font-semibold">Of risk</th>
+              <th className="label whitespace-nowrap px-3 py-2.5 text-right font-semibold"><Term term="Share of risk">Of risk</Term></th>
             </tr>
           </thead>
           <tbody>
-            {a.holdings.map((h) => (
-              <tr key={h.symbol} className="border-b border-border last:border-0 transition-colors hover:bg-surface-hover">
-                <td className="px-4 py-2.5">
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 shrink-0 rounded-[2px]" style={{ backgroundColor: sectorColor(h.asset.sector, h.asset.class) }} />
-                    <span className="font-medium text-text">{h.symbol}</span>
-                    <span className="hidden whitespace-nowrap text-[11px] text-tertiary md:inline xl:hidden 2xl:inline">{h.asset.sector}</span>
-                  </span>
-                </td>
-                <td className="numeric px-3 py-2.5 text-right text-secondary">{amount(h.amount)}</td>
-                <td className="numeric px-3 py-2.5 text-right text-secondary">{price(h.price)}</td>
-                <td className="numeric px-3 py-2.5 text-right">
-                  {closed ? (
-                    h.sinceClose ? (
-                      <span style={{ color: h.sinceClose.changePct < 0 ? "var(--severe)" : h.sinceClose.changePct > 0 ? "var(--calm)" : "var(--text-tertiary)" }}>
-                        {signedPct(h.sinceClose.changePct)}
+            {a.holdings.map((h) => {
+              const color = sectorColor(h.asset.sector, h.asset.class);
+              const series = history.series[h.symbol];
+              const expanded = open === h.symbol;
+              const spark = thinned(series);
+              const sparkColor = spark.length > 1 ? (spark[spark.length - 1] >= spark[0] ? "var(--calm)" : "var(--severe)") : "var(--text-tertiary)";
+              return (
+                <Fragment key={h.symbol}>
+                  <tr
+                    className={`cursor-pointer border-b border-border transition-colors hover:bg-surface-hover ${expanded ? "bg-surface-hover" : ""}`}
+                    onClick={() => setOpen(expanded ? null : h.symbol)}
+                    aria-expanded={expanded}
+                  >
+                    <td className="px-4 py-2.5">
+                      <span className="flex items-center gap-2">
+                        <span className="h-2 w-2 shrink-0 rounded-[2px]" style={{ backgroundColor: color }} />
+                        <span className="font-medium text-text">{h.symbol}</span>
+                        <span className="hidden whitespace-nowrap text-[11px] text-tertiary md:inline xl:hidden 2xl:inline">{h.asset.sector}</span>
+                        {thin.has(h.symbol) && (
+                          <span className="rounded border px-1 text-[9px] font-semibold uppercase tracking-wide" style={{ color: "var(--watch)", borderColor: "color-mix(in srgb, var(--watch) 40%, transparent)" }} title="Thin trading: hourly prints clipped at ±8% in the risk model">
+                            thin
+                          </span>
+                        )}
+                        <svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true" className={`ml-0.5 shrink-0 text-tertiary transition-transform ${expanded ? "rotate-90" : ""}`}>
+                          <path d="M3.5 2 6.5 5 3.5 8" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </span>
-                    ) : (
-                      <span className="text-tertiary">{h.asset.class === "equity" ? "—" : "24/7"}</span>
-                    )
-                  ) : h.beta === null ? (
-                    <span className="text-tertiary">—</span>
-                  ) : (
-                    <span className="text-secondary">{h.beta.toFixed(2)}×</span>
+                    </td>
+                    <td className="hidden px-3 py-1.5 md:table-cell xl:hidden 2xl:table-cell">
+                      <Sparkline values={spark} color={h.asset.class === "cash" ? "var(--text-tertiary)" : sparkColor} minSpan={h.asset.class === "cash" ? h.price * 0.04 : 0} />
+                    </td>
+                    <td className="numeric px-3 py-2.5 text-right text-secondary">{amount(h.amount)}</td>
+                    <td className="numeric px-3 py-2.5 text-right text-secondary">{price(h.price)}</td>
+                    <td className="numeric px-3 py-2.5 text-right">
+                      {closed ? (
+                        h.sinceClose ? (
+                          <span style={{ color: h.sinceClose.changePct < 0 ? "var(--severe)" : h.sinceClose.changePct > 0 ? "var(--calm)" : "var(--text-tertiary)" }}>
+                            {signedPct(h.sinceClose.changePct)}
+                          </span>
+                        ) : (
+                          <span className="text-tertiary">{h.asset.class === "equity" ? "—" : "24/7"}</span>
+                        )
+                      ) : h.beta === null ? (
+                        <span className="text-tertiary">—</span>
+                      ) : (
+                        <span className="text-secondary">{h.beta.toFixed(2)}×</span>
+                      )}
+                    </td>
+                    <td className="numeric px-3 py-2.5 text-right font-medium text-text">{usd(h.value)}</td>
+                    <td className="numeric px-3 py-2.5 text-right text-secondary">{pct(h.weight * 100)}</td>
+                    <td className="numeric px-3 py-2.5 text-right text-secondary">
+                      <span className="inline-flex items-center justify-end gap-2">
+                        {h.riskShare !== null && <RiskBar weight={h.weight} risk={h.riskShare} color={color} />}
+                        <span
+                          className="w-[4.5ch] text-right"
+                          style={
+                            h.riskShare === null
+                              ? undefined
+                              : h.riskShare > h.weight * 1.5 && h.riskShare - h.weight > 0.02
+                                ? { color: "var(--elevated)" }
+                                : h.riskShare < h.weight * 0.5 && h.weight - h.riskShare > 0.02
+                                  ? { color: "var(--calm)" }
+                                  : undefined
+                          }
+                        >
+                          {h.riskShare === null ? "—" : pct(h.riskShare * 100)}
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                  {expanded && (
+                    <tr className="border-b border-border bg-bg-subtle">
+                      <td colSpan={8} className="px-3 pb-3 pt-2">
+                        <AssetChart symbol={h.symbol} series={series ?? []} color={color} split={a.sessions.bySymbol[h.symbol]} underlying={h.asset.underlying} />
+                      </td>
+                    </tr>
                   )}
-                </td>
-                <td className="numeric px-3 py-2.5 text-right font-medium text-text">{usd(h.value)}</td>
-                <td className="numeric px-3 py-2.5 text-right text-secondary">{pct(h.weight * 100)}</td>
-                <td className="numeric px-3 py-2.5 text-right text-secondary">
-                  <span className="inline-flex items-center justify-end gap-2">
-                    {h.riskShare !== null && <RiskBar weight={h.weight} risk={h.riskShare} color={sectorColor(h.asset.sector, h.asset.class)} />}
-                    <span
-                      className="w-[4.5ch] text-right"
-                      style={
-                        h.riskShare === null
-                          ? undefined
-                          : h.riskShare > h.weight * 1.5 && h.riskShare - h.weight > 0.02
-                            ? { color: "var(--elevated)" }
-                            : h.riskShare < h.weight * 0.5 && h.weight - h.riskShare > 0.02
-                              ? { color: "var(--calm)" }
-                              : undefined
-                      }
-                    >
-                      {h.riskShare === null ? "—" : pct(h.riskShare * 100)}
-                    </span>
-                  </span>
-                </td>
-              </tr>
-            ))}
+                </Fragment>
+              );
+            })}
           </tbody>
           <tfoot>
             <tr className="border-t border-border-strong">
               <td className="label px-4 py-2.5 font-semibold">Total</td>
+              <td className="hidden md:table-cell xl:hidden 2xl:table-cell" />
               <td colSpan={3} />
               <td className="numeric px-3 py-2.5 text-right font-medium text-text">{usd(a.total)}</td>
               <td className="numeric px-3 py-2.5 text-right text-tertiary">100%</td>
@@ -121,16 +172,20 @@ export function Holdings({ a }: { a: Analysis }) {
           </tfoot>
         </table>
       </div>
-      {(a.unpriced.length > 0 || a.risk.uncovered.length > 0) && (
-        <div className="space-y-0.5 px-4 pb-3 text-[11px] text-tertiary">
-          {a.risk.uncovered.length > 0 && (
-            <p>
-              Priced but outside the risk model, no thirty-day series yet: {a.risk.uncovered.join(", ")} — {pct((1 - a.risk.coverage) * 100, 0)} of the book.
-            </p>
-          )}
-          {a.unpriced.length > 0 && <p>Held but without a quote this load: {a.unpriced.join(", ")}.</p>}
-        </div>
-      )}
+      <div className="space-y-0.5 px-4 pb-3 text-[11px] text-tertiary">
+        <p>Click a position for its thirty days, with the hours its market was closed shaded.</p>
+        {thinHeld.length > 0 && (
+          <p>
+            <span style={{ color: "var(--watch)" }}>Thin trading:</span> {thinHeld.map((t) => `${t.symbol} (${t.clipped} of ${Math.round(t.clipped / t.share)} hours moved more than 8%)`).join(", ")}. Their hourly prints are clipped at ±8% inside the risk model; the prices shown are the feed&rsquo;s own.
+          </p>
+        )}
+        {a.risk.uncovered.length > 0 && (
+          <p>
+            Priced but outside the risk model, no thirty-day series yet: {a.risk.uncovered.join(", ")} — {pct((1 - a.risk.coverage) * 100, 0)} of the book.
+          </p>
+        )}
+        {a.unpriced.length > 0 && <p>Held but without a quote this load: {a.unpriced.join(", ")}.</p>}
+      </div>
     </div>
   );
 }

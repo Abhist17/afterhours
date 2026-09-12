@@ -4,8 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import type { Analysis } from "@/lib/portfolio";
 import { driftAgainst, type Target } from "@/lib/quant";
 import { ASSETS, BY_SYMBOL, jupiterSwapUrl } from "@/lib/universe";
-import { usd, pct, amount as fmtAmount, sectorColor } from "@/lib/format";
+import { usd, pct, amount as fmtAmount, sectorColor, timeAgo } from "@/lib/format";
+import { quoteSwap, quoteVersusMark, type SwapQuote } from "@/lib/jupiter";
 import { Button } from "./ui";
+
+/** The leg every rebalance routes through. */
+const CASH_LEG = "USDC";
 
 /** Drift inside this band is noise; outside it is a trade. */
 const DEFAULT_BAND = 0.05;
@@ -54,10 +58,13 @@ const PRESETS: { key: string; label: string; build: (a: Analysis) => Target[] }[
  */
 export function Drift({
   a,
+  prices: feed,
   storageKey,
   onTargetsChange,
 }: {
   a: Analysis;
+  /** The feed's price for every asset, held or not, to mark quotes against. */
+  prices: Record<string, number>;
   storageKey: string;
   onTargetsChange?: (targets: Target[]) => void;
 }) {
@@ -89,9 +96,55 @@ export function Drift({
   const drift = useMemo(() => driftAgainst(values, targets), [values, targets]);
   const targetSum = targets.reduce((s, t) => s + t.weight, 0);
 
-  const sells = drift.lines.filter((l) => l.tradeUsd < 0 && Math.abs(l.drift) > band);
-  const buys = drift.lines.filter((l) => l.tradeUsd > 0 && Math.abs(l.drift) > band);
-  const priceOf = (symbol: string) => a.holdings.find((h) => h.symbol === symbol)?.price ?? 0;
+  // Cash is not traded, it is what the trades pass through: sells land in
+  // USDC and buys are paid from it, so the cash line is the residual.
+  const isCash = (symbol: string) => BY_SYMBOL[symbol]?.class === "cash";
+  const sells = drift.lines.filter((l) => l.tradeUsd < 0 && Math.abs(l.drift) > band && !isCash(l.symbol));
+  const buys = drift.lines.filter((l) => l.tradeUsd > 0 && Math.abs(l.drift) > band && !isCash(l.symbol));
+  const cashChange = drift.lines.filter((l) => isCash(l.symbol) && Math.abs(l.drift) > band).reduce((s, l) => s + l.tradeUsd, 0);
+  const priceOf = (symbol: string) => feed[symbol] ?? a.holdings.find((h) => h.symbol === symbol)?.price ?? 0;
+  const prices = feed;
+
+  // Real quotes for the orders, from Jupiter, a moment after they settle.
+  const orderKey = [...sells, ...buys].map((l) => `${l.symbol}:${Math.round(l.tradeUsd)}`).join("|");
+  const [quotes, setQuotes] = useState<Record<string, SwapQuote | "pending" | "failed">>({});
+  useEffect(() => {
+    if (!orderKey) {
+      setQuotes({});
+      return;
+    }
+    const controller = new AbortController();
+    const orders = [...sells, ...buys].slice(0, 10);
+    const timer = setTimeout(async () => {
+      setQuotes(Object.fromEntries(orders.map((l) => [l.symbol, "pending"])));
+      // One at a time: the public endpoint is shared and a book has few lines.
+      for (const l of orders) {
+        if (controller.signal.aborted) return;
+        const sell = l.tradeUsd < 0;
+        const from = sell ? l.symbol : CASH_LEG;
+        const to = sell ? CASH_LEG : l.symbol;
+        const amountIn = sell ? Math.abs(l.tradeUsd) / (priceOf(l.symbol) || 1) : Math.abs(l.tradeUsd);
+        let q: SwapQuote | null = null;
+        // A shared public endpoint; one patient retry covers its rate limit.
+        for (let attempt = 0; attempt < 2 && !q; attempt++) {
+          try {
+            q = await quoteSwap(from, to, amountIn, controller.signal);
+          } catch {
+            if (controller.signal.aborted) return;
+            await new Promise((r) => setTimeout(r, 900));
+          }
+        }
+        if (controller.signal.aborted) return;
+        setQuotes((prev) => ({ ...prev, [l.symbol]: q ?? "failed" }));
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    }, 600);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderKey]);
 
   function setWeight(symbol: string, weight: number) {
     setTargets((ts) => ts.map((t) => (t.symbol === symbol ? { ...t, weight } : t)));
@@ -213,33 +266,74 @@ export function Drift({
             )}
           </span>
         </div>
-        {drift.maxDrift > band ? (
-          <ul className="mt-2 space-y-1.5" role="list">
-            {[...sells, ...buys].map((l) => {
-              const sell = l.tradeUsd < 0;
-              const units = priceOf(l.symbol) > 0 ? Math.abs(l.tradeUsd) / priceOf(l.symbol) : null;
-              const via = l.symbol === "USDC" ? "SOL" : "USDC";
-              const href = sell ? jupiterSwapUrl(l.symbol, via) : jupiterSwapUrl(via, l.symbol);
-              return (
-                <li key={l.symbol} className="flex items-baseline justify-between gap-3 text-[12px]">
-                  <span className="text-text">
-                    <span className="text-tertiary">{sell ? "Sell" : "Buy"}</span> {usd(Math.abs(l.tradeUsd))} of {l.symbol}
-                    {units !== null && <span className="numeric ml-1.5 text-[11px] text-tertiary">≈ {fmtAmount(units)}</span>}
-                  </span>
-                  <a href={href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[11px] text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
-                    on Jupiter<span aria-hidden="true" className="ml-0.5 text-[9px]">↗</span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+        {drift.maxDrift > band && (sells.length > 0 || buys.length > 0) ? (
+          <>
+            <ul className="mt-2 space-y-2" role="list">
+              {[...sells, ...buys].map((l) => {
+                const sell = l.tradeUsd < 0;
+                const units = priceOf(l.symbol) > 0 ? Math.abs(l.tradeUsd) / priceOf(l.symbol) : null;
+                const href = sell ? jupiterSwapUrl(l.symbol, CASH_LEG) : jupiterSwapUrl(CASH_LEG, l.symbol);
+                const q = quotes[l.symbol];
+                const quoted = q && q !== "pending" && q !== "failed" ? q : null;
+                const mark = quoted ? quoteVersusMark(quoted, { ...prices, [CASH_LEG]: prices[CASH_LEG] ?? 1 }) : null;
+                return (
+                  <li key={l.symbol} className="text-[12px]">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-text">
+                        <span className="text-tertiary">{sell ? "Sell" : "Buy"}</span> {usd(Math.abs(l.tradeUsd))} of {l.symbol}
+                        {units !== null && <span className="numeric ml-1.5 text-[11px] text-tertiary">≈ {fmtAmount(units)}</span>}
+                      </span>
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[11px] text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
+                        on Jupiter<span aria-hidden="true" className="ml-0.5 text-[9px]">↗</span>
+                      </a>
+                    </div>
+                    <div className="numeric mt-0.5 text-[10px] text-tertiary">
+                      {q === "pending" && <span className="breathe">quoting…</span>}
+                      {q === "failed" && <span>no route quoted right now</span>}
+                      {quoted && mark && (
+                        <>
+                          Jupiter: {fmtAmount(quoted.amountIn)} {quoted.from} → {fmtAmount(quoted.amountOut)} {quoted.to}
+                          {quoted.priceImpact > 0 && (
+                            <>
+                              {" · "}
+                              <span style={{ color: quoted.priceImpact > 0.01 ? "var(--severe)" : quoted.priceImpact > 0.003 ? "var(--watch)" : undefined }}>
+                                {(quoted.priceImpact * 100).toFixed(2)}% impact
+                              </span>
+                            </>
+                          )}
+                          {Math.abs(mark.shortfall) > 0.0005 && (
+                            <>
+                              {" · "}
+                              <span style={{ color: mark.shortfall > 0.01 ? "var(--severe)" : mark.shortfall > 0.003 ? "var(--watch)" : "var(--calm)" }}>
+                                {mark.shortfall > 0 ? `${(mark.shortfall * 100).toFixed(2)}% below` : `${(-mark.shortfall * 100).toFixed(2)}% above`} the feed
+                              </span>
+                            </>
+                          )}
+                          {quoted.route.length > 0 && <> · via {quoted.route.join(", ")}</>}
+                        </>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {Math.abs(cashChange) > 1 && (
+              <p className="numeric mt-2 text-[11px] text-tertiary">
+                Cash {cashChange > 0 ? "rises" : "falls"} by {usd(Math.abs(cashChange))} as the trades settle.
+              </p>
+            )}
+          </>
         ) : (
           <p className="mt-1.5 text-[11px] leading-snug text-tertiary">
-            Every position is within ±{(band * 100).toFixed(0)}pp of its target. Nothing to trade.
+            {drift.maxDrift > band ? "Only the cash line is off target; the trades above it are inside the band." : `Every position is within ±${(band * 100).toFixed(0)}pp of its target. Nothing to trade.`}
           </p>
         )}
         <p className="mt-2 text-[10px] leading-snug text-tertiary">
-          Orders are sized at the last quote and routed through USDC; Jupiter opens with the pair prefilled and you set the amount. Nothing here trades for you.
+          Orders are sized at the last feed print and routed through USDC. The line under each is a live quote from Jupiter for that exact size — what the swap would fetch on-chain now, with its price impact and route
+          {Object.values(quotes).some((q) => q && q !== "pending" && q !== "failed") && (
+            <>, fetched {timeAgo(Math.max(...Object.values(quotes).map((q) => (q && q !== "pending" && q !== "failed" ? q.fetchedAt : 0))))}</>
+          )}
+          . Jupiter opens with the pair prefilled and you set the amount. Nothing here trades for you.
         </p>
       </div>
     </div>
