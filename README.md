@@ -15,10 +15,10 @@
 
 </div>
 
-![The Afterhours desk reading a real $21M xStocks wallet on mainnet: risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk, and a what-if moving half of MSTRx into SPYx](docs/desk.png)
+![The Afterhours desk reading a real $21M xStocks wallet on mainnet: the New York session ring, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, and a what-if moving half of MSTRx into SPYx](docs/desk.png)
 
 <div align="center">
-<sub>A real wallet, not ours — nine xStocks and USDC, read live. MSTRx is 18% of its value and 52% of its risk.</sub>
+<sub>A real wallet, not ours — eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
 </div>
 
 ---
@@ -41,26 +41,32 @@ trading after the bell. Afterhours is the risk desk for that book.
 ## What it does
 
 Paste a Solana address, or connect a wallet. The desk reads its balances
-from mainnet — sixteen xStocks, plus the SOL, USDC and USDT that sit next to
-them — and scores the book in the browser:
+from mainnet — thirty-five xStocks, plus the SOL, cbBTC and stablecoins that
+sit next to them — and scores the book in the browser:
 
 | Panel | What it says |
 |:--|:--|
-| **Score** | Annualised volatility plus a concentration penalty, 0–100. An index book runs near 18; a single large-cap 30–45; a crypto-heavy book past 60. |
+| **Score** | Annualised volatility plus a concentration penalty, 0–100. An index book runs near 18; a single large-cap 30–45; a crypto-heavy book past 60. Every figure on the page is computed in the tab from thirty days of hourly prices. |
 | **Value at Risk** | The 95% one-day loss in dollars, with Expected Shortfall — parametric and historical, the more conservative one headlines. |
 | **Beta to the S&P 500** | For the book and for every position, on the same estimator, against SPYx. |
 | **Since the close** | While the NYSE is closed: each stock's token move since the last official print, and the sum — *the market opens to this*. |
-| **Stocks, crypto, cash** | Each sleeve's share of value beside its share of risk. Then the sentence a sector label hides: COIN, MSTR, HOOD and CRCL are equity on paper and crypto beta in practice, and the desk says what share of the book is really riding crypto. |
+| **Stocks, crypto, cash** | Each sleeve's share of value beside its share of risk. Then the sentence a sector label hides: COIN, MSTR, HOOD, CRCL and the coin-treasury companies (STRC, BMNR, DFDV) are equity on paper and crypto beta in practice, and the desk says what share of the book is really riding crypto. |
 | **Risk of this allocation, last 30 days** | The current shape of the book, scored at every hour of the window with an estimator that has seen only what was known by then. |
 | **Correlation** | Thirty days of hourly returns across what is held, plus the index. The most correlated held pair is named. |
 | **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back — sized at the last quote, routed through USDC, with Jupiter prefilled. |
 | **What if** | Move a quarter, a half or all of any position into any other asset and re-score the whole book, instantly. |
 | **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. |
 
-Three sample books are built in for anyone without xStocks yet, labelled
+Four sample books are built in for anyone without xStocks yet, labelled
 synthetic, priced live — and one real mainnet wallet, found through the
 largest SPYx token accounts and labelled as not ours. Any view is a link:
-`?address=<wallet>` or `?book=<sample>`.
+`?address=<wallet>` or `?book=<sample>`, with `&theme=light` or `dark` if
+it matters, and there is a button to copy it.
+
+Above it all sits a ring of the New York day: the six and a half hours the
+NYSE is open as a short bright arc, the other seventeen and a half — and
+every weekend — as the time the tokens trade with no market behind them,
+and a dot for now.
 
 ## Where Solana is load-bearing
 
@@ -113,8 +119,10 @@ There is no server. The site is a static export on GitHub Pages:
 - **Prices** — one request to the feed, every minute, from the browser.
 - **History** — thirty days of hourly prices for the whole universe, refreshed
   on the hour by a [GitHub Action](.github/workflows/refresh-history.yml)
-  and published as one file on the `data` branch; a copy is bundled with the
-  build so a first paint never depends on a third party being up.
+  and published as one file on the `data` branch. A copy is bundled with the
+  build and paints first; the hourly file takes over when it lands, filled
+  from the bundle for anything it lacks, so a first paint never waits on a
+  third party and a new listing never sits outside the model.
 - **Arithmetic** — every figure on the page is computed in the tab.
 - **On-chain** — signed by the viewer's own wallet.
 
@@ -131,21 +139,35 @@ browser except what its owner chooses to sign.
 
 ## The universe
 
-Sixteen xStocks and three neighbours, in [one table](app/data/universe.json)
-that both the app and the refresh script read. Every mint was checked against
+Thirty-five xStocks and five neighbours, in [one table](app/data/universe.json)
+that both the app and the refresh script read. Backed lists several hundred
+xStocks; these are the ones with real float and turnover on Solana, chosen
+from CoinGecko's xStocks category by market cap and volume, so every series
+has thirty days of hourly prices behind it. Every mint was checked against
 CoinGecko's Solana platform entry and then against the account on mainnet —
 owner program and decimals. That found every xStock to be a Token-2022 mint
-with 8 decimals, and CoinGecko listing AMDx with 18.
+with 8 decimals, and CoinGecko listing AMDx with 18. A test keeps every row
+to that shape.
 
 | Sector | Tickers |
 |:--|:--|
-| Index | SPYx, QQQx |
+| Index | SPYx, QQQx, VTIx |
 | Mega-cap tech | AAPLx, MSFTx, GOOGLx, AMZNx, METAx |
-| Semis | NVDAx, AVGOx, AMDx |
-| EV | TSLAx |
-| Crypto-linked equity | COINx, MSTRx, HOODx, CRCLx |
+| Software | ORCLx, PLTRx, NFLXx |
+| Semis | NVDAx, AVGOx, AMDx, INTCx, TSMx, MRVLx, SNDKx |
+| EV · aerospace | TSLAx · SPCXx |
+| Crypto-linked equity | COINx, MSTRx, HOODx, CRCLx, STRCx, BMNRx, DFDVx |
+| Consumer | MCDx, KOx, GMEx |
+| Healthcare | LLYx, UNHx |
+| Financials · energy | BRK.Bx · XOMx |
 | Commodity | GLDx |
-| Crypto · cash | SOL · USDC, USDT |
+| Crypto · cash | SOL, cbBTC · USDC, USDT, USDG |
+
+A wallet's other tokens are counted and named, not priced. A position the
+feed quotes but the thirty-day file does not yet cover is kept in the book
+at its value and reported as outside the risk model, with the share of the
+book the model does cover printed beside the VaR. Adding an xStock is one
+verified row.
 
 ## How the numbers are made
 
@@ -165,7 +187,8 @@ with 8 decimals, and CoinGecko listing AMDx with 18.
   token keeps, since the daily sigma is measured over every calendar day —
   plus a continuous concentration penalty for a dominant position or too few
   effective names. Bands: Calm below 25 (index-fund volatility), Watch to 45
-  (a single stock), Elevated to 70 (crypto-grade), Severe above.
+  (a single stock), Elevated to 70 (crypto-grade), Severe above. The page,
+  the help sheet and this file all describe the same formula.
 - **The backtest** seeds its recursive covariance from the first week's
   sample covariance, so the chart is the book's risk, not the estimator
   filling its memory.
@@ -184,7 +207,7 @@ git clone https://github.com/Abhist17/afterhours
 cd afterhours/app
 npm install
 npm run dev                 # http://localhost:3000
-npm test                    # quant, market hours, portfolio assembly, on-chain encoding
+npm test                    # 59 tests: quant, market hours, universe, history, portfolio assembly, on-chain encoding
 npm run build               # static export to out/
 
 cd ..
@@ -196,7 +219,7 @@ node scripts/example-record.mjs    # a policy and three snapshots from ~/.config
 
 | Layer | Technology |
 |:--|:--|
-| App | Next.js 16 static export · React 19 · Tailwind 4 · hand-rolled SVG |
+| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist · hand-rolled SVG |
 | Wallet | Wallet Standard via `@solana/wallet-adapter-react` |
 | Program | Rust · Anchor 0.32 |
 | Data | Solana mainnet RPC · CoinGecko · GitHub Actions |

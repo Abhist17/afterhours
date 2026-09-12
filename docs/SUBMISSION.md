@@ -28,7 +28,8 @@ stand to lose*, and none has ever had to price a share after the bell.
 ## What a judge will see in sixty seconds
 
 1. Open https://abhist17.github.io/afterhours/ — a sample book, live prices,
-   the NYSE status pill saying closed/open and when that changes.
+   and a ring of the New York day: the NYSE session as a short bright arc,
+   the rest as the hours the tokens trade with no market behind them.
 2. **Since the close**: each stock's token move since the last official
    print, summed — *the market opens to this*.
 3. **Stocks, crypto, cash** by share of value vs share of risk, and the
@@ -43,7 +44,9 @@ stand to lose*, and none has ever had to price a share after the bell.
    Without a wallet, the panel shows the author's own record — a policy
    and three snapshots, one in breach — so the accounts are real either way.
 
-Paste any address holding xStocks to run it on a real book.
+Paste any address holding xStocks to run it on a real book — or click "A
+real xStocks wallet", a $21M mainnet book found through the largest SPYx
+token accounts. Every view is a link, with a button to copy it.
 
 ## Where Solana is load-bearing
 
@@ -75,14 +78,18 @@ Nothing sleeps, nothing cold-starts.
   wallet's; the wallet's record is what it anchors on-chain.
 - Every xStock mint was verified on mainnet, which caught a data-source
   error in one token's decimals.
-- Unpriced holdings are listed, not dropped. Quotes that come from
-  history rather than the feed say so.
+- Unpriced holdings are listed, not dropped. A position the feed quotes
+  but the model has no series for stays in the book and is named as
+  uncovered, with the model's coverage printed beside the VaR. Quotes
+  that come from history rather than the feed say so.
 
 ## Numbers
 
-- 16 xStocks + SOL, USDC, USDT · 5 program instructions · 1 event
-- 39 app tests (quant, NYSE calendar, portfolio assembly, on-chain encoding)
-  + 12 program tests on a local validator, all in CI
+- 35 xStocks (every mint verified on mainnet: Token-2022, 8 decimals) +
+  SOL, cbBTC, USDC, USDT, USDG · 5 program instructions · 1 event
+- 59 app tests (quant, NYSE calendar, universe integrity, history
+  loading, portfolio assembly, on-chain encoding) + 12 program tests on a
+  local validator, all in CI
 - One static page; one hourly Action; zero servers
 
 ## What's next
@@ -91,7 +98,9 @@ Nothing sleeps, nothing cold-starts.
 - Dividends and corporate actions from the issuer's feed.
 - A lending-side consumer of `SnapshotRecorded` — the margin-call bot the
   event was designed for.
-- The rest of the xStocks catalogue as liquidity arrives.
+- The rest of the xStocks catalogue as liquidity arrives — Backed lists
+  several hundred; the desk carries the thirty-five with real turnover, and
+  a new one is one verified row.
 
 ## Links
 
