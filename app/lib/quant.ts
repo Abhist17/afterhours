@@ -185,6 +185,10 @@ export interface Contribution {
 }
 
 export interface PortfolioRisk {
+  /** One-day volatility of the book, as a fraction. */
+  sigmaDaily: number;
+  /** Annualised over the token's 365-day calendar, in percent. */
+  annualisedVolPct: number;
   sigmaHorizon: number;
   varPct: number;
   varUsd: number;
@@ -214,6 +218,7 @@ export interface PortfolioRisk {
 export const MIN_HISTORICAL_OBSERVATIONS = 30;
 
 const EMPTY: PortfolioRisk = {
+  sigmaDaily: 0, annualisedVolPct: 0,
   sigmaHorizon: 0, varPct: 0, varUsd: 0, esPct: 0, esUsd: 0,
   histVarPct: 0, histVarUsd: 0, histEsPct: 0, histEsUsd: 0,
   headlineVarPct: 0, headlineVarUsd: 0, headlineEsUsd: 0, headlineModel: "parametric",
@@ -260,6 +265,7 @@ export function calculatePortfolioRisk(inputs: RiskInputs): PortfolioRisk {
   const periodsInHorizon = periodsPerDay * horizonDays;
   const horizonScale = Math.sqrt(periodsInHorizon);
   const sigmaHorizon = sigmaPeriod * horizonScale;
+  const sigmaDaily = sigmaPeriod * Math.sqrt(periodsPerDay);
 
   const z = normalQuantile(confidence);
   const varPct = Math.min(100, sigmaHorizon * z * 100);
@@ -318,6 +324,8 @@ export function calculatePortfolioRisk(inputs: RiskInputs): PortfolioRisk {
   }
 
   return {
+    sigmaDaily,
+    annualisedVolPct: annualisedVolPct(sigmaDaily),
     sigmaHorizon,
     varPct, varUsd: (varPct / 100) * portfolioValue,
     esPct, esUsd: (esPct / 100) * portfolioValue,
@@ -367,9 +375,27 @@ export function correlationMatrix(
 /** Calm / Watch / Elevated / Severe. */
 export const RISK_BANDS = [0, 25, 45, 70] as const;
 
-/** VaR as a share of the book plus the concentration penalty, capped at 100. */
-export function blendedScore(varPct: number, concentration: number): number {
-  return Math.max(0, Math.min(100, varPct + concentration));
+/**
+ * The tokens trade every calendar day, and the daily sigma is measured over
+ * every calendar day — weekends included, flat as they are — so it is
+ * annualised over the calendar the token keeps, not the exchange's 252.
+ */
+export const DAYS_PER_YEAR = 365;
+
+export function annualisedVolPct(sigmaDaily: number): number {
+  return sigmaDaily * Math.sqrt(DAYS_PER_YEAR) * 100;
+}
+
+/**
+ * The score is annualised volatility, in percent, plus the concentration
+ * penalty, capped at 100. Volatility rather than VaR because it is the
+ * number equity holders already carry in their heads: an index book runs
+ * near 15–20, a single large-cap 30–45, a crypto-heavy book 60–90, a
+ * memecoin or leverage past 100. VaR stays the dollar figure — the loss
+ * on a bad day — and the score says what kind of book this is.
+ */
+export function blendedScore(sigmaDaily: number, concentration: number): number {
+  return Math.max(0, Math.min(100, annualisedVolPct(sigmaDaily) + concentration));
 }
 
 // ── Rolling backtest ─────────────────────────────────────────────
@@ -394,7 +420,12 @@ export function rollingRisk(
   amounts: Record<string, number>,
   opts: { periodsPerDay: number; confidence?: number; lambda?: number; horizonDays?: number; warmup?: number }
 ): BacktestPoint[] {
-  const { periodsPerDay, confidence = 0.95, lambda = DEFAULT_LAMBDA, horizonDays = 1, warmup = 24 } = opts;
+  // A week of warm-up by default: the recursion is seeded with the sample
+  // covariance of those hours rather than zeros, otherwise the first
+  // fortnight of the chart is the estimator filling its memory, drawn as
+  // if the book had been getting riskier.
+  const { periodsPerDay, confidence = 0.95, lambda = DEFAULT_LAMBDA, horizonDays = 1 } = opts;
+  const warmup = opts.warmup ?? Math.round(7 * periodsPerDay);
   const symbols = Object.keys(amounts).filter((s) => amounts[s] > 0 && history[s]?.length > 2);
   if (!symbols.length || !(periodsPerDay > 0)) return [];
 
@@ -412,17 +443,28 @@ export function rollingRisk(
 
   const lam = scaleLambdaToFrequency(lambda, periodsPerDay);
   const n = symbols.length;
-  const cov: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
   const z = normalQuantile(confidence);
   const horizonScale = Math.sqrt(periodsPerDay * horizonDays);
   const out: BacktestPoint[] = [];
 
-  for (let k = 1; k < times.length; k++) {
-    // Update the recursive covariance with this hour's returns.
-    const r = priceAt.map((series) => (series[k] - series[k - 1]) / series[k - 1]);
-    for (let i = 0; i < n; i++)
-      for (let j = 0; j < n; j++) cov[i][j] = lam * cov[i][j] + (1 - lam) * r[i] * r[j];
-    if (k < warmup) continue;
+  const returnAt = (k: number) => priceAt.map((series) => (series[k] - series[k - 1]) / series[k - 1]);
+
+  // Seed: zero-mean sample covariance over the warm-up window.
+  const cov: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  const seedEnd = Math.min(warmup, times.length - 1);
+  for (let k = 1; k <= seedEnd; k++) {
+    const r = returnAt(k);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) cov[i][j] += r[i] * r[j];
+  }
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) cov[i][j] /= Math.max(1, seedEnd);
+
+  for (let k = seedEnd; k < times.length; k++) {
+    if (k > seedEnd) {
+      // Update the recursive covariance with this hour's returns.
+      const r = returnAt(k);
+      for (let i = 0; i < n; i++)
+        for (let j = 0; j < n; j++) cov[i][j] = lam * cov[i][j] + (1 - lam) * r[i] * r[j];
+    }
 
     const values = symbols.map((s, i) => amounts[s] * priceAt[i][k]);
     const value = values.reduce((a, b) => a + b, 0);
@@ -431,8 +473,9 @@ export function rollingRisk(
 
     let variance = 0;
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) variance += w[i] * w[j] * cov[i][j];
+    const sigmaDaily = Math.sqrt(Math.max(0, variance)) * Math.sqrt(periodsPerDay);
     const varPct = Math.min(100, Math.sqrt(Math.max(0, variance)) * horizonScale * z * 100);
-    const score = blendedScore(varPct, concentrationPenalty(w).penalty);
+    const score = blendedScore(sigmaDaily, concentrationPenalty(w).penalty);
     out.push({ t: times[k], value, varPct, varUsd: (varPct / 100) * value, score });
   }
   return out;

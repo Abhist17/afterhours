@@ -153,6 +153,19 @@ describe("rollingRisk", () => {
     const points = rollingRisk({ A: base, B: shifted, C: base }, { A: 1, B: 1, C: 0 }, { periodsPerDay: 24, warmup: 10 });
     expect(points.length).toBe(shifted.length - 10);
   });
+
+  it("starts from a seeded covariance, not from zero", () => {
+    // Constant volatility throughout: the first scored hour should already
+    // carry roughly the same risk as the last, not ramp up from nothing.
+    const history = { A: pricesFrom(synthetic(720, 0.01, 31), 100) };
+    const points = rollingRisk(history, { A: 1 }, { periodsPerDay: 24 });
+    const first = points[0].varPct;
+    const last = points[points.length - 1].varPct;
+    expect(first).toBeGreaterThan(last * 0.5);
+    expect(first).toBeLessThan(last * 2);
+    // A week of warm-up leaves about 23 days of hourly points.
+    expect(points.length).toBe(720 - 168 + 1);
+  });
 });
 
 describe("driftAgainst", () => {
@@ -189,9 +202,19 @@ describe("driftAgainst", () => {
 });
 
 describe("blendedScore", () => {
-  it("caps at 100 and floors at 0", () => {
-    expect(blendedScore(95, 20)).toBe(100);
+  it("is annualised volatility plus concentration, capped", () => {
+    // 1% a day is ~19% a year on the token's calendar.
+    expect(blendedScore(0.01, 0)).toBeCloseTo(19.1, 1);
+    expect(blendedScore(0.01, 10)).toBeCloseTo(29.1, 1);
+    expect(blendedScore(0.1, 20)).toBe(100);
     expect(blendedScore(0, 0)).toBe(0);
-    expect(blendedScore(4.2, 10)).toBeCloseTo(14.2, 9);
+  });
+
+  it("puts the kinds of book in the bands their names promise", () => {
+    // Daily sigma: an index ~0.9%, a single large-cap ~2%, crypto ~4%.
+    expect(blendedScore(0.009, 0)).toBeLessThan(25);
+    expect(blendedScore(0.02, 0)).toBeGreaterThan(25);
+    expect(blendedScore(0.02, 0)).toBeLessThan(45);
+    expect(blendedScore(0.04, 0)).toBeGreaterThan(70);
   });
 });
