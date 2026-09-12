@@ -1,0 +1,51 @@
+name: Refresh history
+
+# Thirty days of hourly prices for the whole universe, once an hour, to the
+# `data` branch as a single file. The app fetches it from raw.githubusercontent
+# and falls back to the copy bundled with the build. The branch is an orphan
+# force-pushed each run, so it never grows.
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: history
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Start from the last published file so an asset the feed refuses
+      # this hour keeps its previous series instead of vanishing.
+      - name: Fetch the previous file
+        run: |
+          mkdir -p out
+          curl -sSfL -o out/history.json \
+            "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/data/history.json" || true
+
+      - name: Refresh
+        env:
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+        run: node scripts/refresh-history.mjs --out out/history.json
+
+      - name: Publish to the data branch
+        run: |
+          git config user.name "afterhours history"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout --orphan data
+          git rm -rf . --quiet
+          cp out/history.json history.json
+          git add history.json
+          git commit -qm "history $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -f origin data
