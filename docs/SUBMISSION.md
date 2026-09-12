@@ -40,6 +40,8 @@ stand to lose*, and none has ever had to price a share after the bell.
    orders with Jupiter links.
 6. **Your record on Solana**: connect Phantom, save the targets as an
    on-chain policy, record a snapshot; each one an account on devnet.
+   Without a wallet, the panel shows the author's own record — a policy
+   and three snapshots, one in breach — so the accounts are real either way.
 
 Paste any address holding xStocks to run it on a real book.
 
@@ -95,6 +97,8 @@ Nothing sleeps, nothing cold-starts.
 
 - Desk: https://abhist17.github.io/afterhours/
 - Repository: https://github.com/Abhist17/afterhours
-- Program (devnet): `3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri`
+- Program (devnet): `3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri`,
+  IDL account `EAtJ4QbGP352arvb6u7J19TF8rRei2uKtoCuFAMARuHh`
+- Example record: https://abhist17.github.io/afterhours/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc
 - Built by the author of [Sentra](https://github.com/Abhist17/sentra), whose
   estimators this shares (MIT).

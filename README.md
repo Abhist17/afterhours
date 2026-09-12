@@ -85,6 +85,13 @@ The page prepares each transaction; the wallet signs; the page submits it to
 the program's cluster. A wallet pointed at the wrong network cannot send it
 anywhere else. Only the owner can create, update or close their own record.
 
+The program is deployed on devnet with its IDL published, so Explorer decodes
+every account. The author's own wallet keeps an
+[example record](https://abhist17.github.io/afterhours/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc)
+there — one policy, three snapshots, one of them a breach — written by
+[`scripts/example-record.mjs`](scripts/example-record.mjs) through the same
+client the page uses.
+
 ```
 instructions
   create_policy(risk_limit, drift_band_bps, targets[])
@@ -183,6 +190,8 @@ npm run build               # static export to out/
 cd ..
 node scripts/refresh-history.mjs   # rebuild app/public/data/history.json
 anchor test                        # 12 program tests on a local validator
+anchor build && anchor deploy --provider.cluster devnet   # ~1.1 SOL of rent
+node scripts/example-record.mjs    # a policy and three snapshots from ~/.config/solana/id.json
 ```
 
 | Layer | Technology |
