@@ -2,6 +2,7 @@
 
 import type { Analysis } from "@/lib/portfolio";
 import { usd, price, amount, pct, signedPct, sectorColor } from "@/lib/format";
+import { jupiterSwapUrl } from "@/lib/universe";
 import { EmptyState } from "./ui";
 
 export function Holdings({ a }: { a: Analysis }) {
@@ -9,7 +10,12 @@ export function Holdings({ a }: { a: Analysis }) {
     return (
       <EmptyState
         title="Nothing priced in this wallet"
-        body="It holds none of the xStocks, SOL, USDC or USDT the desk prices. Try a sample book to see the instrument working."
+        body="It holds none of the xStocks, SOL, USDC or USDT the desk prices. Try a sample book to see the instrument working, or buy a first xStock on Jupiter."
+        action={
+          <a href={jupiterSwapUrl("USDC", "SPYx")} target="_blank" rel="noopener noreferrer" className="text-xs text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
+            USDC → SPYx on Jupiter ↗
+          </a>
+        }
         compact
       />
     );

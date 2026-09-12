@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectionProvider, WalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
 import { PROGRAM_RPC_URL } from "@/lib/onchain";
@@ -30,12 +30,25 @@ export function ConnectButton({ onConnected }: { onConnected?: (address: string)
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Connecting by hand reads that wallet's book straight away. A silent
+  // reconnect on load does not, so a link to someone else's address is
+  // not overwritten by whatever wallet happens to be installed.
+  const readOnConnect = useRef(false);
+  const onConnectedRef = useRef(onConnected);
+  onConnectedRef.current = onConnected;
+  useEffect(() => {
+    if (!connected || !publicKey || !readOnConnect.current) return;
+    readOnConnect.current = false;
+    onConnectedRef.current?.(publicKey.toBase58());
+  }, [connected, publicKey]);
+
   const detected = wallets.filter(
     (w) => w.readyState === WalletReadyState.Installed || w.readyState === WalletReadyState.Loadable
   );
 
   async function pick(name: string) {
     setError(null);
+    readOnConnect.current = true;
     try {
       select(name as never);
       // Selecting is asynchronous; connect on the next tick so the adapter
@@ -44,6 +57,7 @@ export function ConnectButton({ onConnected }: { onConnected?: (address: string)
       await connect();
       setOpen(false);
     } catch (err) {
+      readOnConnect.current = false;
       setError(err instanceof Error ? err.message : "Could not connect");
     }
   }

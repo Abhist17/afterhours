@@ -41,3 +41,13 @@ export const REAL_BOOK = {
   label: "A real xStocks wallet",
   blurb: "An active mainnet wallet holding nine xStocks and USDC — read live, not ours.",
 };
+
+/**
+ * The author's wallet, which keeps a policy and a few snapshots on the
+ * program's cluster. Shown read-only when the book on screen is a sample,
+ * so the on-chain accounts are real before anyone has signed anything.
+ */
+export const EXAMPLE_RECORD = {
+  address: "4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc",
+  label: "the author's wallet",
+};

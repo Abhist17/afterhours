@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
+import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
 import type { Analysis } from "@/lib/portfolio";
 import type { Target } from "@/lib/quant";
 import { driftAgainst } from "@/lib/quant";
@@ -19,8 +19,13 @@ import {
 } from "@/lib/onchain";
 import { usd, pct, riskBand, shortAddress, timeAgo, clockTime, dayLabel } from "@/lib/format";
 import { useMounted } from "@/lib/hooks";
+import { EXAMPLE_RECORD } from "@/lib/samples";
 import { Button, Notice, Tag } from "./ui";
-import { PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+
+/** Enough devnet SOL to create a policy or a snapshot, with change. */
+const MIN_WRITE_SOL = 0.01;
+const FAUCET_URL = "https://faucet.solana.com";
 
 /**
  * The owner's record on Solana: a policy stating what the book was meant
@@ -42,6 +47,7 @@ export function OnChain({
 }) {
   const wallet = useAnchorWallet();
   const { connected } = useWallet();
+  const { connection } = useConnection();
   const mounted = useMounted();
   const cluster = clusterOf();
 
@@ -52,17 +58,15 @@ export function OnChain({
   const [lastTx, setLastTx] = useState<string | null>(null);
   const [riskLimit, setRiskLimit] = useState(45);
   const [driftBand, setDriftBand] = useState(500);
+  const [ownerSol, setOwnerSol] = useState<number | null>(null);
 
-  // Whose record: the address on screen, if it is a real one.
-  const subject = viewing && isKey(viewing) ? new PublicKey(viewing) : null;
-  const isOwner = !!wallet && !!subject && wallet.publicKey.equals(subject);
+  // Whose record: the address on screen if it is a real one; otherwise
+  // the example, so a sample book still shows what the accounts look like.
+  const example = !(viewing && isKey(viewing));
+  const subject = new PublicKey(example ? EXAMPLE_RECORD.address : viewing!);
+  const isOwner = !example && !!wallet && wallet.publicKey.equals(subject);
 
   const load = useCallback(async () => {
-    if (!subject) {
-      setPolicy(null);
-      setSnapshots([]);
-      return;
-    }
     try {
       const [p, s] = await Promise.all([fetchPolicy(subject), fetchSnapshots(subject)]);
       setPolicy(p);
@@ -74,7 +78,7 @@ export function OnChain({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not read the chain");
     }
-  }, [subject?.toBase58()]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [subject.toBase58()]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setPolicy(undefined);
@@ -83,8 +87,27 @@ export function OnChain({
     void load();
   }, [load]);
 
+  // A write needs rent on the program's cluster, which is not where the
+  // book lives; say so before the wallet fails the signature for it.
+  useEffect(() => {
+    if (!isOwner || !wallet) {
+      setOwnerSol(null);
+      return;
+    }
+    let cancelled = false;
+    connection
+      .getBalance(wallet.publicKey)
+      .then((lamports) => {
+        if (!cancelled) setOwnerSol(lamports / LAMPORTS_PER_SOL);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isOwner, wallet, connection, lastTx]);
+
   // What a snapshot would say right now.
-  const driftNow = policy ? driftAgainst(Object.fromEntries(a.holdings.map((h) => [h.symbol, h.value])), policy.targets) : null;
+  const driftNow = policy && !example ? driftAgainst(Object.fromEntries(a.holdings.map((h) => [h.symbol, h.value])), policy.targets) : null;
   const reading = {
     score: a.score,
     valueUsd: a.total,
@@ -120,11 +143,17 @@ export function OnChain({
         </div>
       )}
 
-      {!subject ? (
-        <p className="text-xs leading-relaxed text-tertiary">
-          A sample book has no owner, so nothing here can be signed. Read a wallet — or connect yours — and the policy and snapshots for that address appear.
+      {example && (
+        <p className="mb-3 text-xs leading-relaxed text-tertiary">
+          A sample book has no owner, so nothing here can be signed. This is the record kept by{" "}
+          <a href={`?address=${EXAMPLE_RECORD.address}`} className="numeric text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
+            {shortAddress(EXAMPLE_RECORD.address)}
+          </a>
+          , {EXAMPLE_RECORD.label} — read from {cluster}, so the accounts are real. Read your own wallet and yours appears instead.
         </p>
-      ) : policy === undefined || snapshots === null ? (
+      )}
+
+      {policy === undefined || snapshots === null ? (
         <p className="text-xs text-tertiary">Reading {cluster}…</p>
       ) : (
         <>
@@ -158,6 +187,21 @@ export function OnChain({
             <p className="mt-1.5 text-[11px] leading-snug text-tertiary">
               Declare the allocation this book is meant to hold, a risk limit and a drift band. Drift is then measured against intent, and a snapshot can say &ldquo;in breach&rdquo; on-chain.
             </p>
+          )}
+
+          {isOwner && ownerSol !== null && ownerSol < MIN_WRITE_SOL && (
+            <div className="mt-2.5">
+              <Notice tone="warn">
+                This wallet holds {ownerSol.toFixed(3)} SOL on {cluster}, and a write needs rent there.{" "}
+                {cluster === "devnet" ? (
+                  <>
+                    <a href={FAUCET_URL} target="_blank" rel="noopener noreferrer" className="underline decoration-current underline-offset-2">Get devnet SOL from the faucet</a>, then try again.
+                  </>
+                ) : (
+                  "Fund it, then try again."
+                )}
+              </Notice>
+            </div>
           )}
 
           {isOwner && (
@@ -247,12 +291,12 @@ export function OnChain({
             </ol>
           )}
 
-          {!connected && (
+          {!example && !connected && (
             <p className="mt-3 text-[11px] leading-snug text-tertiary">
               Connect the wallet that owns {shortAddress(subject.toBase58())} to declare a policy or record a snapshot.
             </p>
           )}
-          {connected && !isOwner && (
+          {!example && connected && !isOwner && (
             <p className="mt-3 text-[11px] leading-snug text-tertiary">
               The connected wallet is not this address, so this record is read-only here.
             </p>
