@@ -88,9 +88,18 @@ export function Holdings({ a, history }: { a: Analysis; history: History }) {
               return (
                 <Fragment key={h.symbol}>
                   <tr
-                    className={`cursor-pointer border-b border-border transition-colors hover:bg-surface-hover ${expanded ? "bg-surface-hover" : ""}`}
+                    className={`cursor-pointer border-b border-border transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover ${expanded ? "bg-surface-hover" : ""}`}
                     onClick={() => setOpen(expanded ? null : h.symbol)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setOpen(expanded ? null : h.symbol);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
                     aria-expanded={expanded}
+                    aria-label={`${h.symbol}: show thirty days`}
                   >
                     <td className="px-4 py-2.5">
                       <span className="flex items-center gap-2">

@@ -45,6 +45,12 @@ export function SectionNav({ sections }: { sections: Section[] }) {
     return () => observer.disconnect();
   }, [sections]);
 
+  // On a phone the bar scrolls sideways; the lit pill stays in view.
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>(`nav[aria-label="Sections"] a[href="#${active}"]`);
+    el?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [active]);
+
   return (
     <nav aria-label="Sections" className="sticky top-14 z-10 border-b border-border bg-bg/85 backdrop-blur-md">
       <div className="thin-scroll mx-auto flex max-w-[1500px] gap-1 overflow-x-auto px-4 py-1.5 sm:px-6">

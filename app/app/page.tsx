@@ -574,16 +574,19 @@ function Desk() {
 
 function Loading() {
   return (
-    <div>
+    <div aria-busy="true" aria-label="Loading the desk">
+      <Skeleton className="mb-3 h-5 w-64" />
       <Skeleton className="mb-4 h-[174px]" />
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <div className="space-y-4">
+          <Skeleton className="h-[420px]" />
+          <Skeleton className="h-[520px]" />
           <Skeleton className="h-64" />
-          <Skeleton className="h-[280px]" />
         </div>
         <div className="space-y-4">
-          <Skeleton className="h-40" />
-          <Skeleton className="h-64" />
+          <Skeleton className="h-52" />
+          <Skeleton className="h-[460px]" />
+          <Skeleton className="h-80" />
         </div>
       </div>
     </div>

@@ -107,17 +107,28 @@ Nothing sleeps, nothing cold-starts.
 - 82 app tests (quant, session split, stress, NYSE calendar, universe
   integrity, history loading, Jupiter quotes, portfolio assembly, on-chain
   encoding) + 12 program tests on a local validator, all in CI
-- One static page; one hourly Action; zero servers
+- One static page; one hourly Action; one event subscriber; zero servers
 
 ## What's next
 
-- Mainnet deployment of the program (one `anchor deploy`).
-- Dividends and corporate actions from the issuer's feed.
-- A lending-side consumer of `SnapshotRecorded` — the margin-call bot the
-  event was designed for.
+- Mainnet deployment of the program: one `anchor deploy` from a funded
+  keypair, documented in the README. It stays on devnet for judging so
+  trying it costs nobody real SOL.
+- Dividends and corporate actions, once an issuer feed exists to read.
 - The rest of the xStocks catalogue as liquidity arrives — Backed lists
   several hundred; the desk carries the thirty-five with real turnover, and
   a new one is one verified row.
+
+## What is already there that a reader might not expect
+
+- The lending side: `scripts/watch-breaches.mjs` subscribes to the
+  program's `SnapshotRecorded` events, decodes them, prints `BREACH` when a
+  book leaves its owner's policy, and can POST each one to a webhook.
+  Replaying devnet shows the author's own record: two readings in policy,
+  one breach.
+- Live Jupiter quotes on every proposed rebalance order.
+- A print stylesheet: the desk prints as a one-column report.
+- Keyboard: `/` address, `1`–`0` panels, `?` help, `t` theme.
 
 ## Links
 

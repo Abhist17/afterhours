@@ -5,7 +5,14 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
+# One keypair, one id, every cluster: the address in target/deploy decides.
 [programs.localnet]
+afterhours = "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri"
+
+[programs.devnet]
+afterhours = "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri"
+
+[programs.mainnet]
 afterhours = "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri"
 
 [registry]

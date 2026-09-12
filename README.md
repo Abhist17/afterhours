@@ -91,7 +91,17 @@ keeps two accounts per wallet, both owned by that wallet:
 A snapshot recorded under a policy emits `SnapshotRecorded { breached }`. That
 event is the primitive a credit protocol lending against a stock portfolio
 would subscribe to: not "the price moved" but "this book left its own stated
-policy, by its owner's own reading".
+policy, by its owner's own reading". The subscriber exists:
+[`scripts/watch-breaches.mjs`](scripts/watch-breaches.mjs) follows the
+program's logs live, or replays its history, decodes every event, and can
+POST each breach to a webhook — the margin-call bot, as a hundred lines.
+
+```
+$ node scripts/watch-breaches.mjs --history 30
+ok      2026-09-12 12:17Z  4u8c…HpFc  score  22  book $14,650  VaR $265  drift 1.8pp  stocks 74%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-12 12:17Z  4u8c…HpFc  score  27  book $14,910  VaR $312  drift 2.4pp  stocks 75%  NYSE open    (limit 30 · band 5pp)
+BREACH  2026-09-12 12:17Z  4u8c…HpFc  score  34  book $14,380  VaR $402  drift 6.1pp  stocks 77%  NYSE closed  (limit 30 · band 5pp) — score 34 > 30
+```
 
 The page prepares each transaction; the wallet signs; the page submits it to
 the program's cluster. A wallet pointed at the wrong network cannot send it
@@ -240,7 +250,25 @@ node scripts/refresh-history.mjs   # rebuild app/public/data/history.json
 anchor test                        # 12 program tests on a local validator
 anchor build && anchor deploy --provider.cluster devnet   # ~1.1 SOL of rent
 node scripts/example-record.mjs    # a policy and three snapshots from ~/.config/solana/id.json
+node scripts/watch-breaches.mjs    # follow SnapshotRecorded live; --history N replays; --webhook URL alerts
 ```
+
+### Going to mainnet
+
+The program is cluster-agnostic and `Anchor.toml` names the same id for
+localnet, devnet and mainnet, so the move is one deploy from a funded
+keypair — about 1.1 SOL of rent for the program account, plus a few cents
+per policy or snapshot for whoever writes them:
+
+```bash
+anchor build && anchor deploy --provider.cluster mainnet
+anchor idl init --provider.cluster mainnet -f target/idl/afterhours.json 3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri
+```
+
+Then point the site at it by setting `NEXT_PUBLIC_PROGRAM_RPC_URL` to a
+mainnet endpoint in the deploy workflow; the page reads the cluster from
+the URL, labels it, and sends nothing anywhere else. It stays on devnet
+for the hackathon so that trying it costs nobody real SOL.
 
 | Layer | Technology |
 |:--|:--|
