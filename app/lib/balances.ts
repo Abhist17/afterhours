@@ -11,8 +11,39 @@ import { ASSETS, BY_MINT } from "./universe";
 const TOKEN_PROGRAM = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 const TOKEN_2022_PROGRAM = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 
-export const RPC_URL =
-  process.env.NEXT_PUBLIC_RPC_URL || "https://api.mainnet-beta.solana.com";
+/**
+ * The mainnet RPC used for balance reads. The public endpoint refuses
+ * browser-origin token-account queries outright, so a build should carry
+ * a key (a free Helius one, restricted to the site's domain) — and a
+ * viewer can always paste their own, kept in this browser only.
+ */
+const BUILD_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "";
+const PUBLIC_RPC_URL = "https://api.mainnet-beta.solana.com";
+const RPC_KEY = "afterhours-rpc";
+
+export function resolveRpcUrl(): string {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem(RPC_KEY);
+      if (stored && /^https?:\/\//.test(stored)) return stored;
+    } catch {}
+  }
+  return BUILD_RPC_URL || PUBLIC_RPC_URL;
+}
+
+export function setRpcUrl(url: string | null): void {
+  try {
+    if (url) window.localStorage.setItem(RPC_KEY, url.trim());
+    else window.localStorage.removeItem(RPC_KEY);
+  } catch {}
+}
+
+/** True when the read would go to the public endpoint, which blocks browsers. */
+export function usingPublicRpc(): boolean {
+  return resolveRpcUrl() === PUBLIC_RPC_URL;
+}
+
+export const RPC_URL = BUILD_RPC_URL || PUBLIC_RPC_URL;
 
 export interface Balances {
   address: string;
@@ -32,7 +63,7 @@ export function isValidAddress(value: string): boolean {
   }
 }
 
-export async function readBalances(address: string, rpcUrl = RPC_URL): Promise<Balances> {
+export async function readBalances(address: string, rpcUrl = resolveRpcUrl()): Promise<Balances> {
   const owner = new PublicKey(address.trim());
   const connection = new Connection(rpcUrl, "confirmed");
 

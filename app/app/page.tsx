@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { loadHistory, lastPrices, type History } from "@/lib/history";
 import { fetchLivePrices, type Quotes } from "@/lib/prices";
-import { readBalances, isValidAddress, RPC_URL, type Balances } from "@/lib/balances";
+import { readBalances, isValidAddress, resolveRpcUrl, setRpcUrl, usingPublicRpc, type Balances } from "@/lib/balances";
 import { analyse } from "@/lib/portfolio";
 import { SAMPLES } from "@/lib/samples";
 import { marketStatus } from "@/lib/market-hours";
-import { useNow } from "@/lib/hooks";
+import { useNow, useMounted } from "@/lib/hooks";
 import { shortAddress, timeAgo } from "@/lib/format";
 import { TopBar } from "@/components/TopBar";
 import { Summary } from "@/components/Summary";
@@ -19,6 +19,9 @@ import { CorrelationGrid } from "@/components/CorrelationGrid";
 import { Drift } from "@/components/Drift";
 import { WhatIf } from "@/components/WhatIf";
 import { HowItWorks } from "@/components/HowItWorks";
+import { OnChain } from "@/components/OnChain";
+import { WalletContext, ConnectButton } from "@/components/Wallet";
+import type { Target } from "@/lib/quant";
 import { Panel, PanelHeader, Button, Input, Notice, Skeleton, Tag } from "@/components/ui";
 
 type Source =
@@ -28,6 +31,14 @@ type Source =
 const ADDRESS_KEY = "afterhours-address";
 
 export default function Page() {
+  return (
+    <WalletContext>
+      <Desk />
+    </WalletContext>
+  );
+}
+
+function Desk() {
   const [history, setHistory] = useState<History | null>(null);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [quotes, setQuotes] = useState<Quotes | null>(null);
@@ -36,7 +47,11 @@ export default function Page() {
   const [loadingWallet, setLoadingWallet] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [targets, setTargets] = useState<Target[]>([]);
+  const [rpcOpen, setRpcOpen] = useState(false);
+  const [rpcDraft, setRpcDraft] = useState("");
   const now = useNow(60_000);
+  const mounted = useMounted();
 
   // History once, quotes on a timer. Quotes fall back to the last point of
   // the history and say so; nothing here waits on a server.
@@ -95,11 +110,20 @@ export default function Page() {
         localStorage.setItem(ADDRESS_KEY, trimmed);
       } catch {}
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const host = (() => {
+        try {
+          return new URL(resolveRpcUrl()).host;
+        } catch {
+          return "the RPC";
+        }
+      })();
       setWalletError(
-        `Could not read ${shortAddress(trimmed)} from ${new URL(RPC_URL).host}: ${
-          err instanceof Error ? err.message : String(err)
-        }`
+        usingPublicRpc() && /403|forbidden|429/i.test(message)
+          ? `${host} refuses balance reads from a browser. This build has no RPC key; set one below (a free Helius key works), or try a sample book.`
+          : `Could not read ${shortAddress(trimmed)} from ${host}: ${message}`
       );
+      if (usingPublicRpc()) setRpcOpen(true);
     } finally {
       setLoadingWallet(false);
     }
@@ -150,6 +174,13 @@ export default function Page() {
               {loadingWallet ? "Reading…" : "Read wallet"}
             </Button>
             <span className="hidden text-[11px] text-tertiary sm:inline">or</span>
+            <ConnectButton
+              onConnected={(addr) => {
+                setAddress(addr);
+                void loadWallet(addr);
+              }}
+            />
+            <span className="hidden text-[11px] text-tertiary sm:inline">or</span>
             <span className="flex flex-wrap gap-1.5">
               {SAMPLES.map((s) => (
                 <Button
@@ -168,6 +199,44 @@ export default function Page() {
             <div className="mt-2">
               <Notice tone="error">{walletError}</Notice>
             </div>
+          )}
+          {rpcOpen && (
+            <form
+              className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!/^https?:\/\//.test(rpcDraft.trim())) return;
+                setRpcUrl(rpcDraft.trim());
+                setRpcOpen(false);
+                setWalletError(null);
+                if (address.trim()) void loadWallet(address);
+              }}
+            >
+              <Input
+                value={rpcDraft}
+                onChange={(e) => setRpcDraft(e.target.value)}
+                placeholder="https://mainnet.helius-rpc.com/?api-key=…"
+                spellCheck={false}
+                autoComplete="off"
+                aria-label="Mainnet RPC endpoint"
+                className="numeric !text-xs sm:max-w-md"
+              />
+              <Button type="submit" size="md" variant="secondary" disabled={!/^https?:\/\//.test(rpcDraft.trim())}>
+                Use this RPC
+              </Button>
+              <Button type="button" size="md" variant="ghost" onClick={() => setRpcOpen(false)}>
+                Cancel
+              </Button>
+              <span className="text-[11px] text-tertiary">Stored in this browser only.</span>
+            </form>
+          )}
+          {!rpcOpen && (
+            <p className="mt-2 text-[11px] text-tertiary">
+              Reads go to <span className="numeric">{mounted ? safeHost(resolveRpcUrl()) : ""}</span>.{" "}
+              <button type="button" onClick={() => setRpcOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">
+                Change RPC
+              </button>
+            </p>
           )}
         </section>
 
@@ -220,7 +289,20 @@ export default function Page() {
 
                 <Panel delay={120}>
                   <PanelHeader title="Target and drift" meta="rebalance orders" />
-                  <Drift a={analysis} storageKey={source?.kind === "wallet" ? source.balances.address : `sample:${source?.key}`} />
+                  <Drift
+                    a={analysis}
+                    storageKey={source?.kind === "wallet" ? source.balances.address : `sample:${source?.key}`}
+                    onTargetsChange={setTargets}
+                  />
+                </Panel>
+
+                <Panel delay={160}>
+                  <PanelHeader title="Your record on Solana" meta="policy and snapshots, signed by you" />
+                  <OnChain
+                    a={analysis}
+                    viewing={source?.kind === "wallet" ? source.balances.address : null}
+                    targets={targets}
+                  />
                 </Panel>
               </div>
 
@@ -277,4 +359,12 @@ function Loading() {
       </div>
     </div>
   );
+}
+
+function safeHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
 }
