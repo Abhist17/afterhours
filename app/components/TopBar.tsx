@@ -76,14 +76,22 @@ export function MarketPill({ market }: { market: MarketStatus }) {
   );
 }
 
-export function TopBar({ market, onOpenHelp }: { market: MarketStatus | null; onOpenHelp: () => void }) {
+export function TopBar({
+  market,
+  onOpenHelp,
+  connect,
+}: {
+  market: MarketStatus | null;
+  onOpenHelp: () => void;
+  connect?: React.ReactNode;
+}) {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-3 px-4 sm:px-6">
         <Logo />
-        <span className="hidden text-xs text-tertiary md:inline">Markets close; your book doesn&rsquo;t.</span>
         <span className="ml-auto" />
         {market && <MarketPill market={market} />}
+        {connect}
         <Button variant="ghost" size="sm" onClick={onOpenHelp} className="shrink-0">
           <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
             <circle cx="7" cy="7" r="5.9" stroke="currentColor" strokeWidth="1.2" fill="none" />

@@ -31,3 +31,13 @@ export const SAMPLES: SampleBook[] = [
     amounts: { AAPLx: 12, MSFTx: 8, GOOGLx: 12, AMZNx: 16, METAx: 6, NVDAx: 18, TSLAx: 11 },
   },
 ];
+
+/**
+ * A real book on mainnet, not ours: an active xStocks wallet found through
+ * the largest SPYx token accounts. Read live each time, never cached.
+ */
+export const REAL_BOOK = {
+  address: "2Z7zhqp1eddmHNmEqexftST6DFPWmoL4QqfgiG5uJMJx",
+  label: "A real xStocks wallet",
+  blurb: "An active mainnet wallet holding nine xStocks and USDC — read live, not ours.",
+};

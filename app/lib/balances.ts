@@ -12,12 +12,16 @@ const TOKEN_PROGRAM = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 const TOKEN_2022_PROGRAM = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 
 /**
- * The mainnet RPC used for balance reads. The public endpoint refuses
- * browser-origin token-account queries outright, so a build should carry
- * a key (a free Helius one, restricted to the site's domain) — and a
- * viewer can always paste their own, kept in this browser only.
+ * The mainnet RPC used for balance reads. Solana's own public endpoint
+ * refuses browser-origin token-account queries with a 403, and most free
+ * alternatives gate them behind a key. Solana Vibe Station's public
+ * endpoint answers them with CORS open, so it is the default; a build can
+ * carry its own (a free Helius key, restricted to the site's domain) as
+ * NEXT_PUBLIC_RPC_URL, and a viewer can always paste one, kept in this
+ * browser only. Every failure falls through to the next.
  */
 const BUILD_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || "";
+const KEYLESS_RPC_URL = "https://public.rpc.solanavibestation.com";
 const PUBLIC_RPC_URL = "https://api.mainnet-beta.solana.com";
 const RPC_KEY = "afterhours-rpc";
 
@@ -28,7 +32,13 @@ export function resolveRpcUrl(): string {
       if (stored && /^https?:\/\//.test(stored)) return stored;
     } catch {}
   }
-  return BUILD_RPC_URL || PUBLIC_RPC_URL;
+  return BUILD_RPC_URL || KEYLESS_RPC_URL;
+}
+
+/** Endpoints to try, in order, after the resolved one. */
+export function fallbackRpcUrls(): string[] {
+  const primary = resolveRpcUrl();
+  return [KEYLESS_RPC_URL, PUBLIC_RPC_URL].filter((u) => u !== primary);
 }
 
 export function setRpcUrl(url: string | null): void {
@@ -38,12 +48,13 @@ export function setRpcUrl(url: string | null): void {
   } catch {}
 }
 
-/** True when the read would go to the public endpoint, which blocks browsers. */
+/** True when no key is configured anywhere — reads rely on public goodwill. */
 export function usingPublicRpc(): boolean {
-  return resolveRpcUrl() === PUBLIC_RPC_URL;
+  const url = resolveRpcUrl();
+  return url === PUBLIC_RPC_URL || url === KEYLESS_RPC_URL;
 }
 
-export const RPC_URL = BUILD_RPC_URL || PUBLIC_RPC_URL;
+export const RPC_URL = BUILD_RPC_URL || KEYLESS_RPC_URL;
 
 export interface Balances {
   address: string;
@@ -63,7 +74,25 @@ export function isValidAddress(value: string): boolean {
   }
 }
 
-export async function readBalances(address: string, rpcUrl = resolveRpcUrl()): Promise<Balances> {
+/**
+ * Reads through the resolved endpoint, then each fallback, so one refusal
+ * is a retry rather than a dead end. The error that surfaces is the
+ * first endpoint's — the one the viewer chose or the build carries.
+ */
+export async function readBalances(address: string, rpcUrl?: string): Promise<Balances> {
+  const urls = rpcUrl ? [rpcUrl] : [resolveRpcUrl(), ...fallbackRpcUrls()];
+  let firstError: unknown = null;
+  for (const url of urls) {
+    try {
+      return await readBalancesFrom(address, url);
+    } catch (err) {
+      firstError ??= err;
+    }
+  }
+  throw firstError instanceof Error ? firstError : new Error(String(firstError));
+}
+
+async function readBalancesFrom(address: string, rpcUrl: string): Promise<Balances> {
   const owner = new PublicKey(address.trim());
   const connection = new Connection(rpcUrl, "confirmed");
 
