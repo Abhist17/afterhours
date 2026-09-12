@@ -7,6 +7,10 @@ import {
   blendedScore,
   scaleLambdaToFrequency,
   DEFAULT_LAMBDA,
+  thinness,
+  winsorise,
+  THIN_HOURLY_MOVE,
+  THIN_SHARE,
   type PortfolioRisk,
   type Concentration,
   type BacktestPoint,
@@ -15,6 +19,23 @@ import {
 import { marketStatus, moveSinceClose, type MarketStatus } from "./market-hours";
 import { BY_SYMBOL, MARKET_SYMBOL, type Asset, type AssetClass, type Sector } from "./universe";
 import type { History } from "./history";
+import { sessionSplit, bookGapHistory, type SessionSplit, type Gap } from "./sessions";
+import {
+  stressBook,
+  valueSeries,
+  drawdownStats,
+  varCheck,
+  riskReturnMap,
+  type Scenario,
+  type ValuePoint,
+  type Drawdown,
+  type VarCheck,
+  type RiskReturnPoint,
+} from "./scenarios";
+import { annualisedVolPct } from "./quant";
+
+/** The crypto factor every crypto beta is measured against. */
+export const CRYPTO_SYMBOL = "SOL";
 
 /**
  * One pass from what a wallet holds to everything the page says about it.
@@ -72,6 +93,26 @@ export interface Analysis {
   overnight: { equityValue: number; equityShare: number; moveUsd: number; movePct: number; counted: number };
   correlation: { symbols: string[]; matrix: number[][] };
   backtest: BacktestPoint[];
+  /**
+   * Where the moves happen: the book's variance split by whether the NYSE
+   * was open, the same for each tokenized stock, and the move across every
+   * closed period in the window.
+   */
+  sessions: { book: SessionSplit | null; bySymbol: Record<string, SessionSplit>; gaps: Gap[] };
+  /** Factor shocks and the window's own worst day, at today's weights. */
+  stress: { scenarios: Scenario[]; betaToMarket: Record<string, number>; betaToCrypto: Record<string, number> };
+  /** The book at today's amounts, priced through the window. */
+  valueSeries: ValuePoint[];
+  drawdown: Drawdown | null;
+  /** The VaR forecast marked against what the book then did. */
+  varCheck: VarCheck | null;
+  riskReturn: RiskReturnPoint[];
+  /**
+   * Series whose feed prints are too erratic to trust hour by hour, with
+   * the share of hours that moved more than the clip. Their returns are
+   * clipped inside every estimator; their prices are shown as they are.
+   */
+  thin: { symbol: string; share: number; clipped: number }[];
   unpriced: string[];
   periodsPerDay: number;
 }
@@ -108,10 +149,21 @@ export function analyse(
   // Returns for everything with a series, not just what is held: beta needs
   // the index, and the correlation grid is more useful with the neighbours.
   const returnsBySymbol: Record<string, number[]> = {};
+  const thin: Analysis["thin"] = [];
+  const capFor: Record<string, number | undefined> = {};
   for (const [symbol, points] of Object.entries(history.series)) {
     const r = computeReturns(points.map((p) => p.price));
-    if (r.length >= 2) returnsBySymbol[symbol] = r;
+    if (r.length < 2) continue;
+    const share = thinness(r);
+    if (share > THIN_SHARE) {
+      thin.push({ symbol, share, clipped: r.filter((x) => Math.abs(x) > THIN_HOURLY_MOVE).length });
+      capFor[symbol] = THIN_HOURLY_MOVE;
+      returnsBySymbol[symbol] = winsorise(r);
+    } else {
+      returnsBySymbol[symbol] = r;
+    }
   }
+  thin.sort((a, b) => b.share - a.share);
 
   const weightsBySymbol = Object.fromEntries(priced.map((h) => [h.asset.symbol, h.value / (total || 1)]));
 
@@ -228,10 +280,46 @@ export function analyse(
     scaleLambdaToFrequency(DEFAULT_LAMBDA, history.periodsPerDay)
   );
 
-  const backtest = rollingRisk(history.series, amounts, { periodsPerDay: history.periodsPerDay });
+  // The backtest clips at the same size when any held series is thin.
+  const anyThinHeld = priced.some((h) => capFor[h.asset.symbol] !== undefined);
+  const backtest = rollingRisk(history.series, amounts, { periodsPerDay: history.periodsPerDay, cap: anyThinHeld ? THIN_HOURLY_MOVE : undefined });
+
+  // The book through the window, and the moves it carried without a market.
+  const values = valueSeries(history.series, amounts);
+  const drawdown = drawdownStats(values);
+  const equitySymbols = equities.map((h) => h.symbol);
+  const sessionsBySymbol: Record<string, SessionSplit> = {};
+  for (const h of equities) {
+    const split = sessionSplit(history.series[h.symbol] ?? [], capFor[h.symbol]);
+    if (split) sessionsBySymbol[h.symbol] = split;
+  }
+  const sessions = {
+    book: sessionSplit(values.map((p) => ({ t: p.t, price: p.value })), anyThinHeld ? THIN_HOURLY_MOVE : undefined),
+    bySymbol: sessionsBySymbol,
+    gaps: bookGapHistory(history.series, weightsBySymbol, equitySymbols),
+  };
+
+  const valuesBySymbol = Object.fromEntries(priced.map((h) => [h.asset.symbol, h.value]));
+  const timesBySymbol = Object.fromEntries(Object.entries(history.series).map(([s, pts]) => [s, pts.map((p) => p.t)]));
+  const stress = stressBook({
+    values: valuesBySymbol,
+    returnsBySymbol,
+    timesBySymbol,
+    periodsPerDay: history.periodsPerDay,
+    marketSymbol: MARKET_SYMBOL,
+    cryptoSymbol: CRYPTO_SYMBOL,
+    isCash: (s) => BY_SYMBOL[s]?.class === "cash",
+    gaps: sessions.gaps,
+    equityValue,
+  });
+
+  const check = varCheck(backtest, history.periodsPerDay);
+  const riskReturn = riskReturnMap(history.series, returnsBySymbol, weightsBySymbol, history.periodsPerDay, annualisedVolPct);
 
   return {
     holdings, total, risk, concentration, score, sleeves, sectors, cryptoLinked,
-    market, overnight, correlation, backtest, unpriced, periodsPerDay: history.periodsPerDay,
+    market, overnight, correlation, backtest,
+    sessions, stress, valueSeries: values, drawdown, varCheck: check, riskReturn, thin,
+    unpriced, periodsPerDay: history.periodsPerDay,
   };
 }

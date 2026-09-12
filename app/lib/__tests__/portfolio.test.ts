@@ -130,6 +130,27 @@ describe("analyse", () => {
     expect(b.risk.headlineVarUsd).toBeGreaterThan(0);
   });
 
+  it("flags a thin series and clips it inside the estimators, leaving prices alone", () => {
+    // Give TSMx a feed with bad prints: a 40% jump that sits for five hours.
+    const pts = history.series.TSMx.map((p) => ({ ...p }));
+    for (let k = 0; k < 12; k++) {
+      const i = 100 + k * 50;
+      for (let j = 0; j < 5; j++) pts[i + j].price *= 1.4;
+    }
+    const spiky = { ...history, series: { ...history.series, TSMx: pts } };
+    const clean = analyse({ TSMx: 10, SPYx: 5 }, prices, history, END);
+    const thin = analyse({ TSMx: 10, SPYx: 5 }, prices, spiky, END);
+    expect(clean.thin.map((t) => t.symbol)).not.toContain("TSMx");
+    expect(thin.thin[0].symbol).toBe("TSMx");
+    expect(thin.thin[0].clipped).toBeGreaterThanOrEqual(24);
+    // Clipped, the spikes cannot run the volatility to absurdity.
+    const vol = thin.riskReturn.find((p) => p.symbol === "TSMx")!.volPct;
+    expect(vol).toBeLessThan(400);
+    // The value series still carries the feed's own prices.
+    const at = thin.valueSeries.find((p) => p.t === pts[100].t)!;
+    expect(at.value).toBeGreaterThan(clean.valueSeries.find((p) => p.t === pts[100].t)!.value * 1.2);
+  });
+
   it("handles an empty wallet without NaN", () => {
     const b = analyse({}, prices, history, END);
     expect(b.total).toBe(0);

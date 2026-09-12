@@ -33,6 +33,27 @@ export function computeReturns(prices: number[]): number[] {
   return out;
 }
 
+/**
+ * Thin tokens print badly: a stale or off-market trade can sit for hours as
+ * a 40% jump that later unwinds. A liquid stock token almost never moves
+ * 8% in an hour, so the share of hours that do is a fair thinness reading,
+ * and clipping returns at that size keeps one bad print from owning the
+ * covariance. Prices are never altered — only what the estimators see.
+ */
+export const THIN_HOURLY_MOVE = 0.08;
+export const THIN_SHARE = 0.01;
+
+export function thinness(returns: number[], threshold = THIN_HOURLY_MOVE): number {
+  if (!returns.length) return 0;
+  let n = 0;
+  for (const r of returns) if (Math.abs(r) > threshold) n++;
+  return n / returns.length;
+}
+
+export function winsorise(returns: number[], cap = THIN_HOURLY_MOVE): number[] {
+  return returns.map((r) => (r > cap ? cap : r < -cap ? -cap : r));
+}
+
 export function mean(xs: number[]): number {
   return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 }
@@ -418,14 +439,15 @@ export interface BacktestPoint {
 export function rollingRisk(
   history: Record<string, PricePoint[]>,
   amounts: Record<string, number>,
-  opts: { periodsPerDay: number; confidence?: number; lambda?: number; horizonDays?: number; warmup?: number }
+  opts: { periodsPerDay: number; confidence?: number; lambda?: number; horizonDays?: number; warmup?: number; cap?: number }
 ): BacktestPoint[] {
   // A week of warm-up by default: the recursion is seeded with the sample
   // covariance of those hours rather than zeros, otherwise the first
   // fortnight of the chart is the estimator filling its memory, drawn as
   // if the book had been getting riskier.
-  const { periodsPerDay, confidence = 0.95, lambda = DEFAULT_LAMBDA, horizonDays = 1 } = opts;
+  const { periodsPerDay, confidence = 0.95, lambda = DEFAULT_LAMBDA, horizonDays = 1, cap } = opts;
   const warmup = opts.warmup ?? Math.round(7 * periodsPerDay);
+  const clip = (r: number) => (cap === undefined ? r : r > cap ? cap : r < -cap ? -cap : r);
   const symbols = Object.keys(amounts).filter((s) => amounts[s] > 0 && history[s]?.length > 2);
   if (!symbols.length || !(periodsPerDay > 0)) return [];
 
@@ -447,7 +469,7 @@ export function rollingRisk(
   const horizonScale = Math.sqrt(periodsPerDay * horizonDays);
   const out: BacktestPoint[] = [];
 
-  const returnAt = (k: number) => priceAt.map((series) => (series[k] - series[k - 1]) / series[k - 1]);
+  const returnAt = (k: number) => priceAt.map((series) => clip((series[k] - series[k - 1]) / series[k - 1]));
 
   // Seed: zero-mean sample covariance over the warm-up window.
   const cov: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));

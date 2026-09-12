@@ -218,6 +218,17 @@ describe("driftAgainst", () => {
   });
 });
 
+describe("thinness and winsorise", () => {
+  it("measures the share of hours that moved more than the clip, and clips them", async () => {
+    const { thinness, winsorise } = await import("../quant");
+    const r = [0.01, -0.02, 0.45, 0.0, -0.46, 0.003];
+    expect(thinness(r)).toBeCloseTo(2 / 6, 9);
+    expect(thinness(r, 0.5)).toBe(0);
+    expect(winsorise(r)).toEqual([0.01, -0.02, 0.08, 0, -0.08, 0.003]);
+    expect(thinness([])).toBe(0);
+  });
+});
+
 describe("blendedScore", () => {
   it("is annualised volatility plus concentration, capped", () => {
     // 1% a day is ~19% a year on the token's calendar.
