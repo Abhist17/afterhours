@@ -1,0 +1,211 @@
+[
+  {
+    "symbol": "SPYx",
+    "name": "S&P 500 xStock",
+    "underlying": "SPY",
+    "coingeckoId": "sp500-xstock",
+    "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "index"
+  },
+  {
+    "symbol": "QQQx",
+    "name": "Nasdaq 100 xStock",
+    "underlying": "QQQ",
+    "coingeckoId": "nasdaq-xstock",
+    "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "index"
+  },
+  {
+    "symbol": "AAPLx",
+    "name": "Apple xStock",
+    "underlying": "AAPL",
+    "coingeckoId": "apple-xstock",
+    "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "mega-cap tech"
+  },
+  {
+    "symbol": "MSFTx",
+    "name": "Microsoft xStock",
+    "underlying": "MSFT",
+    "coingeckoId": "microsoft-xstock",
+    "mint": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "mega-cap tech"
+  },
+  {
+    "symbol": "GOOGLx",
+    "name": "Alphabet xStock",
+    "underlying": "GOOGL",
+    "coingeckoId": "alphabet-xstock",
+    "mint": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "mega-cap tech"
+  },
+  {
+    "symbol": "AMZNx",
+    "name": "Amazon xStock",
+    "underlying": "AMZN",
+    "coingeckoId": "amazon-xstock",
+    "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "mega-cap tech"
+  },
+  {
+    "symbol": "METAx",
+    "name": "Meta xStock",
+    "underlying": "META",
+    "coingeckoId": "meta-xstock",
+    "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "mega-cap tech"
+  },
+  {
+    "symbol": "NVDAx",
+    "name": "NVIDIA xStock",
+    "underlying": "NVDA",
+    "coingeckoId": "nvidia-xstock",
+    "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "AVGOx",
+    "name": "Broadcom xStock",
+    "underlying": "AVGO",
+    "coingeckoId": "broadcom-xstock",
+    "mint": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "AMDx",
+    "name": "AMD xStock",
+    "underlying": "AMD",
+    "coingeckoId": "amd-xstock",
+    "mint": "XsXcJ6GZ9kVnjqGsjBnktRcuwMBmvKWh8S93RefZ1rF",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "semis"
+  },
+  {
+    "symbol": "TSLAx",
+    "name": "Tesla xStock",
+    "underlying": "TSLA",
+    "coingeckoId": "tesla-xstock",
+    "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "ev & auto"
+  },
+  {
+    "symbol": "COINx",
+    "name": "Coinbase xStock",
+    "underlying": "COIN",
+    "coingeckoId": "coinbase-xstock",
+    "mint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "MSTRx",
+    "name": "Strategy xStock",
+    "underlying": "MSTR",
+    "coingeckoId": "microstrategy-xstock",
+    "mint": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "HOODx",
+    "name": "Robinhood xStock",
+    "underlying": "HOOD",
+    "coingeckoId": "robinhood-xstock",
+    "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "CRCLx",
+    "name": "Circle xStock",
+    "underlying": "CRCL",
+    "coingeckoId": "circle-xstock",
+    "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "crypto-linked equity"
+  },
+  {
+    "symbol": "GLDx",
+    "name": "Gold xStock",
+    "underlying": "GLD",
+    "coingeckoId": "gold-xstock",
+    "mint": "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+    "program": "token-2022",
+    "decimals": 8,
+    "class": "equity",
+    "sector": "commodity"
+  },
+  {
+    "symbol": "SOL",
+    "name": "Solana",
+    "underlying": null,
+    "coingeckoId": "solana",
+    "mint": null,
+    "program": "native",
+    "decimals": 9,
+    "class": "crypto",
+    "sector": "crypto"
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "underlying": null,
+    "coingeckoId": "usd-coin",
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "program": "token",
+    "decimals": 6,
+    "class": "cash",
+    "sector": "cash"
+  },
+  {
+    "symbol": "USDT",
+    "name": "Tether",
+    "underlying": null,
+    "coingeckoId": "tether",
+    "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "program": "token",
+    "decimals": 6,
+    "class": "cash",
+    "sector": "cash"
+  }
+]
