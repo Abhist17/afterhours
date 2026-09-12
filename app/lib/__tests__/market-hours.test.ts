@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   eastern,
+  easternClock,
   isMarketOpen,
   marketStatus,
   moveSinceClose,
@@ -87,6 +88,26 @@ describe("marketStatus", () => {
     const s = marketStatus(T.earlyCloseDay);
     // 13:00 EST = 18:00 UTC
     expect(s.lastClose).toBe(Date.UTC(2026, 10, 27, 18, 0));
+  });
+
+  it("flags a session that ends at one o'clock", () => {
+    // Fri 2026-11-27 16:00 UTC = 11:00 EST — inside the half-day session
+    expect(marketStatus(Date.UTC(2026, 10, 27, 16, 0)).earlyClose).toBe(true);
+    expect(marketStatus(T.midSession).earlyClose).toBe(false);
+    // Thanksgiving evening: the next session is the early one.
+    expect(marketStatus(Date.UTC(2026, 10, 27, 2, 0)).earlyClose).toBe(true);
+    // A Friday night looking at Monday: a full session.
+    expect(marketStatus(T.weekend).earlyClose).toBe(false);
+  });
+});
+
+describe("easternClock", () => {
+  it("prints the New York wall clock in twelve-hour form", () => {
+    expect(easternClock(T.midSession)).toEqual({ minutes: 11 * 60, label: "11:00 AM" });
+    expect(easternClock(T.afterClose)).toEqual({ minutes: 16 * 60 + 30, label: "4:30 PM" });
+    // Midnight and noon are 12, not 0.
+    expect(easternClock(Date.UTC(2026, 8, 16, 4, 0)).label).toBe("12:00 AM");
+    expect(easternClock(Date.UTC(2026, 8, 16, 16, 5)).label).toBe("12:05 PM");
   });
 });
 

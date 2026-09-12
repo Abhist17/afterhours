@@ -11,6 +11,7 @@ import { useNow, useMounted } from "@/lib/hooks";
 import { shortAddress, timeAgo } from "@/lib/format";
 import type { Target } from "@/lib/quant";
 import { TopBar } from "@/components/TopBar";
+import { SessionRing } from "@/components/SessionRing";
 import { Summary } from "@/components/Summary";
 import { Holdings } from "@/components/Holdings";
 import { Sleeves } from "@/components/Sleeves";
@@ -182,97 +183,102 @@ function Desk() {
 
       {/* ── Hero: the premise and the ways in ──────────────────── */}
       <section className="hero-glow border-b border-border">
-        <div className="mx-auto max-w-[1500px] px-4 pb-8 pt-10 sm:px-6 sm:pt-14">
-          <p className="label mb-3" style={{ color: "var(--brand)" }}>The risk desk for tokenized stocks on Solana</p>
-          <h1 className="max-w-[22ch] text-[28px] font-semibold leading-[1.1] tracking-tight text-text sm:text-[40px]">
-            Markets close. <span className="text-secondary">Your book doesn&rsquo;t.</span>
-          </h1>
-          <p className="mt-4 max-w-[58ch] text-[14px] leading-relaxed text-secondary sm:text-[15px]">
-            An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. What your
-            tokens can lose tomorrow, what they&rsquo;ve done since the last bell, and how far your book has drifted
-            from what you meant it to be &mdash; read from your wallet, scored in your browser, recorded on-chain by you.
-          </p>
+        <div className="mx-auto grid max-w-[1500px] items-center gap-x-10 gap-y-6 px-4 pb-8 pt-10 sm:px-6 sm:pt-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:pt-10">
+          <div className="min-w-0">
+            <p className="label mb-3" style={{ color: "var(--brand)" }}>The risk desk for tokenized stocks on Solana</p>
+            <h1 className="max-w-[22ch] text-[30px] font-semibold leading-[1.08] tracking-[-0.02em] text-text sm:text-[44px]">
+              Markets close. <span className="text-secondary">Your book doesn&rsquo;t.</span>
+            </h1>
+            <p className="mt-4 max-w-[58ch] text-[14px] leading-relaxed text-secondary sm:text-[15px]">
+              An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. What your
+              tokens can lose tomorrow, what they&rsquo;ve done since the last bell, and how far your book has drifted
+              from what you meant it to be &mdash; read from your wallet, scored in your browser, recorded on-chain by you.
+            </p>
 
-          <form
-            className="mt-7 flex flex-col gap-2 sm:flex-row sm:items-center"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void loadWallet(address);
-            }}
-          >
-            <Input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Paste a Solana address holding xStocks"
-              spellCheck={false}
-              autoComplete="off"
-              aria-label="Solana wallet address"
-              className="numeric !h-11 !text-[13px] sm:max-w-lg"
-            />
-            <Button type="submit" variant="primary" size="lg" disabled={loadingWallet || !address.trim()}>
-              {loadingWallet ? "Reading…" : "Read wallet"}
-            </Button>
-          </form>
-
-          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
-            <span className="mr-1">or open</span>
-            <Button
-              size="sm"
-              variant={viewing === REAL_BOOK.address ? "primary" : "secondary"}
-              onClick={() => void loadWallet(REAL_BOOK.address, true)}
-              title={REAL_BOOK.blurb}
-              disabled={loadingWallet}
+            <form
+              className="mt-7 flex flex-col gap-2 sm:flex-row sm:items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void loadWallet(address);
+              }}
             >
-              {REAL_BOOK.label}
-            </Button>
-            {SAMPLES.map((s) => (
-              <Button key={s.key} size="sm" variant={sample?.key === s.key ? "primary" : "secondary"} onClick={() => pickSample(s.key)} title={s.blurb}>
-                {s.label}
+              <Input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Paste a Solana address holding xStocks"
+                spellCheck={false}
+                autoComplete="off"
+                aria-label="Solana wallet address"
+                className="numeric !h-11 !text-[13px] sm:max-w-lg"
+              />
+              <Button type="submit" variant="primary" size="lg" disabled={loadingWallet || !address.trim()}>
+                {loadingWallet ? "Reading…" : "Read wallet"}
               </Button>
-            ))}
-          </div>
+            </form>
 
-          {walletError && (
-            <div className="mt-3 max-w-2xl">
-              <Notice tone="error">{walletError}</Notice>
-            </div>
-          )}
-
-          <div className="mt-3 text-[11px] text-tertiary">
-            {rpcOpen ? (
-              <form
-                className="flex flex-col gap-2 sm:flex-row sm:items-center"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!/^https?:\/\//.test(rpcDraft.trim())) return;
-                  setRpcUrl(rpcDraft.trim());
-                  setRpcOpen(false);
-                  setWalletError(null);
-                  if (address.trim()) void loadWallet(address);
-                }}
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
+              <span className="mr-1">or open</span>
+              <Button
+                size="sm"
+                variant={viewing === REAL_BOOK.address ? "primary" : "secondary"}
+                onClick={() => void loadWallet(REAL_BOOK.address, true)}
+                title={REAL_BOOK.blurb}
+                disabled={loadingWallet}
               >
-                <Input
-                  value={rpcDraft}
-                  onChange={(e) => setRpcDraft(e.target.value)}
-                  placeholder="https://mainnet.helius-rpc.com/?api-key=…"
-                  spellCheck={false}
-                  autoComplete="off"
-                  aria-label="Mainnet RPC endpoint"
-                  className="numeric !text-xs sm:max-w-md"
-                />
-                <Button type="submit" size="md" variant="secondary" disabled={!/^https?:\/\//.test(rpcDraft.trim())}>Use this RPC</Button>
-                <Button type="button" size="md" variant="ghost" onClick={() => { setRpcUrl(null); setRpcOpen(false); }}>Reset</Button>
-                <Button type="button" size="md" variant="ghost" onClick={() => setRpcOpen(false)}>Cancel</Button>
-                <span>Stored in this browser only.</span>
-              </form>
-            ) : (
-              <>
-                Balances are read from mainnet by this page via <span className="numeric">{mounted ? safeHost(resolveRpcUrl()) : ""}</span>.{" "}
-                <button type="button" onClick={() => setRpcOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">
-                  Use your own RPC
-                </button>
-              </>
+                {REAL_BOOK.label}
+              </Button>
+              {SAMPLES.map((s) => (
+                <Button key={s.key} size="sm" variant={sample?.key === s.key ? "primary" : "secondary"} onClick={() => pickSample(s.key)} title={s.blurb}>
+                  {s.label}
+                </Button>
+              ))}
+            </div>
+
+            {walletError && (
+              <div className="mt-3 max-w-2xl">
+                <Notice tone="error">{walletError}</Notice>
+              </div>
             )}
+
+            <div className="mt-3 text-[11px] text-tertiary">
+              {rpcOpen ? (
+                <form
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!/^https?:\/\//.test(rpcDraft.trim())) return;
+                    setRpcUrl(rpcDraft.trim());
+                    setRpcOpen(false);
+                    setWalletError(null);
+                    if (address.trim()) void loadWallet(address);
+                  }}
+                >
+                  <Input
+                    value={rpcDraft}
+                    onChange={(e) => setRpcDraft(e.target.value)}
+                    placeholder="https://mainnet.helius-rpc.com/?api-key=…"
+                    spellCheck={false}
+                    autoComplete="off"
+                    aria-label="Mainnet RPC endpoint"
+                    className="numeric !text-xs sm:max-w-md"
+                  />
+                  <Button type="submit" size="md" variant="secondary" disabled={!/^https?:\/\//.test(rpcDraft.trim())}>Use this RPC</Button>
+                  <Button type="button" size="md" variant="ghost" onClick={() => { setRpcUrl(null); setRpcOpen(false); }}>Reset</Button>
+                  <Button type="button" size="md" variant="ghost" onClick={() => setRpcOpen(false)}>Cancel</Button>
+                  <span>Stored in this browser only.</span>
+                </form>
+              ) : (
+                <>
+                  Balances are read from mainnet by this page via <span className="numeric">{mounted ? safeHost(resolveRpcUrl()) : ""}</span>.{" "}
+                  <button type="button" onClick={() => setRpcOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">
+                    Use your own RPC
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="hidden justify-self-center lg:block lg:pr-4 xl:pr-10">
+            <SessionRing market={market} now={now} />
           </div>
         </div>
       </section>

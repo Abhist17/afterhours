@@ -128,6 +128,8 @@ export interface MarketStatus {
   hoursClosed: number;
   /** "weekend" | "holiday" | "overnight" | null when open. */
   reason: "weekend" | "holiday" | "overnight" | null;
+  /** True when the session in view ends at 1:00 rather than 4:00. */
+  earlyClose: boolean;
 }
 
 export function marketStatus(at: Date | number = Date.now()): MarketStatus {
@@ -170,6 +172,7 @@ export function marketStatus(at: Date | number = Date.now()): MarketStatus {
     nextClose,
     hoursClosed: open ? 0 : Math.max(0, (now - lastClose) / 3_600_000),
     reason,
+    earlyClose: closeMinutesFor(open ? et.date : nextOpenDate) === EARLY_CLOSE_MINUTES,
   };
 }
 
@@ -191,6 +194,15 @@ export function moveSinceClose(
   }
   if (atClose === null || !(atClose > 0)) return null;
   return { atClose, now: latest, changePct: ((latest - atClose) / atClose) * 100 };
+}
+
+/** The New York wall clock: minutes since midnight and a label to print. */
+export function easternClock(at: number): { minutes: number; label: string } {
+  const et = eastern(at);
+  const h = Math.floor(et.minutes / 60);
+  const m = et.minutes % 60;
+  const label = `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+  return { minutes: et.minutes, label };
 }
 
 export function formatEastern(at: number): string {

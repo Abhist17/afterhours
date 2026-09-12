@@ -9,15 +9,19 @@ const STORAGE_KEY = "afterhours-theme";
 /**
  * Runs before first paint (injected into <head>) so the page never renders in
  * the wrong theme and then snaps — the flash is far more noticeable than the
- * few bytes of inline script cost.
+ * few bytes of inline script cost. A link can carry ?theme=light|dark; it
+ * wins for that view without being remembered.
  */
 export const THEME_BOOTSTRAP = `
 (function () {
   try {
+    var linked = new URLSearchParams(location.search).get("theme");
     var stored = localStorage.getItem("${STORAGE_KEY}");
-    var theme = stored === "light" || stored === "dark"
-      ? stored
-      : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    var theme = linked === "light" || linked === "dark"
+      ? linked
+      : stored === "light" || stored === "dark"
+        ? stored
+        : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     document.documentElement.setAttribute("data-theme", theme);
     document.documentElement.style.colorScheme = theme;
   } catch (e) {
