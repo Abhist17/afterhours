@@ -15,7 +15,11 @@
 
 </div>
 
-![The Afterhours desk: risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings, and the panels behind them](docs/desk.png)
+![The Afterhours desk reading a real $21M xStocks wallet on mainnet: risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk, and a what-if moving half of MSTRx into SPYx](docs/desk.png)
+
+<div align="center">
+<sub>A real wallet, not ours — nine xStocks and USDC, read live. MSTRx is 18% of its value and 52% of its risk.</sub>
+</div>
 
 ---
 
@@ -54,7 +58,9 @@ them — and scores the book in the browser:
 | **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. |
 
 Three sample books are built in for anyone without xStocks yet, labelled
-synthetic, priced live.
+synthetic, priced live — and one real mainnet wallet, found through the
+largest SPYx token accounts and labelled as not ours. Any view is a link:
+`?address=<wallet>` or `?book=<sample>`.
 
 ## Where Solana is load-bearing
 
@@ -108,11 +114,13 @@ There is no server. The site is a static export on GitHub Pages:
 Nothing sleeps, nothing has a cold start, and nothing about a book leaves the
 browser except what its owner chooses to sign.
 
-> **One key.** The public mainnet RPC refuses browser-origin token-account
-> queries, and so does every keyless alternative. A build should carry a free
-> [Helius](https://helius.dev) key as `NEXT_PUBLIC_RPC_URL`, restricted to the
-> site's domain. Without one, the desk still opens with sample books and
-> offers a field to paste an endpoint, kept in that browser.
+> **On RPCs.** Solana's public mainnet endpoint refuses browser-origin
+> token-account queries with a 403, and most keyless alternatives gate them.
+> [Solana Vibe Station](https://solanavibestation.com)'s public endpoint
+> answers them with CORS open, so it is the default; a build can carry its
+> own key as `NEXT_PUBLIC_RPC_URL` (a free [Helius](https://helius.dev) key,
+> restricted to the site's domain), and any viewer can paste an endpoint,
+> kept in their browser. Each failure falls through to the next.
 
 ## The universe
 

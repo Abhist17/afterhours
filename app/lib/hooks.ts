@@ -12,6 +12,12 @@ export function useCountUp(target: number, duration = 600): number {
     if (!Number.isFinite(target)) return;
     const from = currentRef.current;
     if (from === target) return;
+    // A viewer who asked for less motion gets the number, not the tween.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      currentRef.current = target;
+      setValue(target);
+      return;
+    }
     const start = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
