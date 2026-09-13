@@ -273,7 +273,7 @@ export default function Landing() {
         <div className="hero-glow card flex flex-col items-start gap-5 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
           <div>
             <h2 className="display text-[28px] leading-[1.05] text-text sm:text-[36px]">
-              Open the desk.<span className="cursor" aria-hidden="true" />
+              Open the desk.
             </h2>
             <p className="mt-2 max-w-[48ch] text-[13.5px] text-secondary">A sample book is loaded before you paste anything. Devnet for the on-chain part, so trying it costs nobody real SOL.</p>
           </div>

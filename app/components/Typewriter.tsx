@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
  * A line that types itself in, then leaves the cursor blinking. The full
  * text is laid out invisibly from the first paint so nothing under it
  * moves while the letters arrive; the typed prefix is drawn over it with
- * the same metrics, so the wrapping matches. Screen readers get the whole
- * sentence at once, and so does anyone who asked for reduced motion.
+ * the same metrics, so the wrapping matches. The cursor blinks a moment
+ * after the last letter, then goes. Screen readers get the whole sentence
+ * at once, and so does anyone who asked for reduced motion.
  */
 export function Typewriter({
   text,
@@ -22,6 +23,13 @@ export function Typewriter({
 }) {
   const [shown, setShown] = useState(0);
   const [done, setDone] = useState(false);
+  const [gone, setGone] = useState(false);
+
+  useEffect(() => {
+    if (!done) return;
+    const t = window.setTimeout(() => setGone(true), 1400);
+    return () => window.clearTimeout(t);
+  }, [done]);
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
@@ -70,7 +78,7 @@ export function Typewriter({
         {head}
         <span className="whitespace-nowrap">
           {last}
-          <span className={`cursor ${done ? "" : "cursor-solid"}`} />
+          {!gone && <span className={`cursor ${done ? "" : "cursor-solid"}`} />}
         </span>
       </span>
     </span>
