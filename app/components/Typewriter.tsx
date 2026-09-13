@@ -3,57 +3,69 @@
 import { useEffect, useState } from "react";
 
 /**
- * A line that types itself in, then leaves the cursor blinking. The full
- * text is laid out invisibly from the first paint so nothing under it
- * moves while the letters arrive; the typed prefix is drawn over it with
- * the same metrics, so the wrapping matches. The cursor blinks a moment
- * after the last letter, then goes. Screen readers get the whole sentence
- * at once, and so does anyone who asked for reduced motion.
+ * A line that types itself in, holds, backspaces away and types again,
+ * on repeat. The cursor is only there while letters are moving; the
+ * finished sentence stands on its own. The full text is laid out
+ * invisibly from the first paint so nothing under it moves while the
+ * letters come and go; the visible prefix is drawn over it with the
+ * same metrics, so the wrapping matches. Screen readers get the whole
+ * sentence at once, and so does anyone who asked for reduced motion.
  */
+type Phase = "typing" | "hold" | "deleting" | "pause";
+
 export function Typewriter({
   text,
   speed = 60,
+  eraseSpeed = 32,
   delay = 500,
+  hold = 2600,
+  pause = 700,
   className = "",
 }: {
   text: string;
   speed?: number;
+  eraseSpeed?: number;
   delay?: number;
+  hold?: number;
+  pause?: number;
   className?: string;
 }) {
   const [shown, setShown] = useState(0);
-  const [done, setDone] = useState(false);
-  const [gone, setGone] = useState(false);
-
-  useEffect(() => {
-    if (!done) return;
-    const t = window.setTimeout(() => setGone(true), 1400);
-    return () => window.clearTimeout(t);
-  }, [done]);
+  const [phase, setPhase] = useState<Phase>("pause");
+  const [still, setStill] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       setShown(text.length);
-      setDone(true);
+      setStill(true);
       return;
     }
-    let i = 0;
-    let tick: number | undefined;
-    const start = window.setTimeout(() => {
-      tick = window.setInterval(() => {
-        i += 1;
-        setShown(i);
-        if (i >= text.length) {
-          window.clearInterval(tick);
-          setDone(true);
-        }
-      }, speed);
-    }, delay);
-    return () => {
-      window.clearTimeout(start);
-      if (tick) window.clearInterval(tick);
-    };
-  }, [text, speed, delay]);
+    const t = window.setTimeout(() => setPhase("typing"), delay);
+    return () => window.clearTimeout(t);
+  }, [text, delay]);
+
+  useEffect(() => {
+    if (still) return;
+    let t: number;
+    if (phase === "typing") {
+      if (shown >= text.length) {
+        t = window.setTimeout(() => setPhase("hold"), 0);
+      } else {
+        t = window.setTimeout(() => setShown((n) => n + 1), speed);
+      }
+    } else if (phase === "hold") {
+      t = window.setTimeout(() => setPhase("deleting"), hold);
+    } else if (phase === "deleting") {
+      if (shown <= 0) {
+        t = window.setTimeout(() => setPhase("pause"), 0);
+      } else {
+        t = window.setTimeout(() => setShown((n) => n - 1), eraseSpeed);
+      }
+    } else {
+      t = window.setTimeout(() => setPhase("typing"), pause);
+    }
+    return () => window.clearTimeout(t);
+  }, [phase, shown, still, text, speed, eraseSpeed, hold, pause]);
 
   // The last word and the cursor stay together, in both layers, so the
   // final line breaks where the reserved one did.
@@ -63,6 +75,7 @@ export function Typewriter({
   };
   const [fullHead, fullLast] = split(text);
   const [head, last] = split(text.slice(0, shown));
+  const moving = !still && (phase === "typing" || phase === "deleting");
 
   return (
     <span className={`relative block ${className}`}>
@@ -78,7 +91,7 @@ export function Typewriter({
         {head}
         <span className="whitespace-nowrap">
           {last}
-          {!gone && <span className={`cursor ${done ? "" : "cursor-solid"}`} />}
+          {moving && <span className="cursor cursor-solid" />}
         </span>
       </span>
     </span>
