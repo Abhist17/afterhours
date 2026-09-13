@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" shape-rendering="crispEdges">
   <rect width="64" height="64" rx="14" fill="#0b0d12"/>
-  <circle cx="32" cy="32" r="21" fill="none" stroke="#8b93ff" stroke-width="3" stroke-dasharray="88 44" stroke-linecap="round" transform="rotate(-90 32 32)"/>
-  <circle cx="32" cy="32" r="21" fill="none" stroke="#323b50" stroke-width="3"/>
-  <circle cx="32" cy="32" r="21" fill="none" stroke="#8b93ff" stroke-width="3" stroke-dasharray="36 96" stroke-linecap="round" transform="rotate(-90 32 32)"/>
-  <path d="M32 32V19M32 32h10" stroke="#eef0f6" stroke-width="3.5" stroke-linecap="round"/>
-  <circle cx="32" cy="32" r="2.6" fill="#eef0f6"/>
+  <g transform="translate(10 10) scale(4)">
+    <path fill="#3a4360" d="M4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM2 1h1v1h-1zM3 1h1v1h-1zM4 1h1v1h-1zM5 1h1v1h-1zM6 1h1v1h-1zM7 1h1v1h-1zM8 1h1v1h-1zM1 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM9 2h1v1h-1zM1 3h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM0 4h1v1h-1zM1 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM1 5h1v1h-1zM9 5h1v1h-1zM10 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM9 6h1v1h-1zM10 6h1v1h-1zM1 7h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM8 8h1v1h-1zM9 8h1v1h-1z"/>
+    <path fill="#8b93ff" d="M2 7h1v1h-1zM1 8h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM7 8h1v1h-1zM2 9h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM6 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1z"/>
+    <rect x="5" y="5" width="1" height="1" fill="#eef0f6"/>
+  </g>
 </svg>

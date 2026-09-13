@@ -68,7 +68,7 @@ export function SectionNav({ sections }: { sections: Section[] }) {
               className={`flex shrink-0 items-baseline gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[11px] transition-colors ${on ? "bg-surface-active text-text" : "text-tertiary hover:bg-surface-hover hover:text-text"}`}
               aria-current={on ? "location" : undefined}
             >
-              <span className="numeric text-[10px]" style={{ color: on ? "var(--brand)" : undefined }}>{s.number}</span>
+              <span className="display text-[11px]" style={{ color: on ? "var(--brand)" : undefined }}>{s.number}</span>
               {s.title}
             </a>
           );

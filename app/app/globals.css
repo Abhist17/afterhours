@@ -119,7 +119,7 @@
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", "JetBrains Mono",
     Menlo, Consolas, monospace;
-  --font-display: var(--font-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-pixel), "Pixelify Sans", "Silkscreen", ui-monospace, monospace;
 }
 
 /* ── Base ──────────────────────────────────────────────────────── */
@@ -162,11 +162,17 @@ body {
   box-shadow: inset 0 1px 0 var(--card-light);
 }
 
-/* The headline face. */
+/* The headline face: pixels, set on the grid they were drawn on. Wide
+   tracking or fake italics would blur them, so neither is allowed. */
 @utility display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+.display em {
+  font-style: normal;
 }
 
 /* A definition on hover: dotted, never underlined like a link. */
@@ -178,14 +184,61 @@ body {
 }
 
 /* The hero's backdrop: one soft light, a desk lamp after the close, over
-   a faint grid — graph paper, since the page is about measuring. */
+   a dot matrix — the grid the headline's pixels sit on, one dot per
+   twelve pixels. */
 @utility hero-glow {
   background-image:
     radial-gradient(60% 90% at 15% 0%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 70%),
-    linear-gradient(to right, color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px);
-  background-size: auto, 48px 48px, 48px 48px;
-  background-position: 0 0, -1px -1px, -1px -1px;
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--border-strong) 55%, transparent) 1px, transparent 1.5px);
+  background-size: auto, 12px 12px;
+  background-position: 0 0, 6px 6px;
+}
+
+/* The block cursor after the headline: the terminal is still on. */
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.cursor {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.78em;
+  margin-left: 0.12em;
+  vertical-align: -0.04em;
+  background: var(--brand);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+/* The tape under the hero: every xStock's move since the last bell,
+   passing at reading pace. Two copies of the row make the loop seamless;
+   the pointer pauses it. */
+@keyframes tape {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.tape {
+  display: flex;
+  width: max-content;
+  animation: tape var(--tape-duration, 90s) linear infinite;
+}
+.tape-wrap:hover .tape,
+.tape-wrap:focus-within .tape {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape-wrap {
+    overflow-x: auto;
+  }
+  .cursor {
+    animation: none;
+  }
 }
 
 /* ── Motion ────────────────────────────────────────────────────── */

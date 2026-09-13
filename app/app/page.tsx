@@ -14,6 +14,7 @@ import { shortAddress, timeAgo } from "@/lib/format";
 import type { Target } from "@/lib/quant";
 import { TopBar } from "@/components/TopBar";
 import { SessionRing } from "@/components/SessionRing";
+import { Tape } from "@/components/Tape";
 import { SectionNav, type Section } from "@/components/SectionNav";
 import { Stress } from "@/components/Stress";
 import { RiskMap } from "@/components/RiskMap";
@@ -270,7 +271,14 @@ function Desk() {
           <div className="min-w-0">
             <p className="label mb-3" style={{ color: "var(--brand)" }}>The risk desk for tokenized stocks on Solana</p>
             <h1 className="display max-w-[20ch] text-[38px] leading-[1.02] text-text sm:text-[58px]">
-              Markets close. <em className="text-secondary">Your book doesn&rsquo;t.</em>
+              Markets close.{" "}
+              <em className="text-secondary">
+                Your book{" "}
+                <span className="whitespace-nowrap">
+                  doesn&rsquo;t.
+                  <span className="cursor" aria-hidden="true" />
+                </span>
+              </em>
             </h1>
             <p className="mt-4 max-w-[58ch] text-[14px] leading-relaxed text-secondary sm:text-[15px]">
               An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. What your
@@ -398,6 +406,7 @@ function Desk() {
           </div>
         </div>
       </section>
+      <Tape history={history} prices={quotes?.prices ?? null} market={market} />
 
       <main className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6">
         {historyError ? (

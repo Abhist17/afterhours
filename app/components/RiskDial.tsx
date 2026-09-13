@@ -94,7 +94,7 @@ export function RiskDial({
         {/* Typography scales with the dial so the reading never crowds the
             arc at smaller sizes. */}
         <span
-          className="numeric font-medium leading-none tracking-tight text-text"
+          className="display leading-none text-text"
           style={{ fontSize: Math.round(size * 0.235) }}
         >
           {value.toFixed(1)}

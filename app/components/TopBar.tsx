@@ -5,21 +5,8 @@ import { formatEastern } from "@/lib/market-hours";
 import { untilTime } from "@/lib/format";
 import { useMounted, useNow } from "@/lib/hooks";
 import { useTheme } from "@/lib/theme";
+import { Logo } from "./Logo";
 import { Button, Dot } from "./ui";
-
-function Logo() {
-  return (
-    <span className="flex items-center gap-2.5">
-      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-        <circle cx="10" cy="10" r="8.5" stroke="var(--text-secondary)" strokeWidth="1.2" fill="none" />
-        {/* A clock past the close: the hands say 4:00 and the tick keeps going. */}
-        <path d="M10 10 V5.5 M10 10 H13.6" stroke="var(--text)" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-        <circle cx="10" cy="10" r="1" fill="var(--text)" />
-      </svg>
-      <span className="text-[15px] font-semibold tracking-tight text-text">Afterhours</span>
-    </span>
-  );
-}
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();

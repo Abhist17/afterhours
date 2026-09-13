@@ -273,7 +273,7 @@ for the hackathon so that trying it costs nobody real SOL.
 
 | Layer | Technology |
 |:--|:--|
-| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist, Geist Mono, Instrument Serif · hand-rolled SVG |
+| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist, Geist Mono, Pixelify Sans · hand-rolled SVG |
 | Wallet | Wallet Standard via `@solana/wallet-adapter-react` |
 | Program | Rust · Anchor 0.32 |
 | Data | Solana mainnet RPC · CoinGecko · Jupiter quote API · GitHub Actions |

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Pixelify_Sans } from "next/font/google";
 import { THEME_BOOTSTRAP } from "@/lib/theme";
 import "./globals.css";
 
@@ -7,9 +7,10 @@ import "./globals.css";
 // the figures — which are all monospace — never reflow after first paint.
 const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
-// One display face, spent on the headline and on the sentences the desk
-// wants read slowly — never on a figure.
-const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
+// One display face, spent on the wordmark, the headline and the headline
+// figures: a pixel face, because the desk is a terminal that stays lit
+// after the bell. Body copy and every column of figures stay in Geist.
+const pixel = Pixelify_Sans({ subsets: ["latin"], variable: "--font-pixel", display: "swap" });
 
 const DESCRIPTION =
   "The risk desk for tokenized stocks on Solana. Value at Risk, beta, overnight exposure and " +
@@ -48,7 +49,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${pixel.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>

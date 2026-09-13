@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { Mark } from "@/components/Logo";
 
 export default function NotFound() {
   return (
     <main className="mx-auto flex min-h-screen max-w-[1500px] flex-col items-start justify-center px-6">
-      <p className="label mb-3" style={{ color: "var(--brand)" }}>Afterhours</p>
+      <p className="label mb-3 flex items-center gap-2" style={{ color: "var(--brand)" }}>
+        <Mark size={16} />
+        Afterhours
+      </p>
       <h1 className="display text-[44px] leading-[1.02] text-text sm:text-[64px]">
         Nothing trades <em className="text-secondary">here.</em>
       </h1>
