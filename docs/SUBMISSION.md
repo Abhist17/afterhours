@@ -132,7 +132,7 @@ Nothing sleeps, nothing cold-starts.
 
 ## Links
 
-- Desk: https://abhist17.github.io/afterhours/
+- Desk: https://afterhours-v0dr.onrender.com/ (mirror: https://abhist17.github.io/afterhours/)
 - Repository: https://github.com/Abhist17/afterhours
 - Program (devnet): `3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri`,
   IDL account `EAtJ4QbGP352arvb6u7J19TF8rRei2uKtoCuFAMARuHh`

@@ -20,7 +20,7 @@ services:
         value: ""
       # Absolute URL for the social card and canonical link.
       - key: NEXT_PUBLIC_SITE_URL
-        value: https://afterhours.onrender.com
+        value: https://afterhours-v0dr.onrender.com
       # Optional: a mainnet RPC that accepts browser requests (a free Helius
       # key). Leave unset to use the public endpoint, as Pages does.
       - key: NEXT_PUBLIC_RPC_URL
