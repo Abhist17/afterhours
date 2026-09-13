@@ -5,7 +5,7 @@ import { ASSETS, BY_MINT } from "./universe";
  * Real balances, read from mainnet by the browser. xStocks are Token-2022
  * mints; USDC and USDT are classic Token mints; SOL is native. All three
  * are read, and the same mint spread across several token accounts is
- * summed. Nothing here signs anything — an address is enough.
+ * summed. Nothing here signs anything, an address is enough.
  */
 
 const TOKEN_PROGRAM = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
@@ -48,7 +48,7 @@ export function setRpcUrl(url: string | null): void {
   } catch {}
 }
 
-/** True when no key is configured anywhere — reads rely on public goodwill. */
+/** True when no key is configured anywhere, reads rely on public goodwill. */
 export function usingPublicRpc(): boolean {
   const url = resolveRpcUrl();
   return url === PUBLIC_RPC_URL || url === KEYLESS_RPC_URL;
@@ -77,7 +77,7 @@ export function isValidAddress(value: string): boolean {
 /**
  * Reads through the resolved endpoint, then each fallback, so one refusal
  * is a retry rather than a dead end. The error that surfaces is the
- * first endpoint's — the one the viewer chose or the build carries.
+ * first endpoint's, the one the viewer chose or the build carries.
  */
 export async function readBalances(address: string, rpcUrl?: string): Promise<Balances> {
   const urls = rpcUrl ? [rpcUrl] : [resolveRpcUrl(), ...fallbackRpcUrls()];

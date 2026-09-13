@@ -4,8 +4,8 @@ import { useEffect } from "react";
 
 /**
  * Scroll a panel under the sticky bars. Smooth where the platform will
- * animate it; if nothing has moved a beat later — some embedders and
- * background tabs refuse — jump instead, so a key always lands.
+ * animate it; if nothing has moved a beat later, some embedders and
+ * background tabs refuse, jump instead, so a key always lands.
  */
 export function scrollToPanel(id: string): void {
   const el = document.getElementById(id);

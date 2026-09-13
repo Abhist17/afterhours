@@ -128,10 +128,10 @@ export function Holdings({ a, history }: { a: Analysis; history: History }) {
                             {signedPct(h.sinceClose.changePct)}
                           </span>
                         ) : (
-                          <span className="text-tertiary">{h.asset.class === "equity" ? "—" : "24/7"}</span>
+                          <span className="text-tertiary">{h.asset.class === "equity" ? "n/a" : "24/7"}</span>
                         )
                       ) : h.beta === null ? (
-                        <span className="text-tertiary">—</span>
+                        <span className="text-tertiary">n/a</span>
                       ) : (
                         <span className="text-secondary">{h.beta.toFixed(2)}×</span>
                       )}
@@ -153,7 +153,7 @@ export function Holdings({ a, history }: { a: Analysis; history: History }) {
                                   : undefined
                           }
                         >
-                          {h.riskShare === null ? "—" : pct(h.riskShare * 100)}
+                          {h.riskShare === null ? "n/a" : pct(h.riskShare * 100)}
                         </span>
                       </span>
                     </td>
@@ -190,7 +190,7 @@ export function Holdings({ a, history }: { a: Analysis; history: History }) {
         )}
         {a.risk.uncovered.length > 0 && (
           <p>
-            Priced but outside the risk model, no thirty-day series yet: {a.risk.uncovered.join(", ")} — {pct((1 - a.risk.coverage) * 100, 0)} of the book.
+            Priced but outside the risk model, no thirty-day series yet: {a.risk.uncovered.join(", ")}, {pct((1 - a.risk.coverage) * 100, 0)} of the book.
           </p>
         )}
         {a.unpriced.length > 0 && <p>Held but without a quote this load: {a.unpriced.join(", ")}.</p>}

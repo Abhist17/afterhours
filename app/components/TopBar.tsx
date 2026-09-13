@@ -84,7 +84,7 @@ export function TopBar({
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
       <div className={`flex h-14 items-center gap-2 px-4 sm:gap-3 sm:px-6 ${rail ? "" : "mx-auto max-w-[1500px]"}`}>
-        <Link href="/" className={`rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-focus ${rail ? "lg:hidden" : ""}`} title="Afterhours — home">
+        <Link href="/" className={`rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-focus ${rail ? "lg:hidden" : ""}`} title="Afterhours home">
           <Logo />
         </Link>
         {rail && <span className="label hidden lg:inline">The desk</span>}

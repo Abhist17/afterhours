@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   Afterhours — design tokens
+   Afterhours, design tokens
 
    Black by default, because the product is about what happens after
-   the bell: a terminal left on in a dark room. One brand accent —
-   signal green — is spent on interactive chrome and the cursor only.
+   the bell: a terminal left on in a dark room. One brand accent,
+   signal green, is spent on interactive chrome and the cursor only.
    Data keeps its own colours: the risk ramp for severity (calm is
    teal, never the brand green, so "safe" and "clickable" cannot be
-   confused), and four sleeve tones — stocks, crypto, crypto-in-stock-
-   clothing, cash — so the eye can answer "what kind of thing is this"
+   confused), and four sleeve tones, stocks, crypto, crypto-in-stock-
+   clothing, cash, so the eye can answer "what kind of thing is this"
    before reading a label. Nothing else is tinted.
    ═══════════════════════════════════════════════════════════════ */
 
@@ -31,24 +31,24 @@
   --text-secondary: #a3aba2;
   --text-tertiary: #6d766c;
 
-  /* Brand — interactive chrome only */
+  /* Brand, interactive chrome only */
   --brand: #5eff2f;
   --brand-strong: #8cff6a;
   --primary: #42ff00;
   --primary-text: #041000;
   --focus: #5eff2f;
 
-  /* Risk ramp — semantic, never decorative */
+  /* Risk ramp, semantic, never decorative */
   --calm: #2fd4c4;
   --watch: #e2b23f;
   --elevated: #f27d3c;
   --severe: #ff4f60;
 
   /* Sleeves */
-  --asset-1: #7fa7ff; /* tokenized stocks — blue */
-  --asset-2: #e2b23f; /* crypto — gold */
-  --asset-3: #ff7fb9; /* crypto-linked equity — rose */
-  --asset-4: #8f9aa6; /* cash — slate */
+  --asset-1: #7fa7ff; /* tokenized stocks, blue */
+  --asset-2: #e2b23f; /* crypto, gold */
+  --asset-3: #ff7fb9; /* crypto-linked equity, rose */
+  --asset-4: #8f9aa6; /* cash, slate */
   --asset-other: #6d766c;
 
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
@@ -185,7 +185,7 @@ body {
 }
 
 /* The hero's backdrop: one soft light, a desk lamp after the close, over
-   a dot matrix — the grid the headline's pixels sit on, one dot per
+   a dot matrix, the grid the headline's pixels sit on, one dot per
    twelve pixels. */
 @utility hero-glow {
   background-image:
@@ -214,6 +214,9 @@ body {
   vertical-align: -0.04em;
   background: var(--brand);
   animation: blink 1.1s steps(1) infinite;
+}
+.cursor-solid {
+  animation: none;
 }
 
 /* The tape under the hero: every xStock's move since the last bell,

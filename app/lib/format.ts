@@ -1,7 +1,7 @@
 /** Formatting shared by every panel. Figures never reflow: tabular, monospace. */
 
 export function usd(value: number, opts?: { compact?: boolean }): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   const compact = opts?.compact ?? Math.abs(value) >= 1_000_000;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -13,12 +13,12 @@ export function usd(value: number, opts?: { compact?: boolean }): string {
 }
 
 export function signedUsd(value: number): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   return `${value > 0 ? "+" : value < 0 ? "−" : ""}${usd(Math.abs(value))}`;
 }
 
 export function price(value: number): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   if (value === 0) return "$0.00";
   if (value < 0.001) return `$${value.toFixed(8).replace(/0+$/, "").replace(/\.$/, "")}`;
   if (value < 1) return `$${value.toFixed(4)}`;
@@ -26,7 +26,7 @@ export function price(value: number): string {
 }
 
 export function amount(value: number): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   if (value === 0) return "0";
   if (value >= 1_000_000) {
     return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(value);
@@ -35,12 +35,12 @@ export function amount(value: number): string {
 }
 
 export function pct(value: number, digits = 1): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   return `${value.toFixed(digits)}%`;
 }
 
 export function signedPct(value: number, digits = 2): string {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "n/a";
   return `${value > 0 ? "+" : value < 0 ? "−" : ""}${Math.abs(value).toFixed(digits)}%`;
 }
 
@@ -120,8 +120,8 @@ export const BAND_THRESHOLDS: { at: number; band: RiskBand }[] = [
 
 // ── Asset colour ─────────────────────────────────────────────────
 // Colour by sleeve, not by ticker: with forty assets a per-ticker
-// palette would be noise, and the question the page asks — stocks, crypto
-// or cash? — is what the eye should be able to answer at a glance.
+// palette would be noise, and the question the page asks, stocks, crypto
+// or cash?, is what the eye should be able to answer at a glance.
 
 export function sleeveColor(cls: "equity" | "crypto" | "cash"): string {
   switch (cls) {

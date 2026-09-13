@@ -14,7 +14,7 @@ export function Panel({ children, className = "", delay, id }: { children: React
 
 /**
  * Every panel opens with a number, a title, and one sentence saying what
- * to look for — the desk reads as a sequence, not a grid of widgets.
+ * to look for, the desk reads as a sequence, not a grid of widgets.
  */
 export function PanelHeader({
   number,

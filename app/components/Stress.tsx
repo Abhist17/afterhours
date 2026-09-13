@@ -13,7 +13,7 @@ import { Button } from "./ui";
  * shown. Factor shocks move every position by its beta to the factor; the
  * two dated scenarios are the window's own worst day and worst close-to-
  * open, at today's weights. The custom shock is a slider for each factor,
- * summed — a first-order answer, labelled as one.
+ * summed, a first-order answer, labelled as one.
  */
 export function Stress({ a }: { a: Analysis }) {
   const [selected, setSelected] = useState<string>(a.stress.scenarios[0]?.key ?? "");
@@ -34,7 +34,7 @@ export function Stress({ a }: { a: Analysis }) {
     return {
       key: "custom",
       label: "Your own shock",
-      basis: `S&P 500 ${(marketShock * 100).toFixed(0)}% and crypto ${(cryptoShock * 100).toFixed(0)}% together, betas summed — the two overlap, so read it as a ceiling`,
+      basis: `S&P 500 ${(marketShock * 100).toFixed(0)}% and crypto ${(cryptoShock * 100).toFixed(0)}% together, betas summed, the two overlap, so read it as a ceiling`,
       pnlUsd: pnl,
       pnlPct: a.total > 0 ? pnl / a.total : 0,
       lines,

@@ -1,7 +1,7 @@
 /**
  * Stress: what the book does if a factor moves by an amount the last
  * thirty days may never have shown. Two factors matter for a book of
- * tokenized stocks — the index and crypto — and each position moves by
+ * tokenized stocks, the index and crypto, and each position moves by
  * its beta to the factor being shocked, on the same estimator as
  * everything else. Two more scenarios are not hypothetical at all: the
  * worst day the window actually had, and the worst closed period.

@@ -1,7 +1,7 @@
 /**
  * Real prices for the trades the desk proposes. Jupiter's quote endpoint
  * answers browser requests without a key, so a rebalance line can say what
- * it would actually fetch on-chain right now — routed, with price impact —
+ * it would actually fetch on-chain right now, routed, with price impact,
  * rather than a size at the last feed print. Nothing here signs or sends.
  */
 

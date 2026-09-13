@@ -6,8 +6,8 @@ import { untilTime } from "@/lib/format";
 import { useMounted } from "@/lib/hooks";
 
 /**
- * A day in New York as a ring. The NYSE session — 9:30 to 4:00, six and
- * a half hours — is the short bright arc; the rest of the ring is the
+ * A day in New York as a ring. The NYSE session, 9:30 to 4:00, six and
+ * a half hours, is the short bright arc; the rest of the ring is the
  * seventeen and a half hours a day the tokens trade without their
  * shares. The dot is now. On a weekend or holiday the whole ring is
  * afterhours, and the caption says so.

@@ -49,7 +49,7 @@ export function RiskDial({
     <div
       className="relative inline-flex flex-col items-center"
       role="img"
-      aria-label={`Risk score ${clamped.toFixed(1)} of 100 — ${band.label}`}
+      aria-label={`Risk score ${clamped.toFixed(1)} of 100, ${band.label}`}
     >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <path
@@ -60,7 +60,7 @@ export function RiskDial({
           strokeLinecap="round"
         />
 
-        {/* Band boundary ticks — 25 / 45 / 70 */}
+        {/* Band boundary ticks, 25 / 45 / 70 */}
         {BAND_THRESHOLDS.filter((t) => t.at > 0).map(({ at }) => {
           const angle = START + (at / 100) * SWEEP;
           const inner = polar(cx, cy, r - 6, angle);

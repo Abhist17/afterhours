@@ -4,14 +4,14 @@
  * The table lives in data/universe.json so the hourly history refresh (a
  * plain Node script) and the app read the same rows. Every xStock in it was
  * checked two ways before it went in: the mint from CoinGecko's Solana
- * platform entry, then the account itself on mainnet — owner program and
+ * platform entry, then the account itself on mainnet, owner program and
  * decimals. That caught CoinGecko listing AMDx with 18 decimals; the chain
  * says 8, like every other xStock. All xStocks are Token-2022 mints, which a
  * Token-program-only scan would never see.
  *
  * Sectors are coarse on purpose. The one that matters for this product is
  * "crypto-linked equity": COIN, MSTR, HOOD and CRCL are stocks on paper and
- * crypto beta in practice — and STRC, BMNR and DFDV are treasury companies
+ * crypto beta in practice, and STRC, BMNR and DFDV are treasury companies
  * whose share price is a leveraged claim on the coin they hold. A book of
  * SOL plus those is one bet wearing several tickers.
  *

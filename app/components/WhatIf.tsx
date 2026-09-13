@@ -17,7 +17,7 @@ const FRACTIONS = [
 
 /**
  * "What if I moved some of this into that?" Re-scores the book with a share
- * of one position moved into another asset at the last quote — same
+ * of one position moved into another asset at the last quote, same
  * history, same estimator, in the browser, instantly. Value is preserved:
  * a rebalance changes a book's shape, not its size.
  */
@@ -99,7 +99,7 @@ function Outcome({
   const b1 = riskBand(after.score);
   const rows = [
     { label: "Value at Risk", from: usd(before.risk.headlineVarUsd), to: usd(after.risk.headlineVarUsd) },
-    { label: "Beta to S&P", from: before.risk.beta === null ? "—" : `${before.risk.beta.toFixed(2)}×`, to: after.risk.beta === null ? "—" : `${after.risk.beta.toFixed(2)}×` },
+    { label: "Beta to S&P", from: before.risk.beta === null ? "n/a" : `${before.risk.beta.toFixed(2)}×`, to: after.risk.beta === null ? "n/a" : `${after.risk.beta.toFixed(2)}×` },
     { label: "Stocks", from: `${(before.sleeves[0].valueShare * 100).toFixed(0)}%`, to: `${(after.sleeves[0].valueShare * 100).toFixed(0)}%` },
     { label: "Effective assets", from: before.concentration.effectiveAssets.toFixed(1), to: after.concentration.effectiveAssets.toFixed(1) },
   ];

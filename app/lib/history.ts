@@ -4,8 +4,8 @@ import { inferIntervalMs, type PricePoint } from "./quant";
 /**
  * Thirty days of hourly prices for the universe, refreshed on the hour by a
  * GitHub Action and published to the `data` branch. The app fetches that
- * and the copy bundled with the build together: the bundle — older, but
- * same-origin and never absent — paints first, and the hourly file takes
+ * and the copy bundled with the build together: the bundle, older, but
+ * same-origin and never absent, paints first, and the hourly file takes
  * over when it lands, so a first paint never depends on a third party.
  */
 
@@ -84,7 +84,7 @@ export function mergeHistoryFiles(live: HistoryFile, bundled: HistoryFile): Hist
 
 /**
  * Both files at once. The bundled one is same-origin and paints first;
- * the live one, when it lands, replaces it — filled from the bundle for
+ * the live one, when it lands, replaces it, filled from the bundle for
  * anything it lacks. A slow third party costs freshness for a moment,
  * never the first paint. Returns a cancel function for unmount.
  */
@@ -143,7 +143,7 @@ export function loadHistoryProgressive(handlers: {
   };
 }
 
-/** Latest price per symbol from the history alone — the fallback quote. */
+/** Latest price per symbol from the history alone, the fallback quote. */
 export function lastPrices(history: History): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [symbol, points] of Object.entries(history.series)) {

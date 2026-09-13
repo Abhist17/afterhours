@@ -8,7 +8,7 @@ import { Term } from "./Term";
 /**
  * The dial and four figures, as one instrument. The fourth figure is the
  * one a brokerage never shows: how much of the book is stock that is
- * trading right now without the stock market — and where it has gone
+ * trading right now without the stock market, and where it has gone
  * since the last print.
  */
 export function Summary({ a }: { a: Analysis }) {
@@ -34,7 +34,7 @@ export function Summary({ a }: { a: Analysis }) {
     {
       label: "Beta to S&P 500",
       term: "Beta",
-      value: beta === null ? "—" : `${beta.toFixed(2)}×`,
+      value: beta === null ? "n/a" : `${beta.toFixed(2)}×`,
       detail:
         beta === null
           ? "No index series loaded"

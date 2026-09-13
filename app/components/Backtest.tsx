@@ -13,8 +13,8 @@ type View = "score" | "value" | "drawdown";
 
 /**
  * The score this allocation would have carried on every hour of the last
- * thirty days — the same recursive estimator, seeing only what was known
- * then — with the book's value and drawdown on the same axis of time. It
+ * thirty days, the same recursive estimator, seeing only what was known
+ * then, with the book's value and drawdown on the same axis of time. It
  * is a statement about the shape of the book, not the wallet's past: the
  * wallet's own record is what the owner anchors on-chain. Under it, the
  * model marked against what happened.
@@ -184,8 +184,8 @@ export function Backtest({ a }: { a: Analysis }) {
             {check.verdict === "in line"
               ? "in line with its confidence"
               : check.verdict === "watch"
-                ? "more breaches than the model promised — read the VaR as a floor"
-                : "the model is too calm for this book — the historical VaR headlines"}
+                ? "more breaches than the model promised. Read the VaR as a floor"
+                : "the model is too calm for this book. The historical VaR headlines"}
             {check.worstLoss > check.worstForecast && (
               <> · worst miss {pct(check.worstLoss * 100, 1)} against {pct(check.worstForecast * 100, 1)} on {dayLabel(check.worstAt)}</>
             )}

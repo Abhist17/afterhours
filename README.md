@@ -19,7 +19,7 @@
 ![The Afterhours desk reading a real $21M xStocks wallet on mainnet: a rail of ten numbered panels, the tape of every xStock's move since the close, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, a what-if moving half of MSTRx into SPYx, and the book under an S&P 500 −2% shock, position by position](docs/desk.png)
 
 <div align="center">
-<sub>A real wallet, not ours — eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
+<sub>A real wallet, not ours, eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
 </div>
 
 ---
@@ -30,46 +30,46 @@ An xStock is a Solana token that tracks a share. The token trades every hour
 of every day. The share trades 9:30 to 4:00, New York, on trading days.
 
 Between the close and the next open, the token's price is a forecast of where
-the stock will reopen — and the gap between the two is risk the holder carries
+the stock will reopen, and the gap between the two is risk the holder carries
 with nobody on the other side of the book. On a Friday night, a wallet of
 tokenized stocks is a book of positions its underlying market cannot price
 until Monday.
 
 Every brokerage app shows *what you have*. None shows *what you stand to
-lose* — and none of them has ever had to think about a share that keeps
+lose*, and none of them has ever had to think about a share that keeps
 trading after the bell. Afterhours is the risk desk for that book.
 
 ## What it does
 
 Paste a Solana address, or connect a wallet. The desk reads its balances
-from mainnet — thirty-five xStocks, plus the SOL, cbBTC and stablecoins that
-sit next to them — and scores the book in the browser:
+from mainnet, thirty-five xStocks, plus the SOL, cbBTC and stablecoins that
+sit next to them, and scores the book in the browser:
 
 | Panel | What it says |
 |:--|:--|
-| **Score** | Annualised volatility plus a concentration penalty, 0–100. An index book runs near 18; a single large-cap 30–45; a crypto-heavy book past 60. Every figure on the page is computed in the tab from thirty days of hourly prices. |
-| **Value at Risk** | The 95% one-day loss in dollars, with Expected Shortfall — parametric and historical, the more conservative one headlines. |
+| **Score** | Annualised volatility plus a concentration penalty, 0 to 100. An index book runs near 18; a single large-cap 30 to 45; a crypto-heavy book past 60. Every figure on the page is computed in the tab from thirty days of hourly prices. |
+| **Value at Risk** | The 95% one-day loss in dollars, with Expected Shortfall, parametric and historical, the more conservative one headlines. |
 | **Beta to the S&P 500** | For the book and for every position, on the same estimator, against SPYx. |
-| **What you hold** | Every position with a thirty-day sparkline, its share of value beside its share of risk, and — on a click — its full thirty days with the hours the NYSE was closed shaded. |
-| **Trading without the market** | While the NYSE is closed: each stock's token move since the last official print, and the sum — *the market opens to this*. Then every close the window had, as bars; then the share of the book's variance that fell in closed hours, per stock, with the per-hour comparison. |
+| **What you hold** | Every position with a thirty-day sparkline, its share of value beside its share of risk, and, on a click, its full thirty days with the hours the NYSE was closed shaded. |
+| **Trading without the market** | While the NYSE is closed: each stock's token move since the last official print, and the sum: *the market opens to this*. Then every close the window had, as bars; then the share of the book's variance that fell in closed hours, per stock, with the per-hour comparison. |
 | **Stocks, crypto, cash** | Each sleeve's share of value beside its share of risk. Then the sentence a sector label hides: COIN, MSTR, HOOD, CRCL and the coin-treasury companies (STRC, BMNR, DFDV) are equity on paper and crypto beta in practice, and the desk says what share of the book is really riding crypto. |
-| **Thirty days** | The current shape of the book scored at every hour of the window with an estimator that has seen only what was known by then; its value and drawdown on the same axis; and the model marked against what happened — how many days the loss exceeded the VaR. |
+| **Thirty days** | The current shape of the book scored at every hour of the window with an estimator that has seen only what was known by then; its value and drawdown on the same axis; and the model marked against what happened: how many days the loss exceeded the VaR. |
 | **Correlation** | Thirty days of hourly returns across what is held, plus the index. The most correlated held pair is named. |
 | **What if** | Move a quarter, a half or all of any position into any other asset and re-score the whole book, instantly. |
-| **If the market gaps** | The book under an S&P 500 or crypto shock, every position by its beta to the factor — and under the worst day and the worst close-to-open the window actually had. A custom shock with two sliders. |
-| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back — each one quoted live on Jupiter for its exact size, with price impact, route, and the gap to the feed. |
+| **If the market gaps** | The book under an S&P 500 or crypto shock, every position by its beta to the factor, and under the worst day and the worst close-to-open the window actually had. A custom shock with two sliders. |
+| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back, each one quoted live on Jupiter for its exact size, with price impact, route, and the gap to the feed. |
 | **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. The snapshots draw as a line against the limit. |
 | **Risk and return, name by name** | Every asset the desk knows on a volatility-versus-return map; what is held is solid and sized by weight, the book is the ring, thin names are dashed. |
 
 Four sample books are built in for anyone without xStocks yet, labelled
-synthetic, priced live — and one real mainnet wallet, found through the
+synthetic, priced live, and one real mainnet wallet, found through the
 largest SPYx token accounts and labelled as not ours. Any view is a link:
 `?address=<wallet>` or `?book=<sample>`, with `&theme=light` or `dark` if
 it matters, and there is a button to copy it.
 
 Above it all sits a ring of the New York day: the six and a half hours the
-NYSE is open as a short bright arc, the other seventeen and a half — and
-every weekend — as the time the tokens trade with no market behind them,
+NYSE is open as a short bright arc, the other seventeen and a half, and
+every weekend, as the time the tokens trade with no market behind them,
 and a dot for now. A section bar under the top bar names the ten panels
 and lights the one in view; the number keys jump to them, `/` goes to the
 address, `?` opens the sheet that explains every figure, and every term
@@ -87,7 +87,7 @@ keeps two accounts per wallet, both owned by that wallet:
 | Account | What it holds | Who writes it |
 |:--|:--|:--|
 | `Policy` | Target weights per mint (basis points, must sum to exactly 10,000), a risk limit, a drift band | The owner |
-| `Snapshot` | Score, book value, VaR, drift from policy, share in tokenized stocks, whether the NYSE was open, timestamp — immutable | The owner |
+| `Snapshot` | Score, book value, VaR, drift from policy, share in tokenized stocks, whether the NYSE was open, timestamp, immutable | The owner |
 
 A snapshot recorded under a policy emits `SnapshotRecorded { breached }`. That
 event is the primitive a credit protocol lending against a stock portfolio
@@ -95,13 +95,13 @@ would subscribe to: not "the price moved" but "this book left its own stated
 policy, by its owner's own reading". The subscriber exists:
 [`scripts/watch-breaches.mjs`](scripts/watch-breaches.mjs) follows the
 program's logs live, or replays its history, decodes every event, and can
-POST each breach to a webhook — the margin-call bot, as a hundred lines.
+POST each breach to a webhook, the margin-call bot, as a hundred lines.
 
 ```
 $ node scripts/watch-breaches.mjs --history 30
 ok      2026-09-12 12:17Z  4u8c…HpFc  score  22  book $14,650  VaR $265  drift 1.8pp  stocks 74%  NYSE closed  (limit 30 · band 5pp)
 ok      2026-09-12 12:17Z  4u8c…HpFc  score  27  book $14,910  VaR $312  drift 2.4pp  stocks 75%  NYSE open    (limit 30 · band 5pp)
-BREACH  2026-09-12 12:17Z  4u8c…HpFc  score  34  book $14,380  VaR $402  drift 6.1pp  stocks 77%  NYSE closed  (limit 30 · band 5pp) — score 34 > 30
+BREACH  2026-09-12 12:17Z  4u8c…HpFc  score  34  book $14,380  VaR $402  drift 6.1pp  stocks 77%  NYSE closed  (limit 30 · band 5pp), score 34 > 30
 ```
 
 The page prepares each transaction; the wallet signs; the page submits it to
@@ -111,7 +111,7 @@ anywhere else. Only the owner can create, update or close their own record.
 The program is deployed on devnet with its IDL published, so Explorer decodes
 every account. The author's own wallet keeps an
 [example record](https://abhist17.github.io/afterhours/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc)
-there — one policy, three snapshots, one of them a breach — written by
+there, one policy, three snapshots, one of them a breach, written by
 [`scripts/example-record.mjs`](scripts/example-record.mjs) through the same
 client the page uses.
 
@@ -133,18 +133,18 @@ backfill a flattering history.
 There is no server. The site is a static export on GitHub Pages, and the
 same export serves from a domain root on Render via [`render.yaml`](render.yaml):
 
-- **Balances** — read from mainnet by the browser.
-- **Prices** — one request to the feed, every minute, from the browser.
-- **History** — thirty days of hourly prices for the whole universe, refreshed
+- **Balances**: read from mainnet by the browser.
+- **Prices**: one request to the feed, every minute, from the browser.
+- **History**: thirty days of hourly prices for the whole universe, refreshed
   on the hour by a [GitHub Action](.github/workflows/refresh-history.yml)
   and published as one file on the `data` branch. A copy is bundled with the
   build and paints first; the hourly file takes over when it lands, filled
   from the bundle for anything it lacks, so a first paint never waits on a
   third party and a new listing never sits outside the model.
-- **Arithmetic** — every figure on the page is computed in the tab.
-- **Quotes for trades** — from Jupiter's public quote endpoint, one request
+- **Arithmetic**: every figure on the page is computed in the tab.
+- **Quotes for trades**: from Jupiter's public quote endpoint, one request
   per proposed order, from the browser.
-- **On-chain** — signed by the viewer's own wallet.
+- **On-chain**: signed by the viewer's own wallet.
 
 Nothing sleeps, nothing has a cold start, and nothing about a book leaves the
 browser except what its owner chooses to sign.
@@ -164,7 +164,7 @@ that both the app and the refresh script read. Backed lists several hundred
 xStocks; these are the ones with real float and turnover on Solana, chosen
 from CoinGecko's xStocks category by market cap and volume, so every series
 has thirty days of hourly prices behind it. Every mint was checked against
-CoinGecko's Solana platform entry and then against the account on mainnet —
+CoinGecko's Solana platform entry and then against the account on mainnet,
 owner program and decimals. That found every xStock to be a Token-2022 mint
 with 8 decimals, and CoinGecko listing AMDx with 18. A test keeps every row
 to that shape.
@@ -196,15 +196,15 @@ verified row.
 - **Covariance** is exponentially weighted with the RiskMetrics decay,
   rescaled so its memory is seventeen *days* on hourly data rather than
   seventeen hours.
-- **VaR** is reported two ways — normal-curve on that covariance, and
-  historical simulation on compounded one-day returns — and the larger
+- **VaR** is reported two ways, normal-curve on that covariance, and
+  historical simulation on compounded one-day returns, and the larger
   headlines. Expected Shortfall is the mean loss beyond it.
 - **Attribution** is Euler allocation: component VaRs sum exactly to the
   total, so "COINx is 15% of value and 22% of risk" is a decomposition, not a
   heuristic.
 - **Beta** is covariance with SPYx over its variance, on the same estimator.
-- **The score** is annualised volatility — over the 365-day calendar the
-  token keeps, since the daily sigma is measured over every calendar day —
+- **The score** is annualised volatility, over the 365-day calendar the
+  token keeps, since the daily sigma is measured over every calendar day,
   plus a continuous concentration penalty for a dominant position or too few
   effective names. Bands: Calm below 25 (index-fund volatility), Watch to 45
   (a single stock), Elevated to 70 (crypto-grade), Severe above. The page,
@@ -218,16 +218,16 @@ verified row.
   number; the per-hour comparison is the fair one, since closed hours
   outnumber open ones nearly three to one. Gaps are the move from the last
   print before a close to the first after the next open.
-- **Stress** moves every position by its beta to the shocked factor — SPYx
-  or SOL — on the same estimator. The worst day is the current weights
+- **Stress** moves every position by its beta to the shocked factor, SPYx
+  or SOL, on the same estimator. The worst day is the current weights
   applied to each asset's actual one-day returns; the worst gap is the
   deepest close-to-open the equities carried.
 - **The model check** marks each day's VaR forecast against the book's move
   over the day that followed, in non-overlapping days. About one in twenty
   should breach at 95%.
 - **Thin names**: a series in which more than 1% of hours move more than 8%
-  is flagged as thinly traded — a stale print can sit for hours as a 40%
-  jump — and its hourly returns are clipped at ±8% inside every estimator.
+  is flagged as thinly traded, a stale print can sit for hours as a 40%
+  jump, and its hourly returns are clipped at ±8% inside every estimator.
   Prices are never altered, and the page says which names were clipped.
 - **Market hours** are computed in `America/New_York` through `Intl`, with
   NYSE holidays and early closes through 2027, so daylight saving is the
@@ -259,7 +259,7 @@ node scripts/watch-breaches.mjs    # follow SnapshotRecorded live; --history N r
 
 The program is cluster-agnostic and `Anchor.toml` names the same id for
 localnet, devnet and mainnet, so the move is one deploy from a funded
-keypair — about 1.1 SOL of rent for the program account, plus a few cents
+keypair, about 1.1 SOL of rent for the program account, plus a few cents
 per policy or snapshot for whoever writes them:
 
 ```bash

@@ -1,6 +1,6 @@
 /**
  * The mark: a day in New York as a ring of pixels, midnight at the top,
- * clockwise — the same ring the hero draws. The NYSE session, 9:30 to
+ * clockwise, the same ring the hero draws. The NYSE session, 9:30 to
  * 4:00, is the lit run of cells at the bottom; the seventeen and a half
  * hours the tokens trade without their shares are the dim ones. The
  * single pixel in the middle is now. Eleven cells a side, so it still
@@ -29,8 +29,10 @@ function Cells({ cells, fill }: { cells: [number, number][]; fill: string }) {
 
 export function Mark({
   size = 20,
-  dim = "var(--border-strong)",
-  lit = "var(--brand)",
+  // The hours without a market are the same green, almost all the way to
+  // the surface; the session is the primary at full strength; now is white.
+  dim = "color-mix(in srgb, var(--brand) 24%, var(--surface-active))",
+  lit = "var(--primary)",
   now = "var(--text)",
   className = "",
 }: {

@@ -39,7 +39,7 @@ const PRESETS: { key: string; label: string; build: (a: Analysis) => Target[] }[
     key: "core",
     label: "60 / 40",
     build: (a) => {
-      // Sixty in the index, forty in cash — the allocation every other
+      // Sixty in the index, forty in cash, the allocation every other
       // allocation is measured against.
       void a;
       return [
@@ -222,7 +222,7 @@ export function Drift({
               ))}
             </select>
             <span className={`ml-auto numeric text-[11px] ${Math.abs(targetSum - 1) > 0.005 ? "text-watch" : "text-tertiary"}`}>
-              targets sum to {(targetSum * 100).toFixed(0)}%{Math.abs(targetSum - 1) > 0.005 ? " — normalised when scored" : ""}
+              targets sum to {(targetSum * 100).toFixed(0)}%{Math.abs(targetSum - 1) > 0.005 ? ", normalised when scored" : ""}
             </span>
           </div>
         </div>
@@ -329,7 +329,7 @@ export function Drift({
           </p>
         )}
         <p className="mt-2 text-[10px] leading-snug text-tertiary">
-          Orders are sized at the last feed print and routed through USDC. The line under each is a live quote from Jupiter for that exact size — what the swap would fetch on-chain now, with its price impact and route
+          Orders are sized at the last feed print and routed through USDC. The line under each is a live quote from Jupiter for that exact size, what the swap would fetch on-chain now, with its price impact and route
           {Object.values(quotes).some((q) => q && q !== "pending" && q !== "failed") && (
             <>, fetched {timeAgo(Math.max(...Object.values(quotes).map((q) => (q && q !== "pending" && q !== "failed" ? q.fetchedAt : 0))))}</>
           )}

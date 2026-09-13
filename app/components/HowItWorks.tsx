@@ -8,22 +8,22 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: "The premise",
     body:
-      "An xStock is a Solana token that tracks a share. The token trades every hour of every day; the share trades 9:30 to 4:00, New York, on trading days. Between the close and the next open, the token's price is a forecast of the reopen — and the gap is risk you carry with nobody on the other side. A brokerage app never shows you that. This does.",
+      "An xStock is a Solana token that tracks a share. The token trades every hour of every day; the share trades 9:30 to 4:00, New York, on trading days. Between the close and the next open, the token's price is a forecast of the reopen, and the gap is risk you carry with nobody on the other side. A brokerage app never shows you that. This does.",
   },
   {
     title: "The score",
     body:
-      "One number, 0 to 100: the book's annualised volatility, in percent, plus a penalty for concentration — a dominant position or too few effective names. Volatility because it is the figure equity holders already carry in their heads: an index fund runs near 18, a single large-cap 30 to 45, a crypto-heavy book past 60. Value at Risk stays in dollars: the loss exceeded on about one day in twenty, from a covariance exponentially weighted over thirty days of hourly returns, with the decay rescaled so its memory is seventeen days rather than seventeen hours. Two models run — normal-curve and historical — and the more conservative one headlines.",
+      "One number, 0 to 100: the book's annualised volatility, in percent, plus a penalty for concentration, a dominant position or too few effective names. Volatility because it is the figure equity holders already carry in their heads: an index fund runs near 18, a single large-cap 30 to 45, a crypto-heavy book past 60. Value at Risk stays in dollars: the loss exceeded on about one day in twenty, from a covariance exponentially weighted over thirty days of hourly returns, with the decay rescaled so its memory is seventeen days rather than seventeen hours. Two models run, normal-curve and historical, and the more conservative one headlines.",
   },
   {
     title: "Beta, sleeves, and the crypto that is not called crypto",
     body:
-      "Every position gets a beta to SPYx on the same estimator. The book is split into tokenized stocks, crypto and cash, each with its share of value beside its share of risk — the bars disagree, and where they disagree is what to act on. Coinbase, Strategy, Robinhood, Circle and the coin-treasury companies are stocks on paper and crypto beta in practice; the desk counts them with SOL.",
+      "Every position gets a beta to SPYx on the same estimator. The book is split into tokenized stocks, crypto and cash, each with its share of value beside its share of risk, the bars disagree, and where they disagree is what to act on. Coinbase, Strategy, Robinhood, Circle and the coin-treasury companies are stocks on paper and crypto beta in practice; the desk counts them with SOL.",
   },
   {
     title: "Where the moves happen",
     body:
-      "Every hourly return is sorted by whether the NYSE was open in the middle of that hour. The share of the book's variance that fell in closed hours is the premise as a number; the per-hour comparison is the fair one, since closed hours outnumber open ones nearly three to one. The gap bars are the move from the last print before each close to the first after the next open — what was actually carried across each night and weekend.",
+      "Every hourly return is sorted by whether the NYSE was open in the middle of that hour. The share of the book's variance that fell in closed hours is the premise as a number; the per-hour comparison is the fair one, since closed hours outnumber open ones nearly three to one. The gap bars are the move from the last print before each close to the first after the next open, what was actually carried across each night and weekend.",
   },
   {
     title: "The backtest, and the model's own record",
@@ -33,7 +33,7 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: "Stress",
     body:
-      "Factor shocks move every position by its beta to the factor — SPYx for the index, SOL for crypto — on the same estimator as the VaR. Two rows are not hypothetical: the worst day and the worst close-to-open the window actually had, at today's weights. The custom shock sums the two betas, which overlap, so read it as a ceiling.",
+      "Factor shocks move every position by its beta to the factor, SPYx for the index, SOL for crypto, on the same estimator as the VaR. Two rows are not hypothetical: the worst day and the worst close-to-open the window actually had, at today's weights. The custom shock sums the two betas, which overlap, so read it as a ceiling.",
   },
   {
     title: "Rebalance quotes",
@@ -85,7 +85,7 @@ export function HowItWorks({ open, onClose }: { open: boolean; onClose: () => vo
               return (
                 <li key={entry.band.key} className="flex items-baseline gap-2.5">
                   <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: entry.band.color }} />
-                  <span className="numeric w-14 shrink-0 text-[11px] text-tertiary">{next ? `${entry.at}–${next.at - 1}` : `${entry.at}–100`}</span>
+                  <span className="numeric w-14 shrink-0 text-[11px] text-tertiary">{next ? `${entry.at}-${next.at - 1}` : `${entry.at}-100`}</span>
                   <span className="min-w-0">
                     <span className="text-[13px] font-medium" style={{ color: entry.band.color }}>{entry.band.label}</span>
                     <span className="ml-1.5 text-[12px] text-tertiary">{entry.band.description}</span>
@@ -100,7 +100,7 @@ export function HowItWorks({ open, onClose }: { open: boolean; onClose: () => vo
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px] text-tertiary">
             {[
               ["/", "focus the address"],
-              ["1 – 9, 0", "jump to a panel"],
+              ["1 to 9, 0", "jump to a panel"],
               ["?", "this sheet"],
               ["t", "light or dark"],
               ["esc", "close"],

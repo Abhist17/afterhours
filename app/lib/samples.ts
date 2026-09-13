@@ -1,5 +1,5 @@
 /**
- * Sample books, for a visitor with no xStocks yet — or a reviewer. Labelled
+ * Sample books, for a visitor with no xStocks yet, or a reviewer. Labelled
  * synthetic everywhere they appear. They are chosen to make the product's
  * argument: the first looks diversified across seven tickers and is mostly
  * one bet on crypto beta; the second is fewer names and less risk; the
@@ -46,7 +46,7 @@ export const SAMPLES: SampleBook[] = [
 export const REAL_BOOK = {
   address: "2Z7zhqp1eddmHNmEqexftST6DFPWmoL4QqfgiG5uJMJx",
   label: "A real xStocks wallet",
-  blurb: "An active mainnet wallet holding nine xStocks and USDC — read live, not ours.",
+  blurb: "An active mainnet wallet holding nine xStocks and USDC, read live, not ours.",
 };
 
 /**

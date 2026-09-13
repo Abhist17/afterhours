@@ -105,7 +105,7 @@ export function Rail({
   return (
     <aside className="sticky top-0 hidden h-screen w-[232px] shrink-0 flex-col border-r border-border bg-bg-subtle lg:flex print-hide">
       <div className="flex h-14 items-center border-b border-border px-5">
-        <Link href="/" title="Afterhours — home" className="rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-focus">
+        <Link href="/" title="Afterhours home" className="rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-focus">
           <Logo />
         </Link>
       </div>

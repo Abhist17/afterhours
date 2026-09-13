@@ -202,7 +202,7 @@ export function analyse(
     .sort((a, b) => b.value - a.value);
 
   // Sleeves and sectors: value share from prices, risk share from the
-  // attribution, so the two can disagree — which is the point.
+  // attribution, so the two can disagree, which is the point.
   const sleeveOf = (key: AssetClass): Sleeve => {
     const members = holdings.filter((h) => h.asset.class === key);
     const value = members.reduce((s, h) => s + h.value, 0);

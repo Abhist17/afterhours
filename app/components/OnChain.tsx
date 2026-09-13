@@ -31,7 +31,7 @@ const FAUCET_URL = "https://faucet.solana.com";
 /**
  * The owner's record on Solana: a policy stating what the book was meant
  * to be, and snapshots of what it was. Both are written by the owner's
- * own wallet — the page prepares, the wallet signs, nobody else can — so
+ * own wallet, the page prepares, the wallet signs, nobody else can, so
  * the record is theirs, and a lending protocol reading it knows whose
  * word it is taking.
  */
@@ -150,7 +150,7 @@ export function OnChain({
           <a href={`?address=${EXAMPLE_RECORD.address}`} className="numeric text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
             {shortAddress(EXAMPLE_RECORD.address)}
           </a>
-          , {EXAMPLE_RECORD.label} — read from {cluster}, so the accounts are real. Read your own wallet and yours appears instead.
+          , {EXAMPLE_RECORD.label}, read from {cluster}, so the accounts are real. Read your own wallet and yours appears instead.
         </p>
       )}
 
@@ -178,7 +178,7 @@ export function OnChain({
                 Breach at score &gt; {policy.riskLimit} or drift &gt; {(policy.driftBandBps / 100).toFixed(0)}pp.
                 {driftNow && (
                   <>
-                    {" "}Now: score {a.score.toFixed(0)}, drift {(driftNow.maxDrift * 100).toFixed(1)}pp —{" "}
+                    {" "}Now: score {a.score.toFixed(0)}, drift {(driftNow.maxDrift * 100).toFixed(1)}pp, {" "}
                     <span style={{ color: wouldBreach ? "var(--severe)" : "var(--calm)" }}>{wouldBreach ? "in breach" : "within policy"}</span>.
                   </>
                 )}

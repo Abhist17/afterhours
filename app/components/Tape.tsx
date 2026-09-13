@@ -8,7 +8,7 @@ import { ASSETS } from "@/lib/universe";
 /**
  * The tape: every xStock in the universe with its token price and its
  * move since the last official close, passing under the hero. While the
- * NYSE is closed it is the whole point of the desk in one line — these
+ * NYSE is closed it is the whole point of the desk in one line, these
  * are prices no exchange has confirmed. While it is open it is the day
  * so far. The row is rendered twice so the loop never shows a seam.
  */

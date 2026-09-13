@@ -163,7 +163,7 @@ export async function recordSnapshot(
   const timestamp = Math.floor(Date.now() / 1000);
   const cents = (usd: number) => new anchor.BN(Math.round(Math.max(0, usd) * 100).toString());
   const clampBps = (v: number) => Math.max(0, Math.min(10_000, Math.round(v)));
-  // `null` is how the client spells "no account" for an optional — the
+  // `null` is how the client spells "no account" for an optional, the
   // program id goes in its place and the program reads it as None.
   const accounts = { owner: wallet.publicKey, policy: hasPolicy ? policyPda(wallet.publicKey) : null };
   const signature = await p.methods

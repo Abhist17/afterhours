@@ -8,7 +8,7 @@ const STORAGE_KEY = "afterhours-theme";
 
 /**
  * Runs before first paint (injected into <head>) so the page never renders in
- * the wrong theme and then snaps — the flash is far more noticeable than the
+ * the wrong theme and then snaps, the flash is far more noticeable than the
  * few bytes of inline script cost. A link can carry ?theme=light|dark; it
  * wins for that view without being remembered.
  */
@@ -32,7 +32,7 @@ export const THEME_BOOTSTRAP = `
 
 export function useTheme() {
   // Starts undefined so the toggle renders nothing theme-specific until the
-  // client has read the real value — server HTML has no way to know it.
+  // client has read the real value, server HTML has no way to know it.
   const [theme, setThemeState] = useState<Theme | null>(null);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function useTheme() {
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      // Private browsing or blocked storage — the theme still applies for
+      // Private browsing or blocked storage, the theme still applies for
       // this page view, it just will not be remembered.
     }
     setThemeState(next);

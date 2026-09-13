@@ -9,8 +9,8 @@ import { Button } from "./ui";
 
 /**
  * Wallet plumbing. An empty adapter list lets the provider discover
- * whatever Wallet Standard wallets the browser has — Phantom, Solflare,
- * Backpack — without shipping an adapter per brand. The connection here is
+ * whatever Wallet Standard wallets the browser has, Phantom, Solflare,
+ * Backpack, without shipping an adapter per brand. The connection here is
  * the program's cluster (devnet), used only to submit what the wallet has
  * signed; balances are read from mainnet elsewhere.
  */

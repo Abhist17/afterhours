@@ -14,6 +14,7 @@ import { Logo, Mark } from "@/components/Logo";
 import { ThemeToggle } from "@/components/TopBar";
 import { SessionRing } from "@/components/SessionRing";
 import { Tape } from "@/components/Tape";
+import { Typewriter } from "@/components/Typewriter";
 import { Button, Input } from "@/components/ui";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -24,20 +25,20 @@ const EXPLORER = `https://explorer.solana.com/address/${PROGRAM}?cluster=devnet`
 const PANELS: { id: string; number: string; title: string; line: string }[] = [
   { id: "holdings", number: "01", title: "What you hold", line: "Every position with its share of value beside its share of risk. They differ." },
   { id: "overnight", number: "02", title: "Trading without the market", line: "Each stock's token move since the last official print, summed: the market opens to this." },
-  { id: "sleeves", number: "03", title: "Where the risk really is", line: "Stocks, crypto and cash by value and by risk — and the crypto that is called a stock." },
+  { id: "sleeves", number: "03", title: "Where the risk really is", line: "Stocks, crypto and cash by value and by risk, and the crypto that is called a stock." },
   { id: "backtest", number: "04", title: "Thirty days", line: "The book scored at every hour with what was known then, and the model marked against what happened." },
   { id: "correlation", number: "05", title: "How they move together", line: "Thirty days of hourly returns. Pairs near 1.00 are one bet wearing two names." },
   { id: "whatif", number: "06", title: "What if", line: "Move a share of any position into any other asset and re-score the whole book, instantly." },
-  { id: "stress", number: "07", title: "If the market gaps", line: "S&P −5%, crypto −30%, and the window's own worst day — each position by its beta." },
+  { id: "stress", number: "07", title: "If the market gaps", line: "S&P −5%, crypto −30%, and the window's own worst day, each position by its beta." },
   { id: "drift", number: "08", title: "Target and drift", line: "State the allocation you meant. See the drift and the orders back, each quoted live on Jupiter." },
   { id: "onchain", number: "09", title: "Your record on Solana", line: "Declare the policy on-chain and record snapshots, signed by the wallet that owns the book." },
   { id: "riskmap", number: "10", title: "Risk and return", line: "Every asset the desk knows, placed by volatility and thirty-day return." },
 ];
 
 const STEPS = [
-  { n: "1", title: "Paste an address, or connect", body: "The page reads the wallet's token accounts from Solana mainnet — Token-2022 and the classic program — with no key and no custody." },
+  { n: "1", title: "Paste an address, or connect", body: "The page reads the wallet's token accounts from Solana mainnet, Token-2022 and the classic program, with no key and no custody." },
   { n: "2", title: "Scored in your browser", body: "Thirty days of hourly prices for the whole universe are already in the tab. VaR, beta, drift, stress: every figure is computed where you can see it." },
-  { n: "3", title: "Recorded on Solana, by you", body: "Save the targets as an on-chain policy and record snapshots — each one an account owned and signed by your wallet. A breach is an event anyone can subscribe to." },
+  { n: "3", title: "Recorded on Solana, by you", body: "Save the targets as an on-chain policy and record snapshots, each one an account owned and signed by your wallet. A breach is an event anyone can subscribe to." },
 ];
 
 export default function Landing() {
@@ -110,19 +111,15 @@ export default function Landing() {
               The risk desk for tokenized stocks on Solana
             </p>
             <h1 className="display max-w-[16ch] text-[44px] leading-[1] text-text sm:text-[68px]">
-              Markets close.{" "}
+              Markets close.
               <em className="text-secondary">
-                Your book{" "}
-                <span className="whitespace-nowrap">
-                  doesn&rsquo;t.
-                  <span className="cursor" aria-hidden="true" />
-                </span>
+                <Typewriter text="Your book doesn’t." />
               </em>
             </h1>
             <p className="mt-5 max-w-[56ch] text-[15px] leading-relaxed text-secondary sm:text-[16px]">
               An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. Afterhours reads
               any wallet holding xStocks and says what it can lose tomorrow, what it has done since the last bell, and how far it
-              has drifted from what you meant it to be &mdash; scored in your browser, recorded on-chain by you.
+              has drifted from what you meant it to be, scored in your browser, recorded on-chain by you.
             </p>
 
             <form
@@ -181,7 +178,7 @@ export default function Landing() {
           </Link>
         </div>
         <p className="mt-3 text-center text-[12px] text-tertiary">
-          A real wallet, not ours — found through the largest SPYx token accounts. MSTRx is 18% of its value and 51% of its risk.
+          A real wallet, not ours, found through the largest SPYx token accounts. MSTRx is 18% of its value and 51% of its risk.
         </p>
       </section>
 
@@ -190,7 +187,7 @@ export default function Landing() {
         <p className="label" style={{ color: "var(--brand)" }}>The desk</p>
         <h2 className="display mt-2 text-[30px] leading-[1.05] text-text sm:text-[40px]">Ten panels. One book.</h2>
         <p className="mt-3 max-w-[60ch] text-[14px] leading-relaxed text-secondary">
-          A brokerage app shows what you have. None shows what you stand to lose &mdash; and none has ever had to price a
+          A brokerage app shows what you have. None shows what you stand to lose, and none has ever had to price a
           share after the bell. Each panel answers one question; number keys jump between them.
         </p>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -240,7 +237,7 @@ export default function Landing() {
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
               An Anchor program with a <span className="text-secondary">Policy</span> (targets in bps, a risk limit, a drift band) and
               immutable <span className="text-secondary">Snapshots</span>, both owned by the wallet they describe. Every snapshot emits{" "}
-              <span className="numeric text-secondary">SnapshotRecorded {"{ breached }"}</span> &mdash; a credit primitive.
+              <span className="numeric text-secondary">SnapshotRecorded {"{ breached }"}</span>, a credit primitive.
             </p>
             <a href={EXPLORER} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[12px] underline decoration-border-strong underline-offset-2 hover:text-text" style={{ color: "var(--brand)" }}>
               Program on Explorer ↗
@@ -249,8 +246,8 @@ export default function Landing() {
           <div className="card p-5">
             <p className="text-[14px] font-semibold text-text">Quotes</p>
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
-              Every rebalance order is quoted live on Jupiter for its exact size &mdash; what the swap fetches now, its price
-              impact and route &mdash; and links out by mint.
+              Every rebalance order is quoted live on Jupiter for its exact size, what the swap fetches now, its price
+              impact and route, and links out by mint.
             </p>
           </div>
         </div>

@@ -1,5 +1,5 @@
 /**
- * Quant core — pure functions, no I/O, no clock.
+ * Quant core, pure functions, no I/O, no clock.
  *
  * The estimators here (EWMA covariance with frequency-aware decay, parametric
  * and historical VaR, Expected Shortfall, Euler attribution, continuous
@@ -38,7 +38,7 @@ export function computeReturns(prices: number[]): number[] {
  * a 40% jump that later unwinds. A liquid stock token almost never moves
  * 8% in an hour, so the share of hours that do is a fair thinness reading,
  * and clipping returns at that size keeps one bad print from owning the
- * covariance. Prices are never altered — only what the estimators see.
+ * covariance. Prices are never altered, only what the estimators see.
  */
 export const THIN_HOURLY_MOVE = 0.08;
 export const THIN_SHARE = 0.01;
@@ -122,7 +122,7 @@ export function quantile(sorted: number[], p: number): number {
   return lo === hi ? sorted[lo] : sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
 }
 
-/** Overlapping k-period compounded returns — keeps the fat tails √k assumes away. */
+/** Overlapping k-period compounded returns, keeps the fat tails √k assumes away. */
 export function aggregateReturns(returns: number[], k: number): number[] {
   const periods = Math.max(1, Math.round(k));
   if (periods === 1) return returns.slice();
@@ -398,7 +398,7 @@ export const RISK_BANDS = [0, 25, 45, 70] as const;
 
 /**
  * The tokens trade every calendar day, and the daily sigma is measured over
- * every calendar day — weekends included, flat as they are — so it is
+ * every calendar day, weekends included, flat as they are, so it is
  * annualised over the calendar the token keeps, not the exchange's 252.
  */
 export const DAYS_PER_YEAR = 365;
@@ -411,9 +411,9 @@ export function annualisedVolPct(sigmaDaily: number): number {
  * The score is annualised volatility, in percent, plus the concentration
  * penalty, capped at 100. Volatility rather than VaR because it is the
  * number equity holders already carry in their heads: an index book runs
- * near 15–20, a single large-cap 30–45, a crypto-heavy book 60–90, a
- * memecoin or leverage past 100. VaR stays the dollar figure — the loss
- * on a bad day — and the score says what kind of book this is.
+ * near 15 to 20, a single large-cap 30 to 45, a crypto-heavy book 60 to 90, a
+ * memecoin or leverage past 100. VaR stays the dollar figure, the loss
+ * on a bad day, and the score says what kind of book this is.
  */
 export function blendedScore(sigmaDaily: number, concentration: number): number {
   return Math.max(0, Math.min(100, annualisedVolPct(sigmaDaily) + concentration));
@@ -433,7 +433,7 @@ export interface BacktestPoint {
  * The current allocation, scored at every hour of the window as if it had
  * been held throughout: book value from the prices of the hour, covariance
  * from a recursive EWMA that has seen only what was known by then. Says how
- * risky this shape of book has been, not how risky the wallet was — the
+ * risky this shape of book has been, not how risky the wallet was, the
  * wallet's real record is on the chain.
  */
 export function rollingRisk(
@@ -525,7 +525,7 @@ export interface Drift {
   lines: DriftLine[];
   /** Largest absolute drift across lines, in weight. */
   maxDrift: number;
-  /** Sum of absolute trades / 2 — the one-way turnover to rebalance. */
+  /** Sum of absolute trades / 2, the one-way turnover to rebalance. */
   turnoverUsd: number;
   turnoverPct: number;
 }

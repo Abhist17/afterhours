@@ -3,7 +3,7 @@
  *
  * An xStock trades on Solana at 3am on a Sunday. The share it represents
  * does not. Between the close and the next open, the token's price is a
- * forecast of where the stock will reopen — and the gap between the two is
+ * forecast of where the stock will reopen, and the gap between the two is
  * risk the holder carries with nobody on the other side of the book. So the
  * app needs to know, at any instant, whether the underlying market is open,
  * when it next opens, and where the token has drifted since the last print.

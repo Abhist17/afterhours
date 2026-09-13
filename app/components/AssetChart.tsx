@@ -132,7 +132,7 @@ export function AssetChart({
         </Readout>
       )}
       <p className="mt-1 px-1 text-[10px] leading-snug text-tertiary">
-        Shaded: hours the NYSE was closed — hatched for weekends and holidays. Every move inside them is the token pricing a share nobody could trade.
+        Shaded: hours the NYSE was closed, hatched for weekends and holidays. Every move inside them is the token pricing a share nobody could trade.
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-# Afterhours — Stocklana submission notes
+# Afterhours, Stocklana submission notes
 
 *The two-minute version of the [README](../README.md), for judges.*
 
@@ -6,20 +6,20 @@
 
 The risk desk for tokenized stocks on Solana: what your xStocks can lose
 tomorrow, what they've done since Wall Street closed, and how far your
-book has drifted from what you meant it to be — read from your wallet,
+book has drifted from what you meant it to be, read from your wallet,
 scored in your browser, recorded on-chain by you.
 
 ## Track
 
 **Infrastructure → analytics**, with an Investing edge: the desk turns
 drift into rebalance orders with Jupiter prefilled, and the on-chain
-policy + breach event is a primitive for **Credit** — a protocol lending
+policy + breach event is a primitive for **Credit**, a protocol lending
 against a stock portfolio can subscribe to "this book left its owner's
 stated policy" instead of watching a price.
 
 ## The problem, and why it is a stocks problem
 
-A tokenized share trades 24/7. The share it tracks trades 9:30–4:00 ET
+A tokenized share trades 24/7. The share it tracks trades 9:30 to 4:00 ET
 on trading days. Between the close and the open the token's price is a
 forecast of the reopen, and the holder carries that gap with nobody on
 the other side. Brokerage apps show *what you have*; none shows *what you
@@ -27,34 +27,34 @@ stand to lose*, and none has ever had to price a share after the bell.
 
 ## What a judge will see in sixty seconds
 
-1. Open https://afterhours-v0dr.onrender.com/ — the premise, a ring of the
+1. Open https://afterhours-v0dr.onrender.com/, the premise, a ring of the
    New York day (the NYSE session as a short bright arc, the rest the hours
    the tokens trade with no market behind them), and the tape: every xStock's
    move since the last close. **Open the desk** lands on a sample book with
    live prices, in an app shell with the ten panels down the left.
 2. **Since the close**: each stock's token move since the last official
-   print, summed — *the market opens to this*. Under it, every close of
+   print, summed, *the market opens to this*. Under it, every close of
    the last month as a bar, and the share of the book's variance that
    happened while the NYSE was closed.
 3. Click **MSTRx** in the holdings: its thirty days with the closed hours
-   shaded — every move inside the shading happened with nobody able to
+   shaded, every move inside the shading happened with nobody able to
    trade the share.
 4. **Stocks, crypto, cash** by share of value vs share of risk, and the
    line "COINx, MSTRx, HOODx, CRCLx are equity on paper … 60% of the book
    is riding crypto beta whatever the sector labels say".
 5. **If the market gaps**: S&P −5%, crypto −30%, and the window's own
-   worst day and worst close — each position by its beta.
+   worst day and worst close, each position by its beta.
 6. **What if**: move half of TSLAx into SPYx, watch the score, VaR, beta
-   and effective assets move — instantly, no server.
+   and effective assets move, instantly, no server.
 7. **Target and drift**: pick 60/40, see the drift and the exact sell/buy
-   orders — each quoted live on Jupiter with price impact and route.
+   orders, each quoted live on Jupiter with price impact and route.
 8. **Your record on Solana**: connect Phantom, save the targets as an
    on-chain policy, record a snapshot; each one an account on devnet.
-   Without a wallet, the panel shows the author's own record — a policy
-   and three snapshots, one in breach, drawn against the limit — so the
+   Without a wallet, the panel shows the author's own record, a policy
+   and three snapshots, one in breach, drawn against the limit, so the
    accounts are real either way.
 
-Paste any address holding xStocks to run it on a real book — or click "A
+Paste any address holding xStocks to run it on a real book, or click "A
 real xStocks wallet", a $21M mainnet book found through the largest SPYx
 token accounts. Every view is a link, with a button to copy it. Number
 keys jump between the ten panels; `?` opens the sheet that explains every
@@ -65,13 +65,13 @@ figure.
 - Reads: xStocks are Token-2022 mints on mainnet; the page reads any
   wallet's token accounts under both token programs, no custody.
 - Writes: the [Afterhours program](https://explorer.solana.com/address/3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri?cluster=devnet)
-  — `Policy` (targets in bps summing to 10,000, risk limit, drift band)
+`Policy` (targets in bps summing to 10,000, risk limit, drift band)
   and immutable `Snapshot` accounts (score, value, VaR, drift, equity
   share, NYSE open, timestamp), both owned and signed by the wallet they
   describe; `SnapshotRecorded { breached }` on every snapshot under a
   policy.
-- Rebalance orders are quoted live on Jupiter for their exact size — what
-  the swap fetches on-chain now, its price impact and route — and link to
+- Rebalance orders are quoted live on Jupiter for their exact size, what
+  the swap fetches on-chain now, its price impact and route, and link to
   Jupiter by mint.
 
 ## Architecture: nothing to run
@@ -96,8 +96,8 @@ Nothing sleeps, nothing cold-starts.
   but the model has no series for stays in the book and is named as
   uncovered, with the model's coverage printed beside the VaR. Quotes
   that come from history rather than the feed say so.
-- Thinly traded names — where a stale print can sit for hours as a 40%
-  jump — are flagged, clipped at ±8% an hour inside the estimators, and
+- Thinly traded names, where a stale print can sit for hours as a 40%
+  jump, are flagged, clipped at ±8% an hour inside the estimators, and
   named on the page. Prices are shown as the feed gave them.
 - The VaR is marked against what happened: the page says how many days
   the loss exceeded the forecast, against how many it should have.
@@ -117,7 +117,7 @@ Nothing sleeps, nothing cold-starts.
   keypair, documented in the README. It stays on devnet for judging so
   trying it costs nobody real SOL.
 - Dividends and corporate actions, once an issuer feed exists to read.
-- The rest of the xStocks catalogue as liquidity arrives — Backed lists
+- The rest of the xStocks catalogue as liquidity arrives, Backed lists
   several hundred; the desk carries the thirty-five with real turnover, and
   a new one is one verified row.
 
@@ -130,7 +130,7 @@ Nothing sleeps, nothing cold-starts.
   one breach.
 - Live Jupiter quotes on every proposed rebalance order.
 - A print stylesheet: the desk prints as a one-column report.
-- Keyboard: `/` address, `1`–`0` panels, `?` help, `t` theme.
+- Keyboard: `/` address, `1`-`0` panels, `?` help, `t` theme.
 
 ## Links
 

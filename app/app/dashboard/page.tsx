@@ -97,7 +97,7 @@ function Desk() {
   const { toggle: toggleTheme } = useTheme();
   const addressInput = useRef<HTMLInputElement>(null);
 
-  // Keys: / to the address, ? for help, t for theme, 1–9 and 0 to a panel.
+  // Keys: / to the address, ? for help, t for theme, 1 to 9 and 0 to a panel.
   const shortcuts = useMemo(() => {
     const jump = (i: number) => () => scrollToPanel(SECTIONS[i]?.id ?? "");
     const map: Record<string, () => void> = {
@@ -178,7 +178,7 @@ function Desk() {
       const host = safeHost(resolveRpcUrl());
       setWalletError(
         usingPublicRpc() && /403|forbidden|429/i.test(message)
-          ? `${host} refused the read. Public endpoints do that under load — try again in a moment, set your own RPC below, or open a sample book.`
+          ? `${host} refused the read. Public endpoints do that under load. Try again in a moment, set your own RPC below, or open a sample book.`
           : `Could not read ${shortAddress(trimmed)} from ${host}: ${message}`
       );
       return false;
@@ -188,7 +188,7 @@ function Desk() {
   }, []);
 
   // A link can name the book (?address= or ?book=), a returning viewer
-  // gets their last address back, and a new one gets the first sample —
+  // gets their last address back, and a new one gets the first sample,
   // so the desk is never empty, and a judge can be sent straight to a
   // real wallet.
   useEffect(() => {
@@ -460,7 +460,7 @@ function Desk() {
                     <PanelHeader
                       number="02"
                       title="Trading without the market"
-                      caption="While the NYSE is closed, each stock's token keeps moving. This is what the market will open to — and what it has opened to, close after close."
+                      caption="While the NYSE is closed, each stock's token keeps moving. This is what the market will open to, and what it has opened to, close after close."
                       meta={analysis.market.open ? "NYSE open" : "NYSE closed"}
                     />
                     <Overnight a={analysis} />
@@ -470,7 +470,7 @@ function Desk() {
                     <PanelHeader
                       number="03"
                       title="Where the risk really is"
-                      caption="Stocks, crypto and cash by value and by risk — and the crypto that is called a stock."
+                      caption="Stocks, crypto and cash by value and by risk, and the crypto that is called a stock."
                     />
                     <Sleeves a={analysis} />
                   </Panel>
@@ -479,7 +479,7 @@ function Desk() {
                     <PanelHeader
                       number="04"
                       title="What this allocation has been"
-                      caption="The current shape of the book through the last thirty days: its risk score at every hour, its value, its drawdown — and the model marked against what happened."
+                      caption="The current shape of the book through the last thirty days: its risk score at every hour, its value, its drawdown, and the model marked against what happened."
                     />
                     <Backtest a={analysis} />
                   </Panel>
@@ -509,7 +509,7 @@ function Desk() {
                     <PanelHeader
                       number="07"
                       title="If the market gaps"
-                      caption="The book under shocks the last thirty days may never have shown — and under the worst day and worst close they actually had."
+                      caption="The book under shocks the last thirty days may never have shown, and under the worst day and worst close they actually had."
                     />
                     <Stress a={analysis} />
                   </Panel>
@@ -518,7 +518,7 @@ function Desk() {
                     <PanelHeader
                       number="08"
                       title="What you meant it to be"
-                      caption="State the allocation you intended. See the drift, and the trades that put it back — each quoted live on Jupiter."
+                      caption="State the allocation you intended. See the drift, and the trades that put it back, each quoted live on Jupiter."
                     />
                     <Drift
                       a={analysis}
@@ -532,7 +532,7 @@ function Desk() {
                     <PanelHeader
                       number="09"
                       title="Your record on Solana"
-                      caption="Declare the policy on-chain and record snapshots of the book — signed by the wallet that owns it."
+                      caption="Declare the policy on-chain and record snapshots of the book, signed by the wallet that owns it."
                     />
                     <OnChain a={analysis} viewing={viewing} targets={targets} />
                   </Panel>
@@ -557,7 +557,7 @@ function Desk() {
                   <a href="https://github.com/Abhist17/afterhours/blob/main/docs/SUBMISSION.md" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Submission notes</a>
                   <span className="hidden items-center gap-1 sm:inline-flex">
                     <kbd className="numeric rounded border border-border px-1 text-[10px]">/</kbd> address
-                    <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">1</kbd>–<kbd className="numeric rounded border border-border px-1 text-[10px]">0</kbd> panels
+                    <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">1</kbd>-<kbd className="numeric rounded border border-border px-1 text-[10px]">0</kbd> panels
                     <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">?</kbd> help
                     <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">t</kbd> theme
                   </span>

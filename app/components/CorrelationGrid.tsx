@@ -79,7 +79,7 @@ export function CorrelationGrid({
       <p className="mt-3 text-[11px] leading-snug text-tertiary">
         {callout ? (
           <>
-            <span className="text-secondary">{callout.a} and {callout.b}</span> move together at {callout.rho.toFixed(2)} —{" "}
+            <span className="text-secondary">{callout.a} and {callout.b}</span> move together at {callout.rho.toFixed(2)}, {" "}
             {callout.rho >= 0.9 ? "one position wearing two names." : callout.rho >= 0.7 ? "spreading across them buys less than it looks." : "genuinely different exposures."}
           </>
         ) : (

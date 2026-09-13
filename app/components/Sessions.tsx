@@ -123,7 +123,7 @@ export function VarianceSplit({ a }: { a: Analysis }) {
       <p className="mt-1.5 text-[11px] leading-snug text-tertiary">
         {perHour !== null && (
           <>
-            Per hour, it moved <span className="numeric text-secondary">{perHour.toFixed(2)}×</span> as much closed as open —{" "}
+            Per hour, it moved <span className="numeric text-secondary">{perHour.toFixed(2)}×</span> as much closed as open, {" "}
             {perHour > 1.1 ? "the token was more volatile without its market than with it." : perHour < 0.7 ? "quieter without its market, but there are far more closed hours than open ones." : "about the same rate, spread over far more closed hours."}
           </>
         )}
@@ -140,7 +140,7 @@ export function VarianceSplit({ a }: { a: Analysis }) {
             </span>
             <span className="numeric w-10 shrink-0 text-right text-secondary">{pct(s.closedShare * 100, 0)}</span>
             <span className="numeric hidden w-14 shrink-0 text-right text-[11px] text-tertiary sm:inline">
-              {s.openVolPerHour > 0 ? `${(s.closedVolPerHour / s.openVolPerHour).toFixed(2)}×/h` : "—"}
+              {s.openVolPerHour > 0 ? `${(s.closedVolPerHour / s.openVolPerHour).toFixed(2)}×/h` : "n/a"}
             </span>
           </li>
         ))}

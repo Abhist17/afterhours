@@ -37,7 +37,7 @@ export function Overnight({ a }: { a: Analysis }) {
             NYSE is open. The shares behind {equities.length} position{equities.length === 1 ? "" : "s"} are trading alongside their tokens.
           </p>
           <p className="mt-1.5 text-[11px] leading-snug text-tertiary">
-            Closes in {untilTime(m.nextClose)} at {formatEastern(m.nextClose)}. From then until {formatEastern(m.nextOpen)}, {usd(a.overnight.equityValue)} of this book — {(a.overnight.equityShare * 100).toFixed(0)}% — prices on Solana alone.
+            Closes in {untilTime(m.nextClose)} at {formatEastern(m.nextClose)}. From then until {formatEastern(m.nextOpen)}, {usd(a.overnight.equityValue)} of this book, {(a.overnight.equityShare * 100).toFixed(0)}%, prices on Solana alone.
           </p>
         </>
       ) : (

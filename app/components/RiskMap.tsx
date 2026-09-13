@@ -136,7 +136,7 @@ export function RiskMap({ a }: { a: Analysis }) {
             <div className="numeric text-tertiary">
               vol {pct(active.volPct, 0)} · {signedPct(active.ret * 100, 1)} over the window{active.held ? ` · ${pct(active.weight * 100, 1)} of the book` : " · not held"}
             </div>
-            {active.thin && <div style={{ color: "var(--watch)" }}>thin trading — hourly prints clipped at ±8%</div>}
+            {active.thin && <div style={{ color: "var(--watch)" }}>thin trading, hourly prints clipped at ±8%</div>}
           </Readout>
         )}
         {hover === "book" && (
@@ -149,7 +149,7 @@ export function RiskMap({ a }: { a: Analysis }) {
         )}
       </div>
       <p className="mt-2 text-[11px] leading-snug text-tertiary">
-        Solid points are held, sized by weight; outlines are the rest of the universe; dashed rings are thin names whose prints are clipped. Up and to the left is the corner everyone wants. Thirty days is a short memory — a name here is where it has been, not where it is going.
+        Solid points are held, sized by weight; outlines are the rest of the universe; dashed rings are thin names whose prints are clipped. Up and to the left is the corner everyone wants. Thirty days is a short memory, a name here is where it has been, not where it is going.
       </p>
     </div>
   );

@@ -1,7 +1,7 @@
 {
-  "name": "Afterhours — risk desk for tokenized stocks on Solana",
+  "name": "Afterhours: risk desk for tokenized stocks on Solana",
   "short_name": "Afterhours",
-  "description": "What your xStocks can lose tomorrow, what they've done since Wall Street closed, and how far your book has drifted — read from your wallet, scored in your browser, recorded on-chain by you.",
+  "description": "What your xStocks can lose tomorrow, what they've done since Wall Street closed, and how far your book has drifted, read from your wallet, scored in your browser, recorded on-chain by you.",
   "start_url": "./dashboard/",
   "scope": "./",
   "display": "standalone",

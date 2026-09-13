@@ -15,7 +15,7 @@ function Bar({ label, fraction, color }: { label: string; fraction: number; colo
 }
 
 /**
- * Stocks, crypto, cash — share of value against share of risk. Where the
+ * Stocks, crypto, cash, share of value against share of risk. Where the
  * two bars disagree is the whole panel. Then the sentence that a sector
  * label hides: the crypto that is called a stock.
  */

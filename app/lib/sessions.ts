@@ -6,8 +6,8 @@
  * middle of that hour; the squared returns in each class are summed. The
  * share of variance that fell in closed hours is the product's premise as a
  * number: how much of this book's risk is carried without a market. The
- * same walk yields the gap across each closed period — the move from the
- * last print before a close to the first after the next open — which is
+ * same walk yields the gap across each closed period, the move from the
+ * last print before a close to the first after the next open, which is
  * what the holder actually carried across each night and weekend.
  */
 

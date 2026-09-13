@@ -11,7 +11,7 @@ const PAD = { top: 10, right: 10, bottom: 14, left: 26 };
 /**
  * The owner's snapshots on a line of time, each a dot coloured by its
  * band, against the policy's risk limit. A breach is a dot above the
- * line — the picture a lender subscribed to the event would be drawing.
+ * line, the picture a lender subscribed to the event would be drawing.
  */
 export function SnapshotChart({ snapshots, riskLimit }: { snapshots: OnChainSnapshot[]; riskLimit: number | null }) {
   const [hover, setHover] = useState<number | null>(null);
