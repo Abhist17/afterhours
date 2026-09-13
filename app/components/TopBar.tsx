@@ -5,10 +5,11 @@ import { formatEastern } from "@/lib/market-hours";
 import { untilTime } from "@/lib/format";
 import { useMounted, useNow } from "@/lib/hooks";
 import { useTheme } from "@/lib/theme";
+import Link from "next/link";
 import { Logo } from "./Logo";
 import { Button, Dot } from "./ui";
 
-function ThemeToggle() {
+export function ThemeToggle() {
   const { theme, toggle } = useTheme();
   const mounted = useMounted();
   return (
@@ -64,23 +65,33 @@ export function MarketPill({ market }: { market: MarketStatus }) {
   );
 }
 
+/**
+ * The bar across the top. On the desk a rail down the left carries the
+ * mark from `lg` up, so the bar hides its own there and the help and
+ * theme controls move to the rail's foot.
+ */
 export function TopBar({
   market,
   onOpenHelp,
   connect,
+  rail = false,
 }: {
   market: MarketStatus | null;
   onOpenHelp: () => void;
   connect?: React.ReactNode;
+  rail?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1500px] items-center gap-2 px-4 sm:gap-3 sm:px-6">
-        <Logo />
+      <div className={`flex h-14 items-center gap-2 px-4 sm:gap-3 sm:px-6 ${rail ? "" : "mx-auto max-w-[1500px]"}`}>
+        <Link href="/" className={`rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-focus ${rail ? "lg:hidden" : ""}`} title="Afterhours — home">
+          <Logo />
+        </Link>
+        {rail && <span className="label hidden lg:inline">The desk</span>}
         <span className="ml-auto flex items-center gap-2 sm:gap-3">
           {market && <MarketPill market={market} />}
           {connect}
-          <Button variant="ghost" size="sm" onClick={onOpenHelp} className="shrink-0">
+          <Button variant="ghost" size="sm" onClick={onOpenHelp} className={`shrink-0 ${rail ? "lg:hidden" : ""}`}>
             <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
               <circle cx="7" cy="7" r="5.9" stroke="currentColor" strokeWidth="1.2" fill="none" />
               <path d="M5.3 5.2a1.75 1.75 0 1 1 2.3 1.7c-.4.2-.6.5-.6.9v.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" fill="none" />
@@ -88,7 +99,9 @@ export function TopBar({
             </svg>
             <span className="hidden sm:inline">How it works</span>
           </Button>
-          <ThemeToggle />
+          <span className={rail ? "lg:hidden" : ""}>
+            <ThemeToggle />
+          </span>
         </span>
       </div>
     </header>

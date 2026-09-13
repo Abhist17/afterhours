@@ -3,92 +3,93 @@
 /* ═══════════════════════════════════════════════════════════════
    Afterhours — design tokens
 
-   Dark by default, because the product is about what happens
-   after the bell. The base is a deep navy rather than a neutral
-   grey; one brand accent (indigo) is spent on interactive chrome
-   only. Data keeps its own colours: the risk ramp for severity,
-   and four sleeve tones — stocks, crypto, crypto-in-stock-clothing,
-   cash — so the eye can answer "what kind of thing is this" before
-   reading a label. Nothing else is tinted.
+   Black by default, because the product is about what happens after
+   the bell: a terminal left on in a dark room. One brand accent —
+   signal green — is spent on interactive chrome and the cursor only.
+   Data keeps its own colours: the risk ramp for severity (calm is
+   teal, never the brand green, so "safe" and "clickable" cannot be
+   confused), and four sleeve tones — stocks, crypto, crypto-in-stock-
+   clothing, cash — so the eye can answer "what kind of thing is this"
+   before reading a label. Nothing else is tinted.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
   /* Surfaces */
-  --bg: #090b10;
-  --bg-subtle: #0e1118;
-  --surface: #12161f;
-  --surface-hover: #181d28;
-  --surface-active: #1f2533;
+  --bg: #060706;
+  --bg-subtle: #0b0d0b;
+  --surface: #111311;
+  --surface-hover: #171a17;
+  --surface-active: #1e231e;
 
   /* Hairlines */
-  --border: #222938;
-  --border-strong: #313a4e;
-  --card-light: rgb(255 255 255 / 0.035);
+  --border: #1f241f;
+  --border-strong: #2e352e;
+  --card-light: rgb(255 255 255 / 0.04);
 
   /* Type */
-  --text: #eef0f6;
-  --text-secondary: #a3a9bd;
-  --text-tertiary: #6c7387;
+  --text: #f1f4f0;
+  --text-secondary: #a3aba2;
+  --text-tertiary: #6d766c;
 
   /* Brand — interactive chrome only */
-  --brand: #8b93ff;
-  --brand-strong: #a3a9ff;
-  --primary: #8b93ff;
-  --primary-text: #0b0d12;
-  --focus: #8b93ff;
+  --brand: #5eff2f;
+  --brand-strong: #8cff6a;
+  --primary: #42ff00;
+  --primary-text: #041000;
+  --focus: #5eff2f;
 
   /* Risk ramp — semantic, never decorative */
-  --calm: #4fb389;
-  --watch: #d3a54a;
-  --elevated: #d97a4a;
-  --severe: #d95c5c;
+  --calm: #2fd4c4;
+  --watch: #e2b23f;
+  --elevated: #f27d3c;
+  --severe: #ff4f60;
 
   /* Sleeves */
-  --asset-1: #62c3bd; /* tokenized stocks — teal */
-  --asset-2: #d3a54a; /* crypto — gold */
-  --asset-3: #e08fb0; /* crypto-linked equity — rose */
-  --asset-4: #8fa3b8; /* cash — slate */
-  --asset-other: #6c7387;
+  --asset-1: #7fa7ff; /* tokenized stocks — blue */
+  --asset-2: #e2b23f; /* crypto — gold */
+  --asset-3: #ff7fb9; /* crypto-linked equity — rose */
+  --asset-4: #8f9aa6; /* cash — slate */
+  --asset-other: #6d766c;
 
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
-  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 12px 32px -10px rgb(0 0 0 / 0.7);
 }
 
 [data-theme="light"] {
-  --bg: #f7f8fb;
-  --bg-subtle: #f0f2f7;
+  --bg: #f5f7f4;
+  --bg-subtle: #eef1ec;
   --surface: #ffffff;
-  --surface-hover: #f2f4f9;
-  --surface-active: #e8ebf3;
+  --surface-hover: #f1f4ef;
+  --surface-active: #e5eae2;
 
-  --border: #e2e5ee;
-  --border-strong: #cfd4e2;
+  --border: #dfe4dc;
+  --border-strong: #c8cfc4;
 
-  --text: #151824;
-  --text-secondary: #545a70;
-  --text-tertiary: #858ba0;
+  --text: #121612;
+  --text-secondary: #525a51;
+  --text-tertiary: #7f877e;
 
-  --brand: #5058e0;
-  --brand-strong: #3f47c9;
-  --primary: #5058e0;
-  --primary-text: #ffffff;
-  --focus: #5058e0;
+  --brand: #1a9e00;
+  --brand-strong: #157f00;
+  --primary: #42ff00;
+  --primary-text: #041000;
+  --focus: #1a9e00;
 
-  --calm: #1f8a63;
+  --calm: #0e9c90;
   --watch: #9a7413;
-  --elevated: #b25a22;
-  --severe: #b83b3b;
+  --elevated: #b8531e;
+  --severe: #c73545;
 
-  --asset-1: #1f8f88;
+  --asset-1: #3b66d6;
   --asset-2: #9a7413;
-  --asset-3: #b5527b;
-  --asset-4: #5b6f88;
-  --asset-other: #858ba0;
+  --asset-3: #c2417f;
+  --asset-4: #5f6b78;
+  --asset-other: #7f877e;
 
   --card-light: rgb(255 255 255 / 0.6);
 
-  --shadow-sm: 0 1px 2px rgb(16 18 30 / 0.06);
-  --shadow-md: 0 8px 24px -8px rgb(16 18 30 / 0.14);
+  --shadow-sm: 0 1px 2px rgb(16 20 16 / 0.06);
+  --shadow-md: 0 8px 24px -8px rgb(16 20 16 / 0.14);
 }
 
 @theme inline {

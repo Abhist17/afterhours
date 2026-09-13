@@ -5,7 +5,8 @@
 **The risk desk for tokenized stocks on Solana.**
 **Markets close; your book doesn't.**
 
-[**Open the desk →**](https://abhist17.github.io/afterhours/) ·
+[**Open the desk →**](https://afterhours-v0dr.onrender.com/dashboard/) ·
+[About](https://afterhours-v0dr.onrender.com/) ·
 [Program on devnet](https://explorer.solana.com/address/3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri?cluster=devnet) ·
 [Submission notes](docs/SUBMISSION.md)
 
@@ -15,7 +16,7 @@
 
 </div>
 
-![The Afterhours desk reading a real $21M xStocks wallet on mainnet: the New York session ring, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, a what-if moving half of MSTRx into SPYx, and the book under an S&P 500 −2% shock, position by position](docs/desk.png)
+![The Afterhours desk reading a real $21M xStocks wallet on mainnet: a rail of ten numbered panels, the tape of every xStock's move since the close, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, a what-if moving half of MSTRx into SPYx, and the book under an S&P 500 −2% shock, position by position](docs/desk.png)
 
 <div align="center">
 <sub>A real wallet, not ours — eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
@@ -273,7 +274,7 @@ for the hackathon so that trying it costs nobody real SOL.
 
 | Layer | Technology |
 |:--|:--|
-| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist, Geist Mono, Pixelify Sans · hand-rolled SVG |
+| App | Next.js 16 static export · React 19 · Tailwind 4 · Geist, Geist Mono, Pixelify Sans · hand-rolled SVG · a landing page at `/` and the desk at `/dashboard/` |
 | Wallet | Wallet Standard via `@solana/wallet-adapter-react` |
 | Program | Rust · Anchor 0.32 |
 | Data | Solana mainnet RPC · CoinGecko · Jupiter quote API · GitHub Actions |

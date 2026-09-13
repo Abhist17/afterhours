@@ -69,10 +69,10 @@ Built by the author of Sentra (github.com/Abhist17/sentra), whose estimators thi
 LINKS
 -----
 GitHub:      https://github.com/Abhist17/afterhours
-Live demo:   https://afterhours-v0dr.onrender.com/
+Live demo:   https://afterhours-v0dr.onrender.com/   (landing; the desk is at /dashboard/)
 Extra 1:     https://abhist17.github.io/afterhours/   (GitHub Pages mirror of the same build)
 Extra 2:     https://explorer.solana.com/address/3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri?cluster=devnet   (the program)
-Extra 3:     https://afterhours-v0dr.onrender.com/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc   (your on-chain record)
+Extra 3:     https://afterhours-v0dr.onrender.com/dashboard/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc   (your on-chain record)
 Video slots: leave empty (not required)
 
 TEAM

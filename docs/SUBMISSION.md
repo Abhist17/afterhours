@@ -27,9 +27,11 @@ stand to lose*, and none has ever had to price a share after the bell.
 
 ## What a judge will see in sixty seconds
 
-1. Open https://abhist17.github.io/afterhours/ — a sample book, live prices,
-   and a ring of the New York day: the NYSE session as a short bright arc,
-   the rest as the hours the tokens trade with no market behind them.
+1. Open https://afterhours-v0dr.onrender.com/ — the premise, a ring of the
+   New York day (the NYSE session as a short bright arc, the rest the hours
+   the tokens trade with no market behind them), and the tape: every xStock's
+   move since the last close. **Open the desk** lands on a sample book with
+   live prices, in an app shell with the ten panels down the left.
 2. **Since the close**: each stock's token move since the last official
    print, summed — *the market opens to this*. Under it, every close of
    the last month as a bar, and the share of the book's variance that
@@ -132,10 +134,11 @@ Nothing sleeps, nothing cold-starts.
 
 ## Links
 
-- Desk: https://afterhours-v0dr.onrender.com/ (mirror: https://abhist17.github.io/afterhours/)
+- Site: https://afterhours-v0dr.onrender.com/ · Desk: https://afterhours-v0dr.onrender.com/dashboard/
+  (mirror: https://abhist17.github.io/afterhours/)
 - Repository: https://github.com/Abhist17/afterhours
 - Program (devnet): `3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri`,
   IDL account `EAtJ4QbGP352arvb6u7J19TF8rRei2uKtoCuFAMARuHh`
-- Example record: https://abhist17.github.io/afterhours/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc
+- Example record: https://afterhours-v0dr.onrender.com/dashboard/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc
 - Built by the author of [Sentra](https://github.com/Abhist17/sentra), whose
   estimators this shares (MIT).

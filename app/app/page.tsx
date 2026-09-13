@@ -1,135 +1,75 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { loadHistoryProgressive, lastPrices, type History } from "@/lib/history";
 import { fetchLivePrices, type Quotes } from "@/lib/prices";
-import { readBalances, isValidAddress, resolveRpcUrl, setRpcUrl, usingPublicRpc, type Balances } from "@/lib/balances";
-import { analyse } from "@/lib/portfolio";
-import { SAMPLES, REAL_BOOK } from "@/lib/samples";
+import { isValidAddress } from "@/lib/balances";
 import { marketStatus } from "@/lib/market-hours";
-import { useNow, useMounted } from "@/lib/hooks";
-import { useTheme } from "@/lib/theme";
-import { useShortcuts, scrollToPanel } from "@/lib/shortcuts";
-import { shortAddress, timeAgo } from "@/lib/format";
-import type { Target } from "@/lib/quant";
-import { TopBar } from "@/components/TopBar";
+import { useNow } from "@/lib/hooks";
+import { SAMPLES, REAL_BOOK } from "@/lib/samples";
+import { ASSETS } from "@/lib/universe";
+import { Logo, Mark } from "@/components/Logo";
+import { ThemeToggle } from "@/components/TopBar";
 import { SessionRing } from "@/components/SessionRing";
 import { Tape } from "@/components/Tape";
-import { SectionNav, type Section } from "@/components/SectionNav";
-import { Stress } from "@/components/Stress";
-import { RiskMap } from "@/components/RiskMap";
-import { Summary } from "@/components/Summary";
-import { Holdings } from "@/components/Holdings";
-import { Sleeves } from "@/components/Sleeves";
-import { Overnight } from "@/components/Overnight";
-import { Backtest } from "@/components/Backtest";
-import { CorrelationGrid } from "@/components/CorrelationGrid";
-import { Drift } from "@/components/Drift";
-import { WhatIf } from "@/components/WhatIf";
-import { HowItWorks } from "@/components/HowItWorks";
-import { OnChain } from "@/components/OnChain";
-import { WalletContext, ConnectButton } from "@/components/Wallet";
-import { Panel, PanelHeader, Button, Input, Notice, Skeleton, Tag, CopyLink } from "@/components/ui";
+import { Button, Input } from "@/components/ui";
 
-type Source =
-  | { kind: "sample"; key: string; amounts: Record<string, number> }
-  | { kind: "wallet"; balances: Balances; real?: boolean };
+const PROGRAM = "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri";
+const EXPLORER = `https://explorer.solana.com/address/${PROGRAM}?cluster=devnet`;
 
-const ADDRESS_KEY = "afterhours-address";
-const RECENT_KEY = "afterhours-recent";
-const RECENT_MAX = 5;
-
-function readRecent(): string[] {
-  try {
-    const raw = localStorage.getItem(RECENT_KEY);
-    const list = raw ? (JSON.parse(raw) as unknown) : [];
-    return Array.isArray(list) ? list.filter((x): x is string => typeof x === "string" && isValidAddress(x)) : [];
-  } catch {
-    return [];
-  }
-}
-
-function remember(address: string): string[] {
-  const next = [address, ...readRecent().filter((a) => a !== address)].slice(0, RECENT_MAX);
-  try {
-    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-  } catch {}
-  return next;
-}
-
-/** The desk in reading order; the nav, the panel numbers and the number keys all follow it. */
-const SECTIONS: Section[] = [
-  { id: "holdings", number: "01", title: "What you hold" },
-  { id: "overnight", number: "02", title: "Without the market" },
-  { id: "sleeves", number: "03", title: "Where the risk is" },
-  { id: "backtest", number: "04", title: "Thirty days" },
-  { id: "correlation", number: "05", title: "Correlation" },
-  { id: "whatif", number: "06", title: "What if" },
-  { id: "stress", number: "07", title: "Stress" },
-  { id: "drift", number: "08", title: "Target and drift" },
-  { id: "onchain", number: "09", title: "On Solana" },
-  { id: "riskmap", number: "10", title: "Risk and return" },
+/** The ten panels, in the order the desk reads them. */
+const PANELS: { id: string; number: string; title: string; line: string }[] = [
+  { id: "holdings", number: "01", title: "What you hold", line: "Every position with its share of value beside its share of risk. They differ." },
+  { id: "overnight", number: "02", title: "Trading without the market", line: "Each stock's token move since the last official print, summed: the market opens to this." },
+  { id: "sleeves", number: "03", title: "Where the risk really is", line: "Stocks, crypto and cash by value and by risk — and the crypto that is called a stock." },
+  { id: "backtest", number: "04", title: "Thirty days", line: "The book scored at every hour with what was known then, and the model marked against what happened." },
+  { id: "correlation", number: "05", title: "How they move together", line: "Thirty days of hourly returns. Pairs near 1.00 are one bet wearing two names." },
+  { id: "whatif", number: "06", title: "What if", line: "Move a share of any position into any other asset and re-score the whole book, instantly." },
+  { id: "stress", number: "07", title: "If the market gaps", line: "S&P −5%, crypto −30%, and the window's own worst day — each position by its beta." },
+  { id: "drift", number: "08", title: "Target and drift", line: "State the allocation you meant. See the drift and the orders back, each quoted live on Jupiter." },
+  { id: "onchain", number: "09", title: "Your record on Solana", line: "Declare the policy on-chain and record snapshots, signed by the wallet that owns the book." },
+  { id: "riskmap", number: "10", title: "Risk and return", line: "Every asset the desk knows, placed by volatility and thirty-day return." },
 ];
 
-export default function Page() {
-  return (
-    <WalletContext>
-      <Desk />
-    </WalletContext>
-  );
-}
+const STEPS = [
+  { n: "1", title: "Paste an address, or connect", body: "The page reads the wallet's token accounts from Solana mainnet — Token-2022 and the classic program — with no key and no custody." },
+  { n: "2", title: "Scored in your browser", body: "Thirty days of hourly prices for the whole universe are already in the tab. VaR, beta, drift, stress: every figure is computed where you can see it." },
+  { n: "3", title: "Recorded on Solana, by you", body: "Save the targets as an on-chain policy and record snapshots — each one an account owned and signed by your wallet. A breach is an event anyone can subscribe to." },
+];
 
-function Desk() {
+export default function Landing() {
+  const router = useRouter();
   const [history, setHistory] = useState<History | null>(null);
-  const [historyError, setHistoryError] = useState<string | null>(null);
   const [quotes, setQuotes] = useState<Quotes | null>(null);
-  const [source, setSource] = useState<Source | null>(null);
   const [address, setAddress] = useState("");
-  const [loadingWallet, setLoadingWallet] = useState(false);
-  const [walletError, setWalletError] = useState<string | null>(null);
-  const [helpOpen, setHelpOpen] = useState(false);
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [rpcOpen, setRpcOpen] = useState(false);
-  const [rpcDraft, setRpcDraft] = useState("");
-  const [recent, setRecent] = useState<string[]>([]);
   const now = useNow(60_000);
-  const mounted = useMounted();
-  const { toggle: toggleTheme } = useTheme();
-  const addressInput = useRef<HTMLInputElement>(null);
+  const market = useMemo(() => marketStatus(now), [now]);
+  const equities = useMemo(() => ASSETS.filter((a) => a.class === "equity").length, []);
 
-  // Keys: / to the address, ? for help, t for theme, 1–9 and 0 to a panel.
-  const shortcuts = useMemo(() => {
-    const jump = (i: number) => () => scrollToPanel(SECTIONS[i]?.id ?? "");
-    const map: Record<string, () => void> = {
-      "/": () => addressInput.current?.focus(),
-      "?": () => setHelpOpen((o) => !o),
-      t: () => toggleTheme(),
-      Escape: () => setHelpOpen(false),
-    };
-    SECTIONS.forEach((_, i) => {
-      map[String((i + 1) % 10)] = jump(i);
-    });
-    return map;
-  }, [toggleTheme]);
-  useShortcuts(shortcuts);
+  // Old links named the book on the root page; they still land on it.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("address") || url.searchParams.has("book")) {
+      router.replace(`/dashboard/${url.search}${url.hash}`);
+    }
+  }, [router]);
 
-  // History paints from the bundled copy and upgrades to the hourly file;
-  // quotes are asked for once the first history is in, then on a timer.
-  // Quotes fall back to the last point of the history and say so; nothing
-  // here waits on a server.
+  // The tape wants history and quotes; the same progressive load the desk uses.
   useEffect(() => {
     let cancelled = false;
-    let quotesRequested = false;
+    let asked = false;
     const stop = loadHistoryProgressive({
       onHistory: (h) => {
         setHistory(h);
-        if (quotesRequested) return;
-        quotesRequested = true;
+        if (asked) return;
+        asked = true;
         void fetchLivePrices(lastPrices(h)).then((q) => {
           if (!cancelled) setQuotes(q);
         });
       },
-      onError: (message) => setHistoryError(message),
+      onError: () => {},
     });
     return () => {
       cancelled = true;
@@ -137,140 +77,38 @@ function Desk() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!history) return;
-    const timer = setInterval(async () => {
-      if (document.visibilityState !== "visible") return;
-      setQuotes(await fetchLivePrices(lastPrices(history)));
-    }, 60_000);
-    return () => clearInterval(timer);
-  }, [history]);
-
-  // Only the latest read may speak: a slower earlier one must not paint an
-  // error, or an older book, over a newer answer.
-  const readSeq = useRef(0);
-  const loadWallet = useCallback(async (value: string, real = false): Promise<boolean> => {
-    const trimmed = value.trim();
-    if (!isValidAddress(trimmed)) {
-      setWalletError("That is not a Solana address.");
-      return false;
-    }
-    const seq = ++readSeq.current;
-    setLoadingWallet(true);
-    setWalletError(null);
-    try {
-      const balances = await readBalances(trimmed);
-      if (seq !== readSeq.current) return false;
-      setSource({ kind: "wallet", balances, real });
-      setAddress(trimmed);
-      if (!real) setRecent(remember(trimmed));
-      try {
-        localStorage.setItem(ADDRESS_KEY, trimmed);
-        const url = new URL(window.location.href);
-        url.searchParams.set("address", trimmed);
-        url.searchParams.delete("book");
-        window.history.replaceState(null, "", url);
-      } catch {}
-      return true;
-    } catch (err) {
-      if (seq !== readSeq.current) return false;
-      const message = err instanceof Error ? err.message : String(err);
-      const host = safeHost(resolveRpcUrl());
-      setWalletError(
-        usingPublicRpc() && /403|forbidden|429/i.test(message)
-          ? `${host} refused the read. Public endpoints do that under load — try again in a moment, set your own RPC below, or open a sample book.`
-          : `Could not read ${shortAddress(trimmed)} from ${host}: ${message}`
-      );
-      return false;
-    } finally {
-      if (seq === readSeq.current) setLoadingWallet(false);
-    }
-  }, []);
-
-  // A link can name the book (?address= or ?book=), a returning viewer
-  // gets their last address back, and a new one gets the first sample —
-  // so the desk is never empty, and a judge can be sent straight to a
-  // real wallet.
-  useEffect(() => {
-    setRecent(readRecent());
-    const params = new URLSearchParams(window.location.search);
-    const linked = params.get("address");
-    const book = params.get("book");
-    // A wallet that cannot be read right now still leaves a desk to look
-    // at: the first sample, under the error that says why.
-    const orSample = (ok: boolean) => {
-      if (!ok) setSource((s) => s ?? { kind: "sample", key: SAMPLES[0].key, amounts: SAMPLES[0].amounts });
-    };
-    if (linked && isValidAddress(linked)) {
-      setAddress(linked);
-      void loadWallet(linked, linked === REAL_BOOK.address).then(orSample);
-      return;
-    }
-    if (book && SAMPLES.some((s) => s.key === book)) {
-      pickSample(book);
-      return;
-    }
-    try {
-      const stored = localStorage.getItem(ADDRESS_KEY);
-      if (stored && isValidAddress(stored)) {
-        setAddress(stored);
-        void loadWallet(stored, stored === REAL_BOOK.address).then(orSample);
-        return;
-      }
-    } catch {}
-    setSource({ kind: "sample", key: SAMPLES[0].key, amounts: SAMPLES[0].amounts });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function pickSample(key: string) {
-    const s = SAMPLES.find((x) => x.key === key) ?? SAMPLES[0];
-    setSource({ kind: "sample", key: s.key, amounts: s.amounts });
-    setWalletError(null);
-    try {
-      localStorage.removeItem(ADDRESS_KEY);
-      const url = new URL(window.location.href);
-      url.searchParams.set("book", s.key);
-      url.searchParams.delete("address");
-      window.history.replaceState(null, "", url);
-    } catch {}
-  }
-
-  const amounts = source?.kind === "wallet" ? source.balances.amounts : source?.amounts ?? {};
-
-  const analysis = useMemo(() => {
-    if (!history || !quotes || !source) return null;
-    return analyse(amounts, quotes.prices, history, now);
-  }, [history, quotes, amounts, now, source]);
-
-  // A link that names a panel (#stress) lands on it once the panels exist.
-  const landed = useRef(false);
-  useEffect(() => {
-    if (!analysis || landed.current) return;
-    landed.current = true;
-    const id = window.location.hash.slice(1);
-    if (id && SECTIONS.some((s) => s.id === id)) setTimeout(() => scrollToPanel(id), 50);
-  }, [analysis]);
-
-  const market = useMemo(() => marketStatus(now), [now]);
-  const sample = source?.kind === "sample" ? SAMPLES.find((s) => s.key === source.key) : null;
-  const viewing = source?.kind === "wallet" ? source.balances.address : null;
+  const open = (query: string) => router.push(`/dashboard/${query}`);
 
   return (
     <div className="min-h-screen">
-      <TopBar
-        market={market}
-        onOpenHelp={() => setHelpOpen(true)}
-        connect={<ConnectButton onConnected={(addr) => void loadWallet(addr)} />}
-      />
-      <HowItWorks open={helpOpen} onClose={() => setHelpOpen(false)} />
-      {analysis && <SectionNav sections={SECTIONS} />}
+      {/* ── Nav ─────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[1200px] items-center gap-3 px-4 sm:px-6">
+          <Logo />
+          <nav className="ml-6 hidden items-center gap-5 text-[12.5px] text-secondary md:flex" aria-label="Site">
+            <a href="#panels" className="hover:text-text">The desk</a>
+            <a href="#how" className="hover:text-text">How it works</a>
+            <a href="#solana" className="hover:text-text">On Solana</a>
+            <a href="https://github.com/Abhist17/afterhours" target="_blank" rel="noopener noreferrer" className="hover:text-text">Source</a>
+          </nav>
+          <span className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
+            <Link href="/dashboard/" className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-medium text-primary-text hover:opacity-90">
+              Open the desk <span aria-hidden="true">→</span>
+            </Link>
+          </span>
+        </div>
+      </header>
 
-      {/* ── Hero: the premise and the ways in ──────────────────── */}
+      {/* ── Hero ────────────────────────────────────────────────── */}
       <section className="hero-glow border-b border-border">
-        <div className="mx-auto grid max-w-[1500px] items-center gap-x-10 gap-y-6 px-4 pb-8 pt-10 sm:px-6 sm:pt-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:pt-10">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-x-10 gap-y-8 px-4 pb-12 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_auto] lg:pb-16">
           <div className="min-w-0">
-            <p className="label mb-3" style={{ color: "var(--brand)" }}>The risk desk for tokenized stocks on Solana</p>
-            <h1 className="display max-w-[20ch] text-[38px] leading-[1.02] text-text sm:text-[58px]">
+            <p className="label mb-4 flex items-center gap-2" style={{ color: "var(--brand)" }}>
+              <Mark size={14} />
+              The risk desk for tokenized stocks on Solana
+            </p>
+            <h1 className="display max-w-[16ch] text-[44px] leading-[1] text-text sm:text-[68px]">
               Markets close.{" "}
               <em className="text-secondary">
                 Your book{" "}
@@ -280,332 +118,187 @@ function Desk() {
                 </span>
               </em>
             </h1>
-            <p className="mt-4 max-w-[58ch] text-[14px] leading-relaxed text-secondary sm:text-[15px]">
-              An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. What your
-              tokens can lose tomorrow, what they&rsquo;ve done since the last bell, and how far your book has drifted
-              from what you meant it to be &mdash; read from your wallet, scored in your browser, recorded on-chain by you.
+            <p className="mt-5 max-w-[56ch] text-[15px] leading-relaxed text-secondary sm:text-[16px]">
+              An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. Afterhours reads
+              any wallet holding xStocks and says what it can lose tomorrow, what it has done since the last bell, and how far it
+              has drifted from what you meant it to be &mdash; scored in your browser, recorded on-chain by you.
             </p>
 
             <form
-              className="mt-7 flex flex-col gap-2 sm:flex-row sm:items-center"
+              className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-center"
               onSubmit={(e) => {
                 e.preventDefault();
-                void loadWallet(address);
+                const a = address.trim();
+                if (isValidAddress(a)) open(`?address=${a}`);
               }}
             >
               <Input
-                ref={addressInput}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Paste a Solana address holding xStocks"
                 spellCheck={false}
                 autoComplete="off"
                 aria-label="Solana wallet address"
-                className="numeric !h-11 !text-[13px] sm:max-w-lg"
+                className="numeric !h-12 !text-[13px] sm:max-w-lg"
               />
-              <Button type="submit" variant="primary" size="lg" disabled={loadingWallet || !address.trim()}>
-                {loadingWallet ? "Reading…" : "Read wallet"}
+              <Button type="submit" variant="primary" size="lg" disabled={!isValidAddress(address.trim())} className="!h-12">
+                Read wallet
               </Button>
             </form>
 
-            <div className="print-hide mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary">
               <span className="mr-1">or open</span>
-              <Button
-                size="sm"
-                variant={viewing === REAL_BOOK.address ? "primary" : "secondary"}
-                onClick={() => void loadWallet(REAL_BOOK.address, true)}
-                title={REAL_BOOK.blurb}
-                disabled={loadingWallet}
-              >
+              <Button size="sm" variant="secondary" onClick={() => open(`?address=${REAL_BOOK.address}`)} title={REAL_BOOK.blurb}>
                 {REAL_BOOK.label}
               </Button>
               {SAMPLES.map((s) => (
-                <Button key={s.key} size="sm" variant={sample?.key === s.key ? "primary" : "secondary"} onClick={() => pickSample(s.key)} title={s.blurb}>
+                <Button key={s.key} size="sm" variant="secondary" onClick={() => open(`?book=${s.key}`)} title={s.blurb}>
                   {s.label}
                 </Button>
               ))}
             </div>
-
-            {recent.filter((r) => r !== REAL_BOOK.address).length > 0 && (
-              <div className="print-hide mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-tertiary">
-                <span className="mr-1">recent</span>
-                {recent
-                  .filter((r) => r !== REAL_BOOK.address)
-                  .map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => void loadWallet(r)}
-                      disabled={loadingWallet}
-                      className={`numeric rounded-md border px-1.5 py-0.5 transition-colors hover:text-text ${viewing === r ? "border-brand text-text" : "border-border"}`}
-                      title={r}
-                    >
-                      {shortAddress(r, 5)}
-                    </button>
-                  ))}
-                <button
-                  type="button"
-                  onClick={() => {
-                    try {
-                      localStorage.removeItem(RECENT_KEY);
-                    } catch {}
-                    setRecent([]);
-                  }}
-                  className="underline decoration-border-strong underline-offset-2 hover:text-text"
-                >
-                  forget
-                </button>
-              </div>
-            )}
-
-            {walletError && (
-              <div className="mt-3 max-w-2xl">
-                <Notice tone="error">{walletError}</Notice>
-              </div>
-            )}
-
-            <div className="print-hide mt-3 text-[11px] text-tertiary">
-              {rpcOpen ? (
-                <form
-                  className="flex flex-col gap-2 sm:flex-row sm:items-center"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!/^https?:\/\//.test(rpcDraft.trim())) return;
-                    setRpcUrl(rpcDraft.trim());
-                    setRpcOpen(false);
-                    setWalletError(null);
-                    if (address.trim()) void loadWallet(address);
-                  }}
-                >
-                  <Input
-                    value={rpcDraft}
-                    onChange={(e) => setRpcDraft(e.target.value)}
-                    placeholder="https://mainnet.helius-rpc.com/?api-key=…"
-                    spellCheck={false}
-                    autoComplete="off"
-                    aria-label="Mainnet RPC endpoint"
-                    className="numeric !text-xs sm:max-w-md"
-                  />
-                  <Button type="submit" size="md" variant="secondary" disabled={!/^https?:\/\//.test(rpcDraft.trim())}>Use this RPC</Button>
-                  <Button type="button" size="md" variant="ghost" onClick={() => { setRpcUrl(null); setRpcOpen(false); }}>Reset</Button>
-                  <Button type="button" size="md" variant="ghost" onClick={() => setRpcOpen(false)}>Cancel</Button>
-                  <span>Stored in this browser only.</span>
-                </form>
-              ) : (
-                <>
-                  Balances are read from mainnet by this page via <span className="numeric">{mounted ? safeHost(resolveRpcUrl()) : ""}</span>.{" "}
-                  <button type="button" onClick={() => setRpcOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">
-                    Use your own RPC
-                  </button>
-                </>
-              )}
-            </div>
           </div>
-          <div className="hidden justify-self-center lg:block lg:pr-4 xl:pr-10">
+          <div className="hidden justify-self-center lg:block">
             <SessionRing market={market} now={now} />
           </div>
         </div>
       </section>
       <Tape history={history} prices={quotes?.prices ?? null} market={market} />
 
-      <main className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6">
-        {historyError ? (
-          <Notice tone="error">Price history could not be loaded: {historyError}</Notice>
-        ) : !analysis ? (
-          <Loading />
-        ) : (
-          <>
-            {/* ── Whose book, and how fresh ────────────────────── */}
-            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-tertiary">
-              {source?.kind === "wallet" ? (
-                <>
-                  {source.real && <Tag color="var(--brand)">real wallet · not ours</Tag>}
-                  <span className="text-secondary">
-                    <span className="numeric">{shortAddress(source.balances.address, 6)}</span>
-                  </span>
-                  <span>read from mainnet {timeAgo(source.balances.readAt)}</span>
-                  {source.balances.unpricedMints.length > 0 && (
-                    <span>· {source.balances.unpricedMints.length} other token{source.balances.unpricedMints.length === 1 ? "" : "s"} the desk does not price</span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <Tag>sample</Tag>
-                  <span>{sample?.blurb} Synthetic holdings, real prices.</span>
-                </>
-              )}
-              <span className="ml-auto flex items-center gap-3">
-                <span>
-                  quotes {quotes?.stale ? "from history" : "live"} · history {history?.source === "live" ? "hourly" : "bundled"}, {timeAgo(history?.generatedAt ?? 0)}
-                </span>
-                <CopyLink />
-              </span>
+      {/* ── The desk, as a picture ──────────────────────────────── */}
+      <section className="mx-auto max-w-[1200px] px-4 pt-14 sm:px-6 sm:pt-20">
+        <div className="card overflow-hidden shadow-md">
+          <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
+            <span className="h-2 w-2 rounded-full bg-border-strong" />
+            <span className="h-2 w-2 rounded-full bg-border-strong" />
+            <span className="h-2 w-2 rounded-full bg-border-strong" />
+            <span className="numeric ml-3 text-[10px] text-tertiary">afterhours · a real $21M xStocks wallet on mainnet</span>
+          </div>
+          <Link href={`/dashboard/?address=${REAL_BOOK.address}`} title="Open this wallet on the desk">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="desk.jpg" alt="The Afterhours desk reading a real xStocks wallet: risk score, book, one-day VaR, beta, the move since the close, and the holdings." width={1280} height={800} className="block w-full" />
+          </Link>
+        </div>
+        <p className="mt-3 text-center text-[12px] text-tertiary">
+          A real wallet, not ours — found through the largest SPYx token accounts. MSTRx is 18% of its value and 51% of its risk.
+        </p>
+      </section>
+
+      {/* ── Ten panels ──────────────────────────────────────────── */}
+      <section id="panels" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-16 sm:px-6 sm:pt-24">
+        <p className="label" style={{ color: "var(--brand)" }}>The desk</p>
+        <h2 className="display mt-2 text-[30px] leading-[1.05] text-text sm:text-[40px]">Ten panels. One book.</h2>
+        <p className="mt-3 max-w-[60ch] text-[14px] leading-relaxed text-secondary">
+          A brokerage app shows what you have. None shows what you stand to lose &mdash; and none has ever had to price a
+          share after the bell. Each panel answers one question; number keys jump between them.
+        </p>
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {PANELS.map((p) => (
+            <Link key={p.id} href={`/dashboard/#${p.id}`} className="card group flex flex-col gap-2 p-4 transition-colors hover:bg-surface-hover">
+              <span className="display text-[18px]" style={{ color: "var(--brand)" }}>{p.number}</span>
+              <span className="text-[13px] font-semibold text-text">{p.title}</span>
+              <span className="text-[12px] leading-snug text-tertiary">{p.line}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── How it works ────────────────────────────────────────── */}
+      <section id="how" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-16 sm:px-6 sm:pt-24">
+        <p className="label" style={{ color: "var(--brand)" }}>How it works</p>
+        <h2 className="display mt-2 text-[30px] leading-[1.05] text-text sm:text-[40px]">Nothing to run.</h2>
+        <p className="mt-3 max-w-[60ch] text-[14px] leading-relaxed text-secondary">
+          One static page. Balances from mainnet in the browser, history refreshed hourly by a workflow, every figure computed in
+          the tab, every on-chain write signed by the viewer. Nothing sleeps, nothing cold-starts.
+        </p>
+        <ol className="mt-8 grid gap-3 md:grid-cols-3">
+          {STEPS.map((s) => (
+            <li key={s.n} className="card p-5">
+              <span className="display text-[28px] leading-none" style={{ color: "var(--brand)" }}>{s.n}</span>
+              <p className="mt-3 text-[14px] font-semibold text-text">{s.title}</p>
+              <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ── Where Solana is load-bearing ────────────────────────── */}
+      <section id="solana" className="mx-auto max-w-[1200px] scroll-mt-20 px-4 pt-16 sm:px-6 sm:pt-24">
+        <p className="label" style={{ color: "var(--brand)" }}>On Solana</p>
+        <h2 className="display mt-2 text-[30px] leading-[1.05] text-text sm:text-[40px]">Where the chain is load-bearing.</h2>
+        <div className="mt-8 grid gap-3 md:grid-cols-3">
+          <div className="card p-5">
+            <p className="text-[14px] font-semibold text-text">Reads</p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
+              xStocks are Token-2022 mints on mainnet. The page reads any wallet&rsquo;s token accounts under both token
+              programs. Every one of the {equities} mints was verified on-chain.
+            </p>
+          </div>
+          <div className="card p-5">
+            <p className="text-[14px] font-semibold text-text">Writes</p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
+              An Anchor program with a <span className="text-secondary">Policy</span> (targets in bps, a risk limit, a drift band) and
+              immutable <span className="text-secondary">Snapshots</span>, both owned by the wallet they describe. Every snapshot emits{" "}
+              <span className="numeric text-secondary">SnapshotRecorded {"{ breached }"}</span> &mdash; a credit primitive.
+            </p>
+            <a href={EXPLORER} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[12px] underline decoration-border-strong underline-offset-2 hover:text-text" style={{ color: "var(--brand)" }}>
+              Program on Explorer ↗
+            </a>
+          </div>
+          <div className="card p-5">
+            <p className="text-[14px] font-semibold text-text">Quotes</p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
+              Every rebalance order is quoted live on Jupiter for its exact size &mdash; what the swap fetches now, its price
+              impact and route &mdash; and links out by mint.
+            </p>
+          </div>
+        </div>
+
+        <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[14px] border border-border bg-border md:grid-cols-5">
+          {[
+            [String(equities), "xStocks, every mint verified"],
+            ["5", "program instructions"],
+            ["1", "event: SnapshotRecorded"],
+            ["94", "tests in CI, app + program"],
+            ["0", "servers"],
+          ].map(([n, l]) => (
+            <div key={l} className="bg-surface px-5 py-5">
+              <dt className="display text-[32px] leading-none text-text">{n}</dt>
+              <dd className="mt-1.5 text-[11.5px] text-tertiary">{l}</dd>
             </div>
+          ))}
+        </dl>
+      </section>
 
-            <div className="mb-4">
-              <Summary a={analysis} />
-            </div>
+      {/* ── Closing CTA ─────────────────────────────────────────── */}
+      <section className="mx-auto max-w-[1200px] px-4 pt-16 sm:px-6 sm:pt-24">
+        <div className="hero-glow card flex flex-col items-start gap-5 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+          <div>
+            <h2 className="display text-[28px] leading-[1.05] text-text sm:text-[36px]">
+              Open the desk.<span className="cursor" aria-hidden="true" />
+            </h2>
+            <p className="mt-2 max-w-[48ch] text-[13.5px] text-secondary">A sample book is loaded before you paste anything. Devnet for the on-chain part, so trying it costs nobody real SOL.</p>
+          </div>
+          <Link href="/dashboard/" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg bg-primary px-6 text-[14px] font-medium text-primary-text hover:opacity-90">
+            Open the desk <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </section>
 
-            {/* Left column is the reading; right column is the acting. The
-                numbers run down the left then the right, so a single-column
-                phone reads 01 to 10 in order too. */}
-            <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-              <div className="min-w-0 space-y-4">
-                <Panel delay={40} id="holdings">
-                  <PanelHeader
-                    number="01"
-                    title="What you hold"
-                    caption="Every position the desk can price, with its share of value beside its share of risk. They differ. Click one for its thirty days."
-                    meta={`${analysis.holdings.length} priced`}
-                  />
-                  <Holdings a={analysis} history={history!} />
-                </Panel>
-
-                <Panel delay={80} id="overnight">
-                  <PanelHeader
-                    number="02"
-                    title="Trading without the market"
-                    caption="While the NYSE is closed, each stock's token keeps moving. This is what the market will open to — and what it has opened to, close after close."
-                    meta={analysis.market.open ? "NYSE open" : "NYSE closed"}
-                  />
-                  <Overnight a={analysis} />
-                </Panel>
-
-                <Panel delay={120} id="sleeves">
-                  <PanelHeader
-                    number="03"
-                    title="Where the risk really is"
-                    caption="Stocks, crypto and cash by value and by risk — and the crypto that is called a stock."
-                  />
-                  <Sleeves a={analysis} />
-                </Panel>
-
-                <Panel delay={160} id="backtest">
-                  <PanelHeader
-                    number="04"
-                    title="What this allocation has been"
-                    caption="The current shape of the book through the last thirty days: its risk score at every hour, its value, its drawdown — and the model marked against what happened."
-                  />
-                  <Backtest a={analysis} />
-                </Panel>
-
-                <Panel delay={200} id="correlation">
-                  <PanelHeader
-                    number="05"
-                    title="How they move together"
-                    caption="Thirty days of hourly returns. Pairs near 1.00 are one bet wearing two names."
-                    meta={`${analysis.correlation.symbols.length} assets`}
-                  />
-                  <CorrelationGrid correlation={analysis.correlation} held={analysis.holdings.map((h) => h.symbol)} />
-                </Panel>
-              </div>
-
-              <div className="min-w-0 space-y-4">
-                <Panel delay={40} id="whatif">
-                  <PanelHeader
-                    number="06"
-                    title="What if"
-                    caption="Move a share of any position into any other asset and re-score the whole book, here, now."
-                  />
-                  <WhatIf amounts={amounts} history={history!} quotes={quotes!} now={now} />
-                </Panel>
-
-                <Panel delay={80} id="stress">
-                  <PanelHeader
-                    number="07"
-                    title="If the market gaps"
-                    caption="The book under shocks the last thirty days may never have shown — and under the worst day and worst close they actually had."
-                  />
-                  <Stress a={analysis} />
-                </Panel>
-
-                <Panel delay={120} id="drift">
-                  <PanelHeader
-                    number="08"
-                    title="What you meant it to be"
-                    caption="State the allocation you intended. See the drift, and the trades that put it back — each quoted live on Jupiter."
-                  />
-                  <Drift
-                    a={analysis}
-                    prices={quotes!.prices}
-                    storageKey={source?.kind === "wallet" ? source.balances.address : `sample:${source?.key}`}
-                    onTargetsChange={setTargets}
-                  />
-                </Panel>
-
-                <Panel delay={160} id="onchain">
-                  <PanelHeader
-                    number="09"
-                    title="Your record on Solana"
-                    caption="Declare the policy on-chain and record snapshots of the book — signed by the wallet that owns it."
-                  />
-                  <OnChain a={analysis} viewing={viewing} targets={targets} />
-                </Panel>
-
-                <Panel delay={200} id="riskmap">
-                  <PanelHeader
-                    number="10"
-                    title="Risk and return, name by name"
-                    caption="Every asset the desk knows, placed by its volatility and its thirty-day return. What is held is solid; the book is the ring."
-                    meta={`${analysis.riskReturn.length} assets`}
-                  />
-                  <RiskMap a={analysis} />
-                </Panel>
-              </div>
-            </div>
-
-            <footer className="mt-10 border-t border-border pt-5">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-tertiary">
-                <a href="https://github.com/Abhist17/afterhours" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Source</a>
-                <button type="button" onClick={() => setHelpOpen(true)} className="underline decoration-border-strong underline-offset-2 hover:text-text">How the numbers are made</button>
-                <button type="button" onClick={() => window.print()} className="underline decoration-border-strong underline-offset-2 hover:text-text">Print this desk</button>
-                <a href="https://github.com/Abhist17/afterhours/blob/main/docs/SUBMISSION.md" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Submission notes</a>
-                <span className="hidden items-center gap-1 sm:inline-flex">
-                  <kbd className="numeric rounded border border-border px-1 text-[10px]">/</kbd> address
-                  <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">1</kbd>–<kbd className="numeric rounded border border-border px-1 text-[10px]">0</kbd> panels
-                  <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">?</kbd> help
-                  <kbd className="numeric ml-2 rounded border border-border px-1 text-[10px]">t</kbd> theme
-                </span>
-                <span className="ml-auto">Built for Stocklana · by the author of Sentra</span>
-              </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-tertiary">
-                Balances are read from Solana mainnet by your browser; prices and thirty days of hourly history come from
-                CoinGecko; every figure is computed on this page. Value at Risk is a model estimate, not a prediction and
-                not investment advice. xStocks are issued by Backed Finance; Afterhours is unaffiliated.
-              </p>
-            </footer>
-          </>
-        )}
-      </main>
+      <footer className="mx-auto max-w-[1200px] px-4 pb-10 pt-14 sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-5 text-[11px] text-tertiary">
+          <Logo size={16} />
+          <a href="https://github.com/Abhist17/afterhours" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Source</a>
+          <a href="https://github.com/Abhist17/afterhours/blob/main/docs/SUBMISSION.md" target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Submission notes</a>
+          <a href={EXPLORER} target="_blank" rel="noopener noreferrer" className="underline decoration-border-strong underline-offset-2 hover:text-text">Program</a>
+          <span className="ml-auto">Built for Stocklana · by the author of Sentra</span>
+        </div>
+        <p className="mt-3 text-[11px] leading-relaxed text-tertiary">
+          Balances are read from Solana mainnet by your browser; prices and thirty days of hourly history come from CoinGecko;
+          every figure is computed on the page. Value at Risk is a model estimate, not a prediction and not investment advice.
+          xStocks are issued by Backed Finance; Afterhours is unaffiliated.
+        </p>
+      </footer>
     </div>
   );
-}
-
-function Loading() {
-  return (
-    <div aria-busy="true" aria-label="Loading the desk">
-      <Skeleton className="mb-3 h-5 w-64" />
-      <Skeleton className="mb-4 h-[174px]" />
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        <div className="space-y-4">
-          <Skeleton className="h-[420px]" />
-          <Skeleton className="h-[520px]" />
-          <Skeleton className="h-64" />
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-52" />
-          <Skeleton className="h-[460px]" />
-          <Skeleton className="h-80" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function safeHost(url: string): string {
-  try {
-    return new URL(url).host;
-  } catch {
-    return url;
-  }
 }

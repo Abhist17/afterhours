@@ -14,7 +14,7 @@ export default function NotFound() {
       <p className="mt-4 max-w-[50ch] text-[15px] text-secondary">
         There is one page, and this is not it. The desk reads any Solana address holding xStocks, or a sample book.
       </p>
-      <Link href="/" className="mt-6 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-[14px] font-medium text-primary-text hover:opacity-90">
+      <Link href="/dashboard/" className="mt-6 inline-flex h-10 items-center rounded-lg bg-primary px-4 text-[14px] font-medium text-primary-text hover:opacity-90">
         Open the desk
       </Link>
     </main>
