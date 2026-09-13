@@ -1,0 +1,45 @@
+name: Daily snapshot
+
+# After the New York close, the desk scores its own sample book with live
+# prices and records the reading on devnet as a Snapshot account, signed by
+# a keypair that exists only for this. A reading outside the policy emits
+# SnapshotRecorded { breached: true } and, if a webhook is set, a message.
+
+on:
+  schedule:
+    - cron: "40 21 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Score and print, write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-snapshot
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install
+        working-directory: app
+        run: npm ci
+      - name: Score the book and record the snapshot
+        working-directory: app
+        env:
+          RECORDER_KEYPAIR: ${{ secrets.RECORDER_KEYPAIR }}
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+          ALERT_ALWAYS: ${{ vars.ALERT_ALWAYS }}
+          RECORD_DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: npm run record

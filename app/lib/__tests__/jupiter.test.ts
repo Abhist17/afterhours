@@ -48,3 +48,17 @@ describe("jupiter", () => {
     expect(v.shortfall).toBeCloseTo(30 / 4500, 9);
   });
 });
+
+describe("swapRequest", () => {
+  it("hands Jupiter its own quote back with the payer and SOL wrapping", async () => {
+    const { swapRequest } = await import("../jupiter");
+    const raw = { inAmount: "1", outAmount: "2", priceImpactPct: "0" };
+    const body = swapRequest(
+      { from: "MSTRx", to: "USDC", amountIn: 1, amountOut: 2, priceImpact: 0, route: [], fetchedAt: 0, raw },
+      "4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc"
+    );
+    expect(body.quoteResponse).toBe(raw);
+    expect(body.userPublicKey).toBe("4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc");
+    expect(body.wrapAndUnwrapSol).toBe(true);
+  });
+});

@@ -29,6 +29,8 @@ import { WhatIf } from "@/components/WhatIf";
 import { HowItWorks } from "@/components/HowItWorks";
 import { OnChain } from "@/components/OnChain";
 import { WalletContext, ConnectButton } from "@/components/Wallet";
+import { Watch } from "@/components/Watch";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Panel, PanelHeader, Button, Input, Notice, Skeleton, Tag, CopyLink } from "@/components/ui";
 
 type Source =
@@ -94,6 +96,9 @@ function Desk() {
   const [recent, setRecent] = useState<string[]>([]);
   const now = useNow(60_000);
   const mounted = useMounted();
+  const { publicKey: connectedKey } = useWallet();
+  // While a book is being watched, quotes keep refreshing in a background tab.
+  const watchingRef = useRef(false);
   const { toggle: toggleTheme } = useTheme();
   const addressInput = useRef<HTMLInputElement>(null);
 
@@ -140,7 +145,7 @@ function Desk() {
   useEffect(() => {
     if (!history) return;
     const timer = setInterval(async () => {
-      if (document.visibilityState !== "visible") return;
+      if (document.visibilityState !== "visible" && !watchingRef.current) return;
       setQuotes(await fetchLivePrices(lastPrices(history)));
     }, 60_000);
     return () => clearInterval(timer);
@@ -254,6 +259,8 @@ function Desk() {
   const market = useMemo(() => marketStatus(now), [now]);
   const sample = source?.kind === "sample" ? SAMPLES.find((s) => s.key === source.key) : null;
   const viewing = source?.kind === "wallet" ? source.balances.address : null;
+  const owner = !!viewing && !!connectedKey && connectedKey.toBase58() === viewing;
+  const bookLabel = source?.kind === "wallet" ? (source.real ? REAL_BOOK.label : shortAddress(source.balances.address, 4)) : (sample?.label ?? "Sample book");
 
   return (
     <div className="flex min-h-screen">
@@ -433,6 +440,14 @@ function Desk() {
                   <span>
                     quotes {quotes?.stale ? "from history" : "live"} · history {history?.source === "live" ? "hourly" : "bundled"}, {timeAgo(history?.generatedAt ?? 0)}
                   </span>
+                  <Watch
+                    a={analysis}
+                    book={bookLabel}
+                    storageKey={source?.kind === "wallet" ? source.balances.address : `sample:${source?.key}`}
+                    onWatching={(w) => {
+                      watchingRef.current = w;
+                    }}
+                  />
                   <CopyLink />
                 </span>
               </div>
@@ -525,6 +540,11 @@ function Desk() {
                       prices={quotes!.prices}
                       storageKey={source?.kind === "wallet" ? source.balances.address : `sample:${source?.key}`}
                       onTargetsChange={setTargets}
+                      owner={owner}
+                      onTraded={() => {
+                        // Give the RPC a moment to see the new balances, then re-read.
+                        if (viewing) setTimeout(() => void loadWallet(viewing, source?.kind === "wallet" && !!source.real), 2_500);
+                      }}
                     />
                   </Panel>
 

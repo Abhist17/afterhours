@@ -55,6 +55,6 @@ export const REAL_BOOK = {
  * so the on-chain accounts are real before anyone has signed anything.
  */
 export const EXAMPLE_RECORD = {
-  address: "4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc",
-  label: "the author's wallet",
+  address: "HKer2StnsJ5vrNrk8KTSm3VoroqoGbNAGNStNWGJBndp",
+  label: "the desk's own book, recorded daily by a workflow",
 };

@@ -47,12 +47,17 @@ stand to lose*, and none has ever had to price a share after the bell.
 6. **What if**: move half of TSLAx into SPYx, watch the score, VaR, beta
    and effective assets move, instantly, no server.
 7. **Target and drift**: pick 60/40, see the drift and the exact sell/buy
-   orders, each quoted live on Jupiter with price impact and route.
+   orders, each quoted live on Jupiter with price impact and route. With
+   the book's own wallet connected, **Sign and swap** sends the order:
+   Jupiter builds it, the wallet signs, mainnet confirms, the desk re-reads.
 8. **Your record on Solana**: connect Phantom, save the targets as an
    on-chain policy, record a snapshot; each one an account on devnet.
-   Without a wallet, the panel shows the author's own record, a policy
-   and three snapshots, one in breach, drawn against the limit, so the
-   accounts are real either way.
+   Without a wallet, the panel shows the desk's own record: a policy and
+   a snapshot a day, written by a workflow after each New York close, one
+   of them a breach, drawn against the limit, so the accounts are real
+   either way. The bell beside the book's name watches it: a browser
+   notification when the move since the close or the risk score crosses
+   a line you set.
 
 Paste any address holding xStocks to run it on a real book, or click "A
 real xStocks wallet", a $21M mainnet book found through the largest SPYx
@@ -106,7 +111,7 @@ Nothing sleeps, nothing cold-starts.
 
 - 35 xStocks (every mint verified on mainnet: Token-2022, 8 decimals) +
   SOL, cbBTC, USDC, USDT, USDG · 5 program instructions · 1 event
-- 82 app tests (quant, session split, stress, NYSE calendar, universe
+- 87 app tests (quant, session split, stress, NYSE calendar, universe
   integrity, history loading, Jupiter quotes, portfolio assembly, on-chain
   encoding) + 12 program tests on a local validator, all in CI
 - One static page; one hourly Action; one event subscriber; zero servers
@@ -126,8 +131,12 @@ Nothing sleeps, nothing cold-starts.
 - The lending side: `scripts/watch-breaches.mjs` subscribes to the
   program's `SnapshotRecorded` events, decodes them, prints `BREACH` when a
   book leaves its owner's policy, and can POST each one to a webhook.
-  Replaying devnet shows the author's own record: two readings in policy,
-  one breach.
+  The desk's own record grows by a snapshot a day from a workflow, and a
+  breach posts to a webhook.
+- Sign and swap: a rebalance order executed from the panel, Jupiter's
+  transaction signed by the wallet on mainnet.
+- Watch this book: browser notifications on a move since the close or a
+  risk score past a line.
 - Live Jupiter quotes on every proposed rebalance order.
 - A print stylesheet: the desk prints as a one-column report.
 - Keyboard: `/` address, `1`-`0` panels, `?` help, `t` theme.
@@ -139,6 +148,6 @@ Nothing sleeps, nothing cold-starts.
 - Repository: https://github.com/Abhist17/afterhours
 - Program (devnet): `3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri`,
   IDL account `EAtJ4QbGP352arvb6u7J19TF8rRei2uKtoCuFAMARuHh`
-- Example record: https://afterhours-v0dr.onrender.com/dashboard/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc
+- The desk's own record: https://afterhours-v0dr.onrender.com/dashboard/?address=HKer2StnsJ5vrNrk8KTSm3VoroqoGbNAGNStNWGJBndp
 - Built by the author of [Sentra](https://github.com/Abhist17/sentra), whose
   estimators this shares (MIT).

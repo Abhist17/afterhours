@@ -1,12 +1,30 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import type { Analysis } from "@/lib/portfolio";
 import { driftAgainst, type Target } from "@/lib/quant";
 import { ASSETS, BY_SYMBOL, jupiterSwapUrl } from "@/lib/universe";
 import { usd, pct, amount as fmtAmount, sectorColor, timeAgo } from "@/lib/format";
-import { quoteSwap, quoteVersusMark, type SwapQuote } from "@/lib/jupiter";
-import { Button } from "./ui";
+import { quoteSwap, quoteVersusMark, SLIPPAGE_BPS, type SwapQuote } from "@/lib/jupiter";
+import { executeTrade, mainnetExplorerTx, type TradeStage } from "@/lib/trade";
+import { Button, Notice } from "./ui";
+
+/** One order on its way through the wallet and the chain. */
+interface Trade {
+  symbol: string;
+  stage: "confirm" | TradeStage | "error";
+  signature?: string;
+  error?: string;
+}
+
+const STAGE_COPY: Record<TradeStage, string> = {
+  quoting: "Refreshing the quote…",
+  building: "Jupiter is building the transaction…",
+  signing: "Waiting for your wallet to sign…",
+  confirming: "Sent. Waiting for the chain to confirm…",
+  done: "Confirmed on mainnet.",
+};
 
 /** The leg every rebalance routes through. */
 const CASH_LEG = "USDC";
@@ -61,13 +79,20 @@ export function Drift({
   prices: feed,
   storageKey,
   onTargetsChange,
+  owner = false,
+  onTraded,
 }: {
   a: Analysis;
   /** The feed's price for every asset, held or not, to mark quotes against. */
   prices: Record<string, number>;
   storageKey: string;
   onTargetsChange?: (targets: Target[]) => void;
+  /** True when the connected wallet is the book on screen: orders can be signed. */
+  owner?: boolean;
+  onTraded?: (signature: string) => void;
 }) {
+  const wallet = useWallet();
+  const [trade, setTrade] = useState<Trade | null>(null);
   const [targets, setTargets] = useState<Target[]>([]);
   const [editing, setEditing] = useState(false);
   const [band, setBand] = useState(DEFAULT_BAND);
@@ -283,10 +308,105 @@ export function Drift({
                         <span className="text-tertiary">{sell ? "Sell" : "Buy"}</span> {usd(Math.abs(l.tradeUsd))} of {l.symbol}
                         {units !== null && <span className="numeric ml-1.5 text-[11px] text-tertiary">≈ {fmtAmount(units)}</span>}
                       </span>
-                      <a href={href} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[11px] text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
-                        on Jupiter<span aria-hidden="true" className="ml-0.5 text-[9px]">↗</span>
-                      </a>
+                      <span className="flex shrink-0 items-center gap-2">
+                        {owner && (
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            className="!h-6 !px-2 !text-[11px]"
+                            disabled={!!trade && trade.symbol !== l.symbol && trade.stage !== "done" && trade.stage !== "error"}
+                            onClick={() => setTrade({ symbol: l.symbol, stage: "confirm" })}
+                          >
+                            Sign and swap
+                          </Button>
+                        )}
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-[11px] text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">
+                          on Jupiter<span aria-hidden="true" className="ml-0.5 text-[9px]">↗</span>
+                        </a>
+                      </span>
                     </div>
+                    {trade?.symbol === l.symbol && (
+                      <div className="mt-1.5 rounded-lg border border-border bg-bg-subtle px-3 py-2 text-[11px] leading-snug">
+                        {trade.stage === "confirm" && (
+                          <>
+                            <p className="text-secondary">
+                              {sell ? "Sell" : "Buy"} <span className="numeric text-text">{units !== null ? fmtAmount(units) : usd(Math.abs(l.tradeUsd))} {l.symbol}</span>{" "}
+                              {sell ? "for" : "with"} {CASH_LEG}
+                              {quoted && (
+                                <>
+                                  {" "}at Jupiter&rsquo;s quote, <span className="numeric text-text">≈ {fmtAmount(quoted.amountOut)} {quoted.to}</span>
+                                </>
+                              )}
+                              . Slippage cap {(SLIPPAGE_BPS / 100).toFixed(2)}%, network fee in SOL.{" "}
+                              <span className="font-medium text-text">This is a real trade on Solana mainnet.</span>
+                            </p>
+                            <div className="mt-2 flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="primary"
+                                className="!h-7"
+                                disabled={!wallet.publicKey}
+                                onClick={async () => {
+                                  if (!wallet.publicKey) return;
+                                  const from = sell ? l.symbol : CASH_LEG;
+                                  const to = sell ? CASH_LEG : l.symbol;
+                                  const amountIn = sell ? Math.abs(l.tradeUsd) / (priceOf(l.symbol) || 1) : Math.abs(l.tradeUsd);
+                                  try {
+                                    const result = await executeTrade({
+                                      from,
+                                      to,
+                                      amountIn,
+                                      quote: quoted,
+                                      wallet: { publicKey: wallet.publicKey, sendTransaction: wallet.sendTransaction },
+                                      onStage: (stage) => setTrade({ symbol: l.symbol, stage }),
+                                    });
+                                    setTrade({ symbol: l.symbol, stage: "done", signature: result.signature });
+                                    onTraded?.(result.signature);
+                                  } catch (err) {
+                                    const message = err instanceof Error ? err.message : String(err);
+                                    setTrade({
+                                      symbol: l.symbol,
+                                      stage: "error",
+                                      error: /reject|denied|cancel/i.test(message) ? "Not signed. Nothing was sent." : message,
+                                    });
+                                  }
+                                }}
+                              >
+                                Sign in wallet
+                              </Button>
+                              <Button size="sm" variant="ghost" className="!h-7" onClick={() => setTrade(null)}>
+                                Cancel
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                        {trade.stage !== "confirm" && trade.stage !== "error" && trade.stage !== "done" && (
+                          <p className="breathe text-secondary">{STAGE_COPY[trade.stage]}</p>
+                        )}
+                        {trade.stage === "done" && trade.signature && (
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span style={{ color: "var(--calm)" }}>{STAGE_COPY.done}</span>
+                            <a href={mainnetExplorerTx(trade.signature)} target="_blank" rel="noopener noreferrer" className="numeric underline decoration-border-strong underline-offset-2 hover:text-text">
+                              {trade.signature.slice(0, 8)}…{trade.signature.slice(-6)} ↗
+                            </a>
+                            <span className="text-tertiary">The book is being re-read. Record a snapshot below so the change is on your record.</span>
+                            <Button size="sm" variant="ghost" className="!h-6 !px-1.5 !text-[11px]" onClick={() => setTrade(null)}>
+                              Dismiss
+                            </Button>
+                          </div>
+                        )}
+                        {trade.stage === "error" && (
+                          <div className="flex flex-col gap-1.5">
+                            <Notice tone="error">{trade.error}</Notice>
+                            <span>
+                              <Button size="sm" variant="ghost" className="!h-6 !px-1.5 !text-[11px]" onClick={() => setTrade(null)}>
+                                Dismiss
+                              </Button>
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <div className="numeric mt-0.5 text-[10px] text-tertiary">
                       {q === "pending" && <span className="breathe">quoting…</span>}
                       {q === "failed" && <span>no route quoted right now</span>}
@@ -333,7 +453,10 @@ export function Drift({
           {Object.values(quotes).some((q) => q && q !== "pending" && q !== "failed") && (
             <>, fetched {timeAgo(Math.max(...Object.values(quotes).map((q) => (q && q !== "pending" && q !== "failed" ? q.fetchedAt : 0))))}</>
           )}
-          . Jupiter opens with the pair prefilled and you set the amount. Nothing here trades for you.
+          .{" "}
+          {owner
+            ? `Sign and swap sends that order from your wallet on mainnet at the quote, with a ${(SLIPPAGE_BPS / 100).toFixed(1)}% slippage cap; the desk re-reads the book when it confirms.`
+            : "Jupiter opens with the pair prefilled and you set the amount. Connect the wallet this book belongs to and each order gets a Sign and swap."}
         </p>
       </div>
     </div>

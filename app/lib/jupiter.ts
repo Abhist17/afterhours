@@ -2,12 +2,17 @@
  * Real prices for the trades the desk proposes. Jupiter's quote endpoint
  * answers browser requests without a key, so a rebalance line can say what
  * it would actually fetch on-chain right now, routed, with price impact,
- * rather than a size at the last feed print. Nothing here signs or sends.
+ * rather than a size at the last feed print. The swap endpoint turns a
+ * quote into a transaction for a given wallet; signing and sending are the
+ * wallet's, in `trade.ts`.
  */
 
 import { BY_SYMBOL } from "./universe";
 
 export const JUPITER_QUOTE_URL = "https://lite-api.jup.ag/swap/v1/quote";
+export const JUPITER_SWAP_URL = "https://lite-api.jup.ag/swap/v1/swap";
+/** The most a fill may slip from the quote before the chain rejects it. */
+export const SLIPPAGE_BPS = 50;
 const WSOL = "So11111111111111111111111111111111111111112";
 
 export interface SwapQuote {
@@ -21,6 +26,8 @@ export interface SwapQuote {
   /** Venues along the route, in order, deduplicated. */
   route: string[];
   fetchedAt: number;
+  /** Jupiter's own response, handed back to it verbatim to build the swap. */
+  raw: unknown;
 }
 
 interface QuoteResponse {
@@ -47,7 +54,7 @@ export function fromRaw(symbol: string, raw: string | bigint): number {
   return Number(raw) / 10 ** d;
 }
 
-export function quoteUrl(from: string, to: string, amountIn: number, slippageBps = 50): string | null {
+export function quoteUrl(from: string, to: string, amountIn: number, slippageBps = SLIPPAGE_BPS): string | null {
   const inMint = mintFor(from);
   const outMint = mintFor(to);
   if (!inMint || !outMint || !(amountIn > 0)) return null;
@@ -79,7 +86,35 @@ export async function quoteSwap(from: string, to: string, amountIn: number, sign
     priceImpact: Math.max(0, Number(body.priceImpactPct) || 0),
     route,
     fetchedAt: Date.now(),
+    raw: body,
   };
+}
+
+/** The body the swap endpoint wants: the quote back, and who is paying. */
+export function swapRequest(quote: SwapQuote, userPublicKey: string): Record<string, unknown> {
+  return {
+    quoteResponse: quote.raw,
+    userPublicKey,
+    wrapAndUnwrapSol: true,
+    dynamicComputeUnitLimit: true,
+    prioritizationFeeLamports: { priorityLevelWithMaxLamports: { maxLamports: 1_000_000, priorityLevel: "medium" } },
+  };
+}
+
+/** A quote older than this is re-fetched before it is turned into a swap. */
+export const QUOTE_MAX_AGE_MS = 20_000;
+
+export async function buildSwap(quote: SwapQuote, userPublicKey: string, signal?: AbortSignal): Promise<Uint8Array> {
+  const res = await fetch(JUPITER_SWAP_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(swapRequest(quote, userPublicKey)),
+    signal: signal ?? AbortSignal.timeout(12_000),
+  });
+  if (!res.ok) throw new Error(`Jupiter swap ${res.status}`);
+  const body = (await res.json()) as { swapTransaction?: string; error?: string };
+  if (!body.swapTransaction) throw new Error(body.error || "Jupiter returned no transaction");
+  return Uint8Array.from(atob(body.swapTransaction), (c) => c.charCodeAt(0));
 }
 
 /**

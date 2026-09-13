@@ -9,7 +9,7 @@ ONE-LINER (276/280)
 -------------------
 The risk desk for tokenized stocks on Solana. Paste any wallet holding xStocks and see what it can lose tomorrow, what it has done since Wall Street closed, and how far it has drifted from the allocation you meant to hold, scored in your browser, recorded on-chain by you.
 
-DETAILED DESCRIPTION (4804/5000)
+DETAILED DESCRIPTION (4975/5000)
 --------------------------------
 THE PROBLEM
 
@@ -21,20 +21,20 @@ WHAT IT DOES
 
 Paste a Solana address or connect a wallet. The desk reads its balances from mainnet, 35 xStocks (every mint verified on-chain: Token-2022, 8 decimals) plus the SOL, cbBTC and stablecoins beside them, and scores the book in the browser from thirty days of hourly prices. Ten panels:
 
-• Score: annualised volatility plus a concentration penalty, 0 to 100.
+• Score: annualised volatility plus a concentration penalty.
 • Value at Risk: 95% one-day loss with Expected Shortfall, parametric and historical; the more conservative one headlines.
 • Beta to the S&P 500, for the book and every position, against SPYx.
-• Holdings: share of value beside share of risk, sparklines, and the NYSE-closed hours shaded on click.
+• Holdings: share of value beside share of risk, with the NYSE-closed hours shaded on click.
 • Trading without the market: each stock's token move since the last official print, summed: "the market opens to this", and the share of the book's variance that happened while the NYSE was closed.
 • Stocks, crypto, cash: COINx, MSTRx, HOODx, CRCLx are equity on paper and crypto beta in practice; the desk says what share of the book is really riding crypto.
-• Thirty days: the book scored at every hour with an estimator that saw only what was known then, and a backtest of the VaR against what happened.
-• Correlation across everything held.
-• What if: move a quarter, half or all of any position into any other asset and re-score instantly, no server.
-• If the market gaps: S&P −5%, crypto −30%, the window's own worst day and worst close-to-open, each position by its beta.
-• Target and drift: state the allocation you meant to hold, see the drift and the exact orders, each quoted live on Jupiter with price impact and route.
+• Thirty days: the book scored at every hour with only what was known then, and the VaR marked against what happened.
+• What if: move part of any position into any other asset and re-score instantly.
+• If the market gaps: S&P −5%, crypto −30%, the window's own worst day, each position by its beta.
+• Target and drift: state the allocation you meant to hold, see the drift and the exact orders, each quoted live on Jupiter. Connect the book's wallet and each order gets Sign and swap: Jupiter builds it, the wallet signs, mainnet confirms, the desk re-reads.
 • Your record on Solana: save the targets as an on-chain Policy and record immutable Snapshots, signed by the wallet that owns the book.
+• Watch this book: a browser notification when the move since the close or the risk score crosses a line you set.
 
-Number keys jump between panels, every view is a link, ? defines every figure. Click "A real xStocks wallet" to run it on a $21M mainnet book found through the largest SPYx token accounts.
+Every view is a link; ? defines every figure. Click "A real xStocks wallet" to run it on a $21M mainnet book found through the largest SPYx token accounts.
 
 WHERE SOLANA IS LOAD-BEARING
 
@@ -42,7 +42,7 @@ Reads: xStocks are Token-2022 mints; the page reads any wallet's token accounts 
 
 Writes: the Afterhours Anchor program (devnet 3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri), five instructions, one event. Policy holds targets in bps summing to 10,000, a risk limit and a drift band; Snapshot holds score, value, VaR, drift, equity share, NYSE-open flag and timestamp. Both are owned and signed by the wallet they describe. Every snapshot under a policy emits SnapshotRecorded { breached }.
 
-That event is a credit primitive: a protocol lending against a stock portfolio can subscribe to "this book left its owner's stated policy" instead of watching a price. scripts/watch-breaches.mjs does exactly that, subscribes, decodes, prints BREACH, can POST to a webhook. Replaying devnet shows the author's own record: two readings in policy, one breach.
+That event is a credit primitive: a protocol lending against a stock portfolio can subscribe to "this book left its owner's stated policy" instead of watching a price. scripts/watch-breaches.mjs subscribes, decodes and prints BREACH. And the desk keeps its own record: a workflow scores the sample book after every New York close and records a snapshot on devnet; a breach posts to a webhook.
 
 ARCHITECTURE: NOTHING TO RUN
 
@@ -54,7 +54,7 @@ Sampling interval measured from the data, EWMA decay rescaled to it. Unpriced ho
 
 NUMBERS
 
-35 xStocks + SOL, cbBTC, USDC, USDT, USDG · 5 instructions · 1 event · 82 app tests + 12 program tests on a local validator, all in CI · one static page, one hourly Action, one event subscriber, zero servers.
+35 xStocks + SOL, cbBTC, USDC, USDT, USDG · 5 instructions · 1 event · 87 app tests + 12 program tests on a local validator, all in CI · one static page, one hourly Action, one daily Action, one event subscriber, zero servers.
 
 TRACK
 
@@ -72,7 +72,7 @@ GitHub:      https://github.com/Abhist17/afterhours
 Live demo:   https://afterhours-v0dr.onrender.com/   (landing; the desk is at /dashboard/)
 Extra 1:     https://abhist17.github.io/afterhours/   (GitHub Pages mirror of the same build)
 Extra 2:     https://explorer.solana.com/address/3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri?cluster=devnet   (the program)
-Extra 3:     https://afterhours-v0dr.onrender.com/dashboard/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc   (your on-chain record)
+Extra 3:     https://afterhours-v0dr.onrender.com/dashboard/?address=HKer2StnsJ5vrNrk8KTSm3VoroqoGbNAGNStNWGJBndp   (the desk's own on-chain record, one snapshot a day)
 Video slots: leave empty (not required)
 
 TEAM

@@ -13,6 +13,7 @@
 [![CI](https://github.com/Abhist17/afterhours/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhist17/afterhours/actions/workflows/ci.yml)
 [![Refresh history](https://github.com/Abhist17/afterhours/actions/workflows/refresh-history.yml/badge.svg)](https://github.com/Abhist17/afterhours/actions/workflows/refresh-history.yml)
 [![Deploy](https://github.com/Abhist17/afterhours/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Abhist17/afterhours/actions/workflows/deploy-pages.yml)
+[![Daily snapshot](https://github.com/Abhist17/afterhours/actions/workflows/daily-snapshot.yml/badge.svg)](https://github.com/Abhist17/afterhours/actions/workflows/daily-snapshot.yml)
 
 </div>
 
@@ -57,7 +58,7 @@ sit next to them, and scores the book in the browser:
 | **Correlation** | Thirty days of hourly returns across what is held, plus the index. The most correlated held pair is named. |
 | **What if** | Move a quarter, a half or all of any position into any other asset and re-score the whole book, instantly. |
 | **If the market gaps** | The book under an S&P 500 or crypto shock, every position by its beta to the factor, and under the worst day and the worst close-to-open the window actually had. A custom shock with two sliders. |
-| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back, each one quoted live on Jupiter for its exact size, with price impact, route, and the gap to the feed. |
+| **Target and drift** | State the allocation you meant to hold. See the drift from it, and the trades that put it back, each one quoted live on Jupiter for its exact size, with price impact, route, and the gap to the feed. Connect the wallet the book belongs to and each order gets **Sign and swap**: Jupiter builds the transaction, the wallet signs it, the desk re-reads the book when mainnet confirms. |
 | **Your record on Solana** | Declare the policy on-chain. Record a snapshot. Both signed by the wallet that owns the book. The snapshots draw as a line against the limit. |
 | **Risk and return, name by name** | Every asset the desk knows on a volatility-versus-return map; what is held is solid and sized by weight, the book is the ring, thin names are dashed. |
 
@@ -74,6 +75,32 @@ and a dot for now. A section bar under the top bar names the ten panels
 and lights the one in view; the number keys jump to them, `/` goes to the
 address, `?` opens the sheet that explains every figure, and every term
 on the page carries its definition on hover.
+
+## Act on it, and be told
+
+Reading is half of a desk. The other half:
+
+- **Sign and swap.** Every rebalance order is already quoted on Jupiter for
+  its exact size. When the connected wallet is the book on screen, the
+  order can be sent: the quote is refreshed if it is older than twenty
+  seconds, Jupiter's swap endpoint builds the transaction with a 0.5%
+  slippage cap, the wallet signs and sends it on mainnet, the page waits
+  for confirmation and re-reads the book. Nothing is custodied and no key
+  leaves the wallet. This is the one path in the desk that moves money,
+  and it says so before it does.
+- **Watch this book.** A bell beside the book's name. Set a line for the
+  move since the close and one for the risk score; the desk sends a
+  browser notification the moment a reading crosses either, once per
+  crossing, for as long as the tab is open. Quotes keep refreshing in a
+  background tab while a book is watched.
+- **The desk's own record.** A [workflow](.github/workflows/daily-snapshot.yml)
+  runs after every New York close, scores the *Index, gold, cash* sample
+  book with live prices exactly as the page would, and records the reading
+  as a Snapshot on devnet, signed by a keypair that exists only for this.
+  Its policy is the shape the book had on 14 September 2026, so a breach
+  means prices moved it five points from there. The record grows by one
+  account a day; a breach emits `SnapshotRecorded { breached: true }` and,
+  with `ALERT_WEBHOOK_URL` set, posts to Discord, Slack or a Telegram bot.
 
 ## Where Solana is load-bearing
 
@@ -109,11 +136,13 @@ the program's cluster. A wallet pointed at the wrong network cannot send it
 anywhere else. Only the owner can create, update or close their own record.
 
 The program is deployed on devnet with its IDL published, so Explorer decodes
-every account. The author's own wallet keeps an
-[example record](https://abhist17.github.io/afterhours/?address=4u8ckM2U1GBpizKKDVdnb6wfGtenUECDZCbcLMiBHpFc)
-there, one policy, three snapshots, one of them a breach, written by
-[`scripts/example-record.mjs`](scripts/example-record.mjs) through the same
-client the page uses.
+every account. The desk keeps
+[its own record](https://afterhours-v0dr.onrender.com/dashboard/?address=HKer2StnsJ5vrNrk8KTSm3VoroqoGbNAGNStNWGJBndp)
+there, a policy and a snapshot a day since 14 September 2026, written by
+[`scripts/daily-snapshot.ts`](scripts/daily-snapshot.ts) through the same
+client the page uses; the page shows it to anyone who has not connected a
+wallet. The author's own wallet has an older record from
+[`scripts/example-record.mjs`](scripts/example-record.mjs).
 
 ```
 instructions
@@ -144,6 +173,10 @@ same export serves from a domain root on Render via [`render.yaml`](render.yaml)
 - **Arithmetic**: every figure on the page is computed in the tab.
 - **Quotes for trades**: from Jupiter's public quote endpoint, one request
   per proposed order, from the browser.
+- **Trades**: built by Jupiter's swap endpoint for the exact order, signed and
+  sent by the viewer's wallet on mainnet, confirmed by the page.
+- **Alerts**: browser notifications from the tab; the daily record from a
+  workflow.
 - **On-chain**: signed by the viewer's own wallet.
 
 Nothing sleeps, nothing has a cold start, and nothing about a book leaves the
@@ -244,7 +277,7 @@ git clone https://github.com/Abhist17/afterhours
 cd afterhours/app
 npm install
 npm run dev                 # http://localhost:3000
-npm test                    # 82 tests: quant, sessions, scenarios, market hours, universe, history, Jupiter, portfolio, on-chain
+npm test                    # 87 tests: quant, sessions, scenarios, market hours, universe, history, Jupiter, alerts, portfolio, on-chain
 npm run build               # static export to out/
 
 cd ..
@@ -252,6 +285,7 @@ node scripts/refresh-history.mjs   # rebuild app/public/data/history.json
 anchor test                        # 12 program tests on a local validator
 anchor build && anchor deploy --provider.cluster devnet   # ~1.1 SOL of rent
 node scripts/example-record.mjs    # a policy and three snapshots from ~/.config/solana/id.json
+npm run record                     # score the sample book and record today's snapshot from ~/.config/solana/afterhours-recorder.json
 node scripts/watch-breaches.mjs    # follow SnapshotRecorded live; --history N replays; --webhook URL alerts
 ```
 

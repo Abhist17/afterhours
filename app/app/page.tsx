@@ -257,7 +257,7 @@ export default function Landing() {
             [String(equities), "xStocks, every mint verified"],
             ["5", "program instructions"],
             ["1", "event: SnapshotRecorded"],
-            ["94", "tests in CI, app + program"],
+            ["99", "tests in CI, app + program"],
             ["0", "servers"],
           ].map(([n, l]) => (
             <div key={l} className="bg-surface px-5 py-5">
