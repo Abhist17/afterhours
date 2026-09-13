@@ -129,7 +129,8 @@ backfill a flattering history.
 
 ## Nothing to run
 
-There is no server. The site is a static export on GitHub Pages:
+There is no server. The site is a static export on GitHub Pages, and the
+same export serves from a domain root on Render via [`render.yaml`](render.yaml):
 
 - **Balances** — read from mainnet by the browser.
 - **Prices** — one request to the feed, every minute, from the browser.

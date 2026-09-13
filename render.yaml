@@ -1,0 +1,31 @@
+# Render blueprint: the same static export GitHub Pages serves, at a root
+# path. Create it once with "New → Blueprint" on render.com pointing at
+# this repository; every push to main that touches app/ redeploys.
+services:
+  - type: web
+    name: afterhours
+    runtime: static
+    rootDir: app
+    buildCommand: npm ci && npm run build
+    staticPublishPath: out
+    buildFilter:
+      paths:
+        - app/**
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Served from the domain root, so no base path — unlike Pages.
+      - key: NEXT_PUBLIC_BASE_PATH
+        value: ""
+      # Absolute URL for the social card and canonical link.
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://afterhours.onrender.com
+      # Optional: a mainnet RPC that accepts browser requests (a free Helius
+      # key). Leave unset to use the public endpoint, as Pages does.
+      - key: NEXT_PUBLIC_RPC_URL
+        sync: false
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
