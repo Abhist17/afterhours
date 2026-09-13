@@ -16,6 +16,7 @@ import { SessionRing } from "@/components/SessionRing";
 import { Tape } from "@/components/Tape";
 import { Button, Input } from "@/components/ui";
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 const PROGRAM = "3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri";
 const EXPLORER = `https://explorer.solana.com/address/${PROGRAM}?cluster=devnet`;
 
@@ -176,7 +177,7 @@ export default function Landing() {
           </div>
           <Link href={`/dashboard/?address=${REAL_BOOK.address}`} title="Open this wallet on the desk">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="desk.jpg" alt="The Afterhours desk reading a real xStocks wallet: risk score, book, one-day VaR, beta, the move since the close, and the holdings." width={1280} height={800} className="block w-full" />
+            <img src={`${BASE}/desk.jpg`} alt="The Afterhours desk reading a real xStocks wallet: risk score, book, one-day VaR, beta, the move since the close, and the holdings." width={1280} height={800} className="block w-full" />
           </Link>
         </div>
         <p className="mt-3 text-center text-[12px] text-tertiary">

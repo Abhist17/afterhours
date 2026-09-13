@@ -46,7 +46,7 @@ That event is a credit primitive: a protocol lending against a stock portfolio c
 
 ARCHITECTURE: NOTHING TO RUN
 
-A static export on GitHub Pages. Balances from mainnet in the browser; hourly history refreshed by a GitHub Action to a data branch and bundled as a fallback; every figure computed in the tab; on-chain writes signed by the viewer. Nothing sleeps, nothing cold-starts.
+A static export: a landing page at / and the desk at /dashboard/, on Render with a GitHub Pages mirror. Balances from mainnet in the browser; hourly history refreshed by a GitHub Action to a data branch and bundled as a fallback; every figure computed in the tab; on-chain writes signed by the viewer. Nothing sleeps, nothing cold-starts.
 
 HONEST BY DESIGN
 
