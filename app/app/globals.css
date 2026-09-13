@@ -218,6 +218,23 @@ body {
 .cursor-solid {
   animation: none;
 }
+/* The typewriter: no kerning or ligatures, so a letter arriving never
+   moves the ones before it by a pixel. */
+.tw {
+  font-kerning: none;
+  font-variant-ligatures: none;
+  letter-spacing: 0;
+}
+/* Its cursor: hung off the last letter, no width of its own. */
+.tw-cursor {
+  position: absolute;
+  left: calc(100% + 0.08em);
+  bottom: 0.06em;
+  width: 0.4em;
+  height: 0.8em;
+  background: var(--brand);
+  pointer-events: none;
+}
 
 /* The tape under the hero: every xStock's move since the last bell,
    passing at reading pace. Two copies of the row make the loop seamless;
