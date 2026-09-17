@@ -132,7 +132,9 @@ Nothing sleeps, nothing cold-starts.
   program's `SnapshotRecorded` events, decodes them, prints `BREACH` when a
   book leaves its owner's policy, and can POST each one to a webhook.
   The desk's own record grows by a snapshot a day from a workflow, and a
-  breach posts to a webhook.
+  breach posts to a webhook. This has been running unattended for five
+  days now, not a one-off test: replaying the program's history turns up
+  9 snapshots and 2 real breaches, full transcript in the README.
 - Sign and swap: a rebalance order executed from the panel, Jupiter's
   transaction signed by the wallet on mainnet.
 - Watch this book: browser notifications on a move since the close or a

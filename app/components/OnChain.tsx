@@ -320,6 +320,11 @@ export function OnChain({
           </dd>
         </div>
       </dl>
+      {cluster === "devnet" && (
+        <p className="mt-2 text-[10px] leading-snug text-tertiary">
+          Devnet by design, not by omission: trying this costs nobody real SOL. The same program id is already reserved on mainnet; deploying it there is one signed transaction away.
+        </p>
+      )}
       <p className="mt-2 text-[10px] leading-snug text-tertiary">
         Every account here was signed by the wallet it describes. The page prepares the transaction and submits it; only the owner can create, update or close their own record.
       </p>

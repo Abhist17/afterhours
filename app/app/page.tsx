@@ -237,7 +237,8 @@ export default function Landing() {
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
               An Anchor program with a <span className="text-secondary">Policy</span> (targets in bps, a risk limit, a drift band) and
               immutable <span className="text-secondary">Snapshots</span>, both owned by the wallet they describe. Every snapshot emits{" "}
-              <span className="numeric text-secondary">SnapshotRecorded {"{ breached }"}</span>, a credit primitive.
+              <span className="numeric text-secondary">SnapshotRecorded {"{ breached }"}</span> — not a price to watch, but an
+              event a lending protocol could act on directly: this book left its owner&rsquo;s own stated policy.
             </p>
             <a href={EXPLORER} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[12px] underline decoration-border-strong underline-offset-2 hover:text-text" style={{ color: "var(--brand)" }}>
               Program on Explorer ↗

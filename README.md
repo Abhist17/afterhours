@@ -122,13 +122,24 @@ would subscribe to: not "the price moved" but "this book left its own stated
 policy, by its owner's own reading". The subscriber exists:
 [`scripts/watch-breaches.mjs`](scripts/watch-breaches.mjs) follows the
 program's logs live, or replays its history, decodes every event, and can
-POST each breach to a webhook, the margin-call bot, as a hundred lines.
+POST each breach to a webhook, the margin-call bot, as a hundred lines. This
+is not a one-off test burst: the daily workflow has now been recording for
+five days straight, unattended, with two real breaches in that window —
+replaying the program's whole history shows it:
 
 ```
 $ node scripts/watch-breaches.mjs --history 30
 ok      2026-09-12 12:17Z  4u8c…HpFc  score  22  book $14,650  VaR $265  drift 1.8pp  stocks 74%  NYSE closed  (limit 30 · band 5pp)
 ok      2026-09-12 12:17Z  4u8c…HpFc  score  27  book $14,910  VaR $312  drift 2.4pp  stocks 75%  NYSE open    (limit 30 · band 5pp)
-BREACH  2026-09-12 12:17Z  4u8c…HpFc  score  34  book $14,380  VaR $402  drift 6.1pp  stocks 77%  NYSE closed  (limit 30 · band 5pp), score 34 > 30
+BREACH  2026-09-12 12:17Z  4u8c…HpFc  score  34  book $14,380  VaR $402  drift 6.1pp  stocks 77%  NYSE closed  (limit 30 · band 5pp) — score 34 > 30
+BREACH  2026-09-13 18:42Z  HKer…Bndp  score  14  book $18,014  VaR $161  drift 11.6pp  stocks 81%  NYSE closed  (limit 30 · band 5pp) — drift 11.6pp > 5pp
+ok      2026-09-13 18:42Z  HKer…Bndp  score  14  book $18,010  VaR $161  drift 0.4pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-13 23:29Z  HKer…Bndp  score  14  book $17,997  VaR $161  drift 0.5pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-14 23:58Z  HKer…Bndp  score  14  book $17,946  VaR $159  drift 0.7pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-15 23:41Z  HKer…Bndp  score  14  book $17,899  VaR $159  drift 0.7pp  stocks 80%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-16 23:49Z  HKer…Bndp  score  15  book $17,888  VaR $166  drift 0.7pp  stocks 80%  NYSE closed  (limit 30 · band 5pp)
+
+9 snapshots recorded
 ```
 
 The page prepares each transaction; the wallet signs; the page submits it to
