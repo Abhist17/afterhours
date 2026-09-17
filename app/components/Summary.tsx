@@ -73,7 +73,7 @@ export function Summary({ a }: { a: Analysis }) {
           {metrics.map((m) => (
             <div key={m.label} className="min-w-0 bg-surface px-5 py-4">
               <dt className="label">{m.term ? <Term term={m.term}>{m.label}</Term> : m.label}</dt>
-              <dd className="display mt-1.5 truncate text-[22px] leading-none text-text xl:text-[24px]" style={m.color ? { color: m.color } : undefined}>{m.value}</dd>
+              <dd className="figure mt-1.5 truncate text-[22px] leading-none text-text xl:text-[24px]" style={m.color ? { color: m.color } : undefined}>{m.value}</dd>
               <p className="mt-1.5 text-[11px] leading-snug text-tertiary">{m.detail}</p>
             </div>
           ))}

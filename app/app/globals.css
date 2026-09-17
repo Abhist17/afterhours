@@ -147,6 +147,19 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* A number meant to be read at a glance: the risk score, a KPI tile, a
+   stat. The pixel face draws 9 and S, or 3 and 8, almost the same, which
+   is fine for a word but not for a figure someone is trusting; this is
+   the same mono face as .numeric, bolder, for anywhere a digit is the
+   whole point. */
+@utility figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
 /* Small-caps section label. */
 @utility label {
   font-size: 11px;

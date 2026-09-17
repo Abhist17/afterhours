@@ -193,7 +193,7 @@ export default function Landing() {
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {PANELS.map((p) => (
             <Link key={p.id} href={`/dashboard/#${p.id}`} className="card group flex flex-col gap-2 p-4 transition-colors hover:bg-surface-hover">
-              <span className="display text-[18px]" style={{ color: "var(--brand)" }}>{p.number}</span>
+              <span className="figure text-[18px]" style={{ color: "var(--brand)" }}>{p.number}</span>
               <span className="text-[13px] font-semibold text-text">{p.title}</span>
               <span className="text-[12px] leading-snug text-tertiary">{p.line}</span>
             </Link>
@@ -212,7 +212,7 @@ export default function Landing() {
         <ol className="mt-8 grid gap-3 md:grid-cols-3">
           {STEPS.map((s) => (
             <li key={s.n} className="card p-5">
-              <span className="display text-[28px] leading-none" style={{ color: "var(--brand)" }}>{s.n}</span>
+              <span className="figure text-[28px] leading-none" style={{ color: "var(--brand)" }}>{s.n}</span>
               <p className="mt-3 text-[14px] font-semibold text-text">{s.title}</p>
               <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">{s.body}</p>
             </li>
@@ -261,7 +261,7 @@ export default function Landing() {
             ["0", "servers"],
           ].map(([n, l]) => (
             <div key={l} className="bg-surface px-5 py-5">
-              <dt className="display text-[32px] leading-none text-text">{n}</dt>
+              <dt className="figure text-[32px] leading-none text-text">{n}</dt>
               <dd className="mt-1.5 text-[11.5px] text-tertiary">{l}</dd>
             </div>
           ))}

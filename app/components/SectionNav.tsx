@@ -77,7 +77,7 @@ export function SectionNav({ sections }: { sections: Section[] }) {
               className={`flex shrink-0 items-baseline gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[11px] transition-colors ${on ? "bg-surface-active text-text" : "text-tertiary hover:bg-surface-hover hover:text-text"}`}
               aria-current={on ? "location" : undefined}
             >
-              <span className="display text-[11px]" style={{ color: on ? "var(--brand)" : undefined }}>{s.number}</span>
+              <span className="figure text-[11px]" style={{ color: on ? "var(--brand)" : undefined }}>{s.number}</span>
               {s.title}
             </a>
           );
@@ -122,7 +122,7 @@ export function Rail({
               aria-current={on ? "location" : undefined}
             >
               {on && <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-brand" aria-hidden="true" />}
-              <span className="display w-[22px] shrink-0 text-[12px]" style={{ color: on ? "var(--brand)" : "var(--text-tertiary)" }}>{s.number}</span>
+              <span className="figure w-[22px] shrink-0 text-[12px]" style={{ color: on ? "var(--brand)" : "var(--text-tertiary)" }}>{s.number}</span>
               <span className="truncate">{s.title}</span>
             </a>
           );

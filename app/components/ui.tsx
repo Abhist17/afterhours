@@ -33,7 +33,7 @@ export function PanelHeader({
     <div className="border-b border-border px-5 py-3.5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-2.5">
-          {number && <span className="display text-[12px] text-brand">{number}</span>}
+          {number && <span className="figure text-[12px] text-brand">{number}</span>}
           <h2 className="shrink-0 text-[13px] font-semibold tracking-tight text-text">{title}</h2>
           {meta && <span className="truncate text-[11px] text-tertiary">{meta}</span>}
         </div>
