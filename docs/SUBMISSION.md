@@ -25,7 +25,7 @@ prices them live from PreStocks' own API. They sit beside the risk-scored
 book, not inside it, on purpose: a private company has no public listing,
 so there is no thirty-day series to score it against, and folding it into
 the VaR would be a number dressed up past what it knows. Open **A real
-PreStocks wallet** to see it on a live mainnet book: six PreStocks tokens,
+PreStocks wallet** to see it on a live mainnet book: five PreStocks tokens,
 SOL and USDC, found through the largest holders of the SpaceX token.
 
 ## The problem, and why it is a stocks problem

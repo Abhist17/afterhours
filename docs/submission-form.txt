@@ -73,7 +73,7 @@ Live demo:   https://afterhours-v0dr.onrender.com/   (landing; the desk is at /d
 Extra 1:     https://abhist17.github.io/afterhours/   (GitHub Pages mirror of the same build)
 Extra 2:     https://explorer.solana.com/address/3hqhzG55EkCjhUYmmCxHWyNGkXi3XJSTEWimkTzVifri?cluster=devnet   (the program)
 Extra 3:     https://afterhours-v0dr.onrender.com/dashboard/?address=HKer2StnsJ5vrNrk8KTSm3VoroqoGbNAGNStNWGJBndp   (the desk's own on-chain record, one snapshot a day)
-Extra 4:     https://afterhours-v0dr.onrender.com/dashboard/?address=6GJbPKBtovsrMEEMcic5KMi5tswh9qSyT5ZYLMqEwNgt   (a real wallet holding six PreStocks pre-IPO tokens)
+Extra 4:     https://afterhours-v0dr.onrender.com/dashboard/?address=6GJbPKBtovsrMEEMcic5KMi5tswh9qSyT5ZYLMqEwNgt   (a real wallet holding five PreStocks pre-IPO tokens)
 Video slots: leave empty (not required)
 
 TEAM
