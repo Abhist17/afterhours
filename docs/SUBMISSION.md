@@ -141,11 +141,12 @@ Nothing sleeps, nothing cold-starts.
 
 - The lending side: `scripts/watch-breaches.mjs` subscribes to the
   program's `SnapshotRecorded` events, decodes them, prints `BREACH` when a
-  book leaves its owner's policy, and can POST each one to a webhook.
-  The desk's own record grows by a snapshot a day from a workflow, and a
-  breach posts to a webhook. This has been running unattended for five
-  days now, not a one-off test: replaying the program's history turns up
-  9 snapshots and 2 real breaches, full transcript in the README.
+  book leaves its owner's policy, and can POST each one to a webhook when
+  `--webhook` or `ALERT_WEBHOOK_URL` names one. The desk's own record
+  grows by a snapshot a day from a workflow; no webhook is configured for
+  it right now, so that step is proven by the script, not running live.
+  Not a one-off test either way: replaying the program's history turns up
+  9 real snapshots and 2 real breaches over five days, transcript in the README.
 - Sign and swap: a rebalance order executed from the panel, Jupiter's
   transaction signed by the wallet on mainnet.
 - Watch this book: browser notifications on a move since the close or a
