@@ -17,6 +17,7 @@ export const TERMS: Record<string, string> = {
   "Share of risk": "Each position's contribution to the book's Value at Risk, so the contributions sum to the total. A small position can carry a large share.",
   "Since the close": "The token's move since the last official print of the share it tracks. The stock market opens to this.",
   "Price impact": "How much the swap itself moves the price on the venues it routes through, as Jupiter quotes it for this exact size.",
+  "Overnight Risk Ratio": "The share of this book's thirty-day variance, 0 to 100, that happened while the NYSE was closed: how much of what moved this book was risk no exchange was open to price. A pure index book with no tokenized stock scores 0; a book that is entirely tokenized equity scores near 100.",
 };
 
 export function Term({ children, term, def }: { children?: ReactNode; term: keyof typeof TERMS | string; def?: string }) {

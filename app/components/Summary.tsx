@@ -15,6 +15,7 @@ export function Summary({ a }: { a: Analysis }) {
   const band = riskBand(a.score);
   const beta = a.risk.beta;
   const closed = !a.market.open && a.overnight.counted > 0;
+  const ratio = a.sessions.book ? Math.round(a.sessions.book.closedShare * 100) : null;
 
   const metrics: { label: string; term?: string; value: string; detail: string; color?: string }[] = [
     {
@@ -57,6 +58,23 @@ export function Summary({ a }: { a: Analysis }) {
 
   return (
     <section className="card enter overflow-hidden">
+      {closed && (
+        <div className="border-b border-border px-6 py-5" style={{ backgroundColor: a.overnight.moveUsd < 0 ? "color-mix(in srgb, var(--severe) 8%, transparent)" : "color-mix(in srgb, var(--calm) 8%, transparent)" }}>
+          <p className="label">The market opens to this</p>
+          <p className="figure mt-1 text-[36px] leading-none sm:text-[44px]" style={{ color: a.overnight.moveUsd < 0 ? "var(--severe)" : a.overnight.moveUsd > 0 ? "var(--calm)" : "var(--text)" }}>
+            {signedUsd(a.overnight.moveUsd)} <span className="text-[20px] sm:text-[24px]">({signedPct(a.overnight.movePct)})</span>
+          </p>
+          <p className="mt-1.5 text-[12px] leading-snug text-tertiary">
+            Across {a.overnight.counted} tokenized stock{a.overnight.counted === 1 ? "" : "s"} since the last NYSE close, unpriced by any exchange until it reopens.
+            {ratio !== null && (
+              <>
+                {" "}<Term term="Overnight Risk Ratio">Overnight Risk Ratio</Term>:{" "}
+                <span className="numeric font-medium text-secondary">{ratio}/100</span> — the share of this book&rsquo;s thirty-day variance that happened while the NYSE was closed.
+              </>
+            )}
+          </p>
+        </div>
+      )}
       <div className="flex flex-col lg:flex-row">
         <div className="flex shrink-0 items-center gap-5 border-b border-border px-6 py-5 lg:border-b-0 lg:border-r">
           <RiskDial score={a.score} size={124} showLabel={false} />

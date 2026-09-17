@@ -5,6 +5,7 @@ import type { Analysis } from "@/lib/portfolio";
 import type { Gap } from "@/lib/sessions";
 import { usd, signedUsd, signedPct, pct, dayLabel, sectorColor } from "@/lib/format";
 import { useMeasuredWidth, Readout } from "./chart";
+import { Term } from "./Term";
 
 const BAR_H = 96;
 
@@ -112,7 +113,8 @@ export function VarianceSplit({ a }: { a: Analysis }) {
     <div>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[13px] text-text">
-          <span className="numeric font-medium" style={{ color: "var(--watch)" }}>{pct(book.closedShare * 100, 0)}</span> of this book&rsquo;s variance happened while the NYSE was closed
+          <Term term="Overnight Risk Ratio"><span className="numeric font-medium" style={{ color: "var(--watch)" }}>{Math.round(book.closedShare * 100)}/100</span></Term>{" "}
+          of this book&rsquo;s variance happened while the NYSE was closed
         </span>
         <span className="numeric shrink-0 text-[11px] text-tertiary">{Math.round(book.closedHours)}h closed · {Math.round(book.openHours)}h open</span>
       </div>
