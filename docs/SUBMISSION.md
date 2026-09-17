@@ -17,6 +17,17 @@ policy + breach event is a primitive for **Credit**, a protocol lending
 against a stock portfolio can subscribe to "this book left its owner's
 stated policy" instead of watching a price.
 
+Also entered for the **PreStocks bounty** ("Best Use of PreStocks"): the
+desk reads any wallet's [PreStocks](https://prestocks.com) pre-IPO tokens
+(OpenAI, SpaceX, Anthropic, Anduril, Neuralink, Figure AI, Kalshi,
+Polymarket) the same way it reads xStocks, no key and no custody, and
+prices them live from PreStocks' own API. They sit beside the risk-scored
+book, not inside it, on purpose: a private company has no public listing,
+so there is no thirty-day series to score it against, and folding it into
+the VaR would be a number dressed up past what it knows. Open **A real
+PreStocks wallet** to see it on a live mainnet book: six PreStocks tokens,
+SOL and USDC, found through the largest holders of the SpaceX token.
+
 ## The problem, and why it is a stocks problem
 
 A tokenized share trades 24/7. The share it tracks trades 9:30 to 4:00 ET

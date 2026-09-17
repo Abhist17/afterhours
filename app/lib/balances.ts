@@ -1,5 +1,6 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { ASSETS, BY_MINT } from "./universe";
+import { PRESTOCKS_BY_MINT } from "./prestocks";
 
 /**
  * Real balances, read from mainnet by the browser. xStocks are Token-2022
@@ -62,6 +63,12 @@ export interface Balances {
   amounts: Record<string, number>;
   /** Mints held that the universe cannot price. */
   unpricedMints: string[];
+  /**
+   * PreStocks (tokenized pre-IPO equity) held, by symbol. Priced, but kept
+   * out of `amounts` and the risk model entirely: see lib/prestocks.ts for
+   * why a private company can't be scored the way a listed one can.
+   */
+  preIpo: Record<string, number>;
   readAt: number;
 }
 
@@ -97,6 +104,7 @@ async function readBalancesFrom(address: string, rpcUrl: string): Promise<Balanc
   const connection = new Connection(rpcUrl, "confirmed");
 
   const amounts: Record<string, number> = {};
+  const preIpo: Record<string, number> = {};
   const unpriced = new Set<string>();
 
   const lamports = await connection.getBalance(owner);
@@ -110,12 +118,14 @@ async function readBalancesFrom(address: string, rpcUrl: string): Promise<Balanc
       const amount = (info?.tokenAmount as { uiAmount?: number } | undefined)?.uiAmount;
       if (!mint || !Number.isFinite(amount) || !amount || amount <= 0) continue;
       const asset = BY_MINT[mint];
+      const preStock = PRESTOCKS_BY_MINT[mint];
       if (asset) amounts[asset.symbol] = (amounts[asset.symbol] ?? 0) + amount;
+      else if (preStock) preIpo[preStock.symbol] = (preIpo[preStock.symbol] ?? 0) + amount;
       else unpriced.add(mint);
     }
   }
 
-  return { address: owner.toBase58(), amounts, unpricedMints: [...unpriced], readAt: Date.now() };
+  return { address: owner.toBase58(), amounts, unpricedMints: [...unpriced], preIpo, readAt: Date.now() };
 }
 
 /** Assets the universe prices, for building sample books and target lists. */

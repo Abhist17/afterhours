@@ -50,6 +50,16 @@ export const REAL_BOOK = {
 };
 
 /**
+ * A real book on mainnet, found through the largest holders of a PreStocks
+ * mint: six pre-IPO tokens beside SOL and USDC, not ours, read live.
+ */
+export const REAL_PRESTOCKS_BOOK = {
+  address: "6GJbPKBtovsrMEEMcic5KMi5tswh9qSyT5ZYLMqEwNgt",
+  label: "A real PreStocks wallet",
+  blurb: "An active mainnet wallet holding six PreStocks pre-IPO tokens, SOL and USDC, read live, not ours.",
+};
+
+/**
  * The author's wallet, which keeps a policy and a few snapshots on the
  * program's cluster. Shown read-only when the book on screen is a sample,
  * so the on-chain accounts are real before anyone has signed anything.

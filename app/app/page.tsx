@@ -8,7 +8,7 @@ import { fetchLivePrices, type Quotes } from "@/lib/prices";
 import { isValidAddress } from "@/lib/balances";
 import { marketStatus } from "@/lib/market-hours";
 import { useNow } from "@/lib/hooks";
-import { SAMPLES, REAL_BOOK } from "@/lib/samples";
+import { SAMPLES, REAL_BOOK, REAL_PRESTOCKS_BOOK } from "@/lib/samples";
 import { ASSETS } from "@/lib/universe";
 import { Logo, Mark } from "@/components/Logo";
 import { ThemeToggle } from "@/components/TopBar";
@@ -149,6 +149,9 @@ export default function Landing() {
               <Button size="sm" variant="secondary" onClick={() => open(`?address=${REAL_BOOK.address}`)} title={REAL_BOOK.blurb}>
                 {REAL_BOOK.label}
               </Button>
+              <Button size="sm" variant="secondary" onClick={() => open(`?address=${REAL_PRESTOCKS_BOOK.address}`)} title={REAL_PRESTOCKS_BOOK.blurb}>
+                {REAL_PRESTOCKS_BOOK.label}
+              </Button>
               {SAMPLES.map((s) => (
                 <Button key={s.key} size="sm" variant="secondary" onClick={() => open(`?book=${s.key}`)} title={s.blurb}>
                   {s.label}
@@ -229,7 +232,9 @@ export default function Landing() {
             <p className="text-[14px] font-semibold text-text">Reads</p>
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-tertiary">
               xStocks are Token-2022 mints on mainnet. The page reads any wallet&rsquo;s token accounts under both token
-              programs. Every one of the {equities} mints was verified on-chain.
+              programs. Every one of the {equities} mints was verified on-chain, alongside eight{" "}
+              <a href="https://prestocks.com" target="_blank" rel="noopener noreferrer" className="text-secondary underline decoration-border-strong underline-offset-2 hover:text-text">PreStocks</a>
+              {" "}pre-IPO tokens, read the same way: no key, no custody, held or not.
             </p>
           </div>
           <div className="card p-5">
@@ -295,7 +300,7 @@ export default function Landing() {
         <p className="mt-3 text-[11px] leading-relaxed text-tertiary">
           Balances are read from Solana mainnet by your browser; prices and thirty days of hourly history come from CoinGecko;
           every figure is computed on the page. Value at Risk is a model estimate, not a prediction and not investment advice.
-          xStocks are issued by Backed Finance; Afterhours is unaffiliated.
+          xStocks are issued by Backed Finance; PreStocks tokens by PreStocks; Afterhours is unaffiliated with either.
         </p>
       </footer>
     </div>

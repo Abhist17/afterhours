@@ -63,10 +63,17 @@ sit next to them, and scores the book in the browser:
 | **Risk and return, name by name** | Every asset the desk knows on a volatility-versus-return map; what is held is solid and sized by weight, the book is the ring, thin names are dashed. |
 
 Four sample books are built in for anyone without xStocks yet, labelled
-synthetic, priced live, and one real mainnet wallet, found through the
-largest SPYx token accounts and labelled as not ours. Any view is a link:
-`?address=<wallet>` or `?book=<sample>`, with `&theme=light` or `dark` if
-it matters, and there is a button to copy it.
+synthetic, priced live, and two real mainnet wallets, found through the
+largest holders of their tokens and labelled as not ours: one an xStocks
+book, the other [PreStocks](https://prestocks.com) — eight tokenized
+pre-IPO companies (OpenAI, SpaceX, Anthropic, Anduril, Neuralink, Figure
+AI, Kalshi, Polymarket), read from mainnet the same way, priced live from
+PreStocks' own API. They sit beside the risk-scored book under **What you
+hold**, not inside it: a private company has no public listing, so there
+is no thirty-day series to score it against, and the desk would rather
+say so than fold it into a number that does not know that. Any view is a
+link: `?address=<wallet>` or `?book=<sample>`, with `&theme=light` or
+`dark` if it matters, and there is a button to copy it.
 
 Above it all sits a ring of the New York day: the six and a half hours the
 NYSE is open as a short bright arc, the other seventeen and a half, and

@@ -6,7 +6,7 @@ import { loadHistoryProgressive, lastPrices, type History } from "@/lib/history"
 import { fetchLivePrices, type Quotes } from "@/lib/prices";
 import { readBalances, isValidAddress, resolveRpcUrl, setRpcUrl, usingPublicRpc, type Balances } from "@/lib/balances";
 import { analyse } from "@/lib/portfolio";
-import { SAMPLES, REAL_BOOK } from "@/lib/samples";
+import { SAMPLES, REAL_BOOK, REAL_PRESTOCKS_BOOK } from "@/lib/samples";
 import { marketStatus } from "@/lib/market-hours";
 import { useNow, useMounted } from "@/lib/hooks";
 import { useTheme } from "@/lib/theme";
@@ -20,6 +20,7 @@ import { Stress } from "@/components/Stress";
 import { RiskMap } from "@/components/RiskMap";
 import { Summary } from "@/components/Summary";
 import { Holdings } from "@/components/Holdings";
+import { PreStocksHoldings } from "@/components/PreStocks";
 import { Sleeves } from "@/components/Sleeves";
 import { Overnight } from "@/components/Overnight";
 import { Backtest } from "@/components/Backtest";
@@ -208,7 +209,7 @@ function Desk() {
     };
     if (linked && isValidAddress(linked)) {
       setAddress(linked);
-      void loadWallet(linked, linked === REAL_BOOK.address).then(orSample);
+      void loadWallet(linked, linked === REAL_BOOK.address || linked === REAL_PRESTOCKS_BOOK.address).then(orSample);
       return;
     }
     if (book && SAMPLES.some((s) => s.key === book)) {
@@ -219,7 +220,7 @@ function Desk() {
       const stored = localStorage.getItem(ADDRESS_KEY);
       if (stored && isValidAddress(stored)) {
         setAddress(stored);
-        void loadWallet(stored, stored === REAL_BOOK.address).then(orSample);
+        void loadWallet(stored, stored === REAL_BOOK.address || stored === REAL_PRESTOCKS_BOOK.address).then(orSample);
         return;
       }
     } catch {}
@@ -260,7 +261,14 @@ function Desk() {
   const sample = source?.kind === "sample" ? SAMPLES.find((s) => s.key === source.key) : null;
   const viewing = source?.kind === "wallet" ? source.balances.address : null;
   const owner = !!viewing && !!connectedKey && connectedKey.toBase58() === viewing;
-  const bookLabel = source?.kind === "wallet" ? (source.real ? REAL_BOOK.label : shortAddress(source.balances.address, 4)) : (sample?.label ?? "Sample book");
+  const bookLabel =
+    source?.kind === "wallet"
+      ? source.balances.address === REAL_BOOK.address
+        ? REAL_BOOK.label
+        : source.balances.address === REAL_PRESTOCKS_BOOK.address
+          ? REAL_PRESTOCKS_BOOK.label
+          : shortAddress(source.balances.address, 4)
+      : (sample?.label ?? "Sample book");
 
   return (
     <div className="flex min-h-screen">
@@ -321,6 +329,15 @@ function Desk() {
               >
                 {REAL_BOOK.label}
               </Button>
+              <Button
+                size="sm"
+                variant={viewing === REAL_PRESTOCKS_BOOK.address ? "primary" : "secondary"}
+                onClick={() => void loadWallet(REAL_PRESTOCKS_BOOK.address, true)}
+                title={REAL_PRESTOCKS_BOOK.blurb}
+                disabled={loadingWallet}
+              >
+                {REAL_PRESTOCKS_BOOK.label}
+              </Button>
               {SAMPLES.map((s) => (
                 <Button key={s.key} size="sm" variant={sample?.key === s.key ? "primary" : "secondary"} onClick={() => pickSample(s.key)} title={s.blurb}>
                   {s.label}
@@ -329,11 +346,11 @@ function Desk() {
             </div>
 
             <div className="ml-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-tertiary">
-              {recent.filter((r) => r !== REAL_BOOK.address).length > 0 && (
+              {recent.filter((r) => r !== REAL_BOOK.address && r !== REAL_PRESTOCKS_BOOK.address).length > 0 && (
                 <span className="flex items-center gap-1.5">
                   <span>recent</span>
                   {recent
-                    .filter((r) => r !== REAL_BOOK.address)
+                    .filter((r) => r !== REAL_BOOK.address && r !== REAL_PRESTOCKS_BOOK.address)
                     .map((r) => (
                       <button
                         key={r}
@@ -469,6 +486,9 @@ function Desk() {
                       meta={`${analysis.holdings.length} priced`}
                     />
                     <Holdings a={analysis} history={history!} />
+                    <div className="px-4 pb-4">
+                      <PreStocksHoldings held={source?.kind === "wallet" ? source.balances.preIpo : {}} />
+                    </div>
                   </Panel>
 
                   <Panel delay={80} id="overnight">
@@ -586,7 +606,8 @@ function Desk() {
                 <p className="mt-3 text-[11px] leading-relaxed text-tertiary">
                   Balances are read from Solana mainnet by your browser; prices and thirty days of hourly history come from
                   CoinGecko; every figure is computed on this page. Value at Risk is a model estimate, not a prediction and
-                  not investment advice. xStocks are issued by Backed Finance; Afterhours is unaffiliated.
+                  not investment advice. xStocks are issued by Backed Finance; PreStocks tokens by PreStocks; Afterhours
+                  is unaffiliated with either.
                 </p>
               </footer>
             </>
