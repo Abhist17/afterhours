@@ -106,25 +106,25 @@ export default function Landing() {
       <section className="hero-glow border-b border-border">
         <div className="mx-auto grid max-w-[1200px] items-center gap-x-10 gap-y-8 px-4 pb-12 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_auto] lg:pb-16">
           <div className="min-w-0">
-            <p className="enter label mb-4 flex items-center gap-2" style={{ color: "var(--brand)" }}>
+            <p className="hero-enter label mb-4 flex items-center gap-2" style={{ color: "var(--brand)" }}>
               <Mark size={14} />
               The risk desk for tokenized stocks on Solana
             </p>
-            <h1 className="enter display max-w-[16ch] text-[44px] leading-[1] text-text sm:text-[68px]" style={{ animationDelay: "60ms" }}>
+            <h1 className="hero-enter display max-w-[16ch] text-[44px] leading-[1] text-text sm:text-[68px]" style={{ animationDelay: "100ms" }}>
               Markets close.
               <em className="text-secondary">
                 <Typewriter text="Your book doesn’t." />
               </em>
             </h1>
-            <p className="enter mt-5 max-w-[56ch] text-[15px] leading-relaxed text-secondary sm:text-[16px]" style={{ animationDelay: "140ms" }}>
+            <p className="hero-enter mt-5 max-w-[56ch] text-[15px] leading-relaxed text-secondary sm:text-[16px]" style={{ animationDelay: "220ms" }}>
               An xStock trades every hour of every day. The share behind it trades 9:30 to 4:00, New York. Afterhours reads
               any wallet holding xStocks and says what it can lose tomorrow, what it has done since the last bell, and how far it
               has drifted from what you meant it to be, scored in your browser, recorded on-chain by you.
             </p>
 
             <form
-              className="enter mt-8 flex flex-col gap-2 sm:flex-row sm:items-center"
-              style={{ animationDelay: "220ms" }}
+              className="hero-enter mt-8 flex flex-col gap-2 sm:flex-row sm:items-center"
+              style={{ animationDelay: "340ms" }}
               onSubmit={(e) => {
                 e.preventDefault();
                 const a = address.trim();
@@ -145,7 +145,7 @@ export default function Landing() {
               </Button>
             </form>
 
-            <div className="enter mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary" style={{ animationDelay: "300ms" }}>
+            <div className="hero-enter mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-tertiary" style={{ animationDelay: "440ms" }}>
               <span className="mr-1">or open</span>
               <Button size="sm" variant="secondary" onClick={() => open(`?address=${REAL_BOOK.address}`)} title={REAL_BOOK.blurb}>
                 {REAL_BOOK.label}
@@ -160,7 +160,7 @@ export default function Landing() {
               ))}
             </div>
           </div>
-          <div className="enter hidden justify-self-center lg:block" style={{ animationDelay: "180ms" }}>
+          <div className="hero-enter hidden justify-self-center lg:block" style={{ animationDelay: "160ms" }}>
             <SessionRing market={market} now={now} />
           </div>
         </div>
