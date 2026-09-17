@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Analysis } from "@/lib/portfolio";
 import { ARMED, DEFAULT_WATCH, evaluateWatch, type WatchSettings, type WatchState } from "@/lib/alerts";
-import { useMounted } from "@/lib/hooks";
+import { useDismiss, useMounted } from "@/lib/hooks";
 import { Button } from "./ui";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -33,6 +33,8 @@ export function Watch({
   const [last, setLast] = useState<string | null>(null);
   const state = useRef<WatchState>(ARMED);
   const key = `afterhours-watch:${storageKey}`;
+  const dismiss = useCallback(() => setOpen(false), []);
+  const ref = useDismiss<HTMLSpanElement>(open, dismiss);
 
   useEffect(() => {
     setPermission(typeof Notification === "undefined" ? "unsupported" : Notification.permission);
@@ -84,7 +86,7 @@ export function Watch({
   const watching = enabled && permission === "granted";
 
   return (
-    <span className="relative inline-flex">
+    <span ref={ref} className="relative inline-flex">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

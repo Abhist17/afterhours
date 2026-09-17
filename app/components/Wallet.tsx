@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { ConnectionProvider, WalletProvider, useWallet } from "@solana/wallet-adapter-react";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
 import { PROGRAM_RPC_URL } from "@/lib/onchain";
 import { shortAddress } from "@/lib/format";
+import { useDismiss } from "@/lib/hooks";
 import { Button } from "./ui";
 
 /**
@@ -29,6 +30,8 @@ export function ConnectButton({ onConnected }: { onConnected?: (address: string)
   const { wallets, wallet, select, connect, disconnect, connecting, connected, publicKey } = useWallet();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dismiss = useCallback(() => setOpen(false), []);
+  const ref = useDismiss<HTMLSpanElement>(open, dismiss);
 
   // Connecting by hand reads that wallet's book straight away. A silent
   // reconnect on load does not, so a link to someone else's address is
@@ -77,7 +80,7 @@ export function ConnectButton({ onConnected }: { onConnected?: (address: string)
   }
 
   return (
-    <span className="relative">
+    <span ref={ref} className="relative">
       <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} disabled={connecting} className="shrink-0 whitespace-nowrap">
         {connecting ? "Connecting…" : <span>Connect<span className="hidden sm:inline"> wallet</span></span>}
       </Button>

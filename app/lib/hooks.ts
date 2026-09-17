@@ -51,3 +51,29 @@ export function useMounted(): boolean {
   useEffect(() => setMounted(true), []);
   return mounted;
 }
+
+/**
+ * Closes an open popover on a pointer down outside it or on Escape.
+ * Attach the returned ref to the popover's positioning wrapper (the
+ * element that also contains the toggle button), so a click on the
+ * toggle itself is "inside" and left to its own onClick to handle.
+ */
+export function useDismiss<T extends HTMLElement>(open: boolean, onDismiss: () => void) {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onDismiss();
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onDismiss();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, onDismiss]);
+  return ref;
+}

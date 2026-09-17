@@ -55,12 +55,21 @@ export function RiskMap({ a }: { a: Analysis }) {
     for (let i = 1; i < labelled.length; i++) {
       const prev = labelled[i - 1];
       const cur = labelled[i];
-      if (Math.abs(cur.x - prev.x) < 64 && cur.labelY - prev.labelY < 11) cur.labelY = prev.labelY + 11;
+      if (Math.abs(cur.x - prev.x) < 70 && cur.labelY - prev.labelY < 13) cur.labelY = prev.labelY + 13;
+    }
+    // The book's own label competes with the same space; push it clear of
+    // whichever held label's baseline lands nearest once those have settled.
+    const bookX = x(bookVol);
+    const bookY = y(bookRet);
+    let bookLabelBaseline = bookY - 8;
+    for (const p of labelled) {
+      const baseline = p.labelY + 3.5;
+      if (Math.abs(bookX - p.x) < 70 && Math.abs(bookLabelBaseline - baseline) < 13) bookLabelBaseline = baseline - 13;
     }
     const xTicks = [1, 3, 10, 30, 100, 300, 1000].filter((v) => lg(v) <= xMax).map((v) => ({ v, x: x(v) }));
     return {
       placed,
-      book: { x: x(bookVol), y: y(bookRet), vol: bookVol, ret: bookRet },
+      book: { x: bookX, y: bookY, labelBaseline: bookLabelBaseline, vol: bookVol, ret: bookRet },
       xTicks,
       yTicks: niceTicks(yMin, yMax, 4).map((v) => ({ v, y: y(v) })),
       zero: y(0),
@@ -123,7 +132,10 @@ export function RiskMap({ a }: { a: Analysis }) {
             <circle cx={model.book.x} cy={model.book.y} r={12} fill="transparent" />
             <circle cx={model.book.x} cy={model.book.y} r={7} fill="none" stroke="var(--brand)" strokeWidth={2} />
             <circle cx={model.book.x} cy={model.book.y} r={2.5} fill="var(--brand)" />
-            <text x={model.book.x + 11} y={model.book.y - 8} fontSize={10} fill="var(--brand)" style={{ fontWeight: 600 }}>
+            {model.book.labelBaseline !== model.book.y - 8 && (
+              <line x1={model.book.x + 9} y1={model.book.y} x2={model.book.x + 11} y2={model.book.labelBaseline - 3} stroke="var(--border-strong)" strokeWidth={1} />
+            )}
+            <text x={model.book.x + 11} y={model.book.labelBaseline} fontSize={10} fill="var(--brand)" style={{ fontWeight: 600 }}>
               this book
             </text>
           </g>
