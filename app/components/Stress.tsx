@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Analysis } from "@/lib/portfolio";
-import { factorScenario, type Scenario } from "@/lib/scenarios";
+import type { Scenario } from "@/lib/scenarios";
 import { CRYPTO_SYMBOL } from "@/lib/portfolio";
 import { BY_SYMBOL, MARKET_SYMBOL } from "@/lib/universe";
 import { usd, signedUsd, signedPct, dayLabel, sectorColor } from "@/lib/format";
@@ -13,7 +13,8 @@ import { Button } from "./ui";
  * shown. Factor shocks move every position by its beta to the factor; the
  * two dated scenarios are the window's own worst day and worst close-to-
  * open, at today's weights. The custom shock is a slider for each factor,
- * summed, a first-order answer, labelled as one.
+ * applied through betas fit to both factors jointly, so a name correlated
+ * with both is not double-counted.
  */
 export function Stress({ a }: { a: Analysis }) {
   const [selected, setSelected] = useState<string>(a.stress.scenarios[0]?.key ?? "");
@@ -23,23 +24,24 @@ export function Stress({ a }: { a: Analysis }) {
   const values = useMemo(() => Object.fromEntries(a.holdings.map((h) => [h.symbol, h.value])), [a]);
   const custom = useMemo<Scenario>(() => {
     const isCash = (s: string) => BY_SYMBOL[s]?.class === "cash";
-    const m = factorScenario("custom-m", "", MARKET_SYMBOL, marketShock, values, a.stress.betaToMarket, isCash);
-    const c = factorScenario("custom-c", "", CRYPTO_SYMBOL, cryptoShock, values, a.stress.betaToCrypto, isCash);
-    const lines = m.lines.map((l) => {
-      const cl = c.lines.find((x) => x.symbol === l.symbol);
-      return { symbol: l.symbol, move: l.move + (cl?.move ?? 0), pnlUsd: l.pnlUsd + (cl?.pnlUsd ?? 0) };
-    });
-    lines.sort((x, y) => x.pnlUsd - y.pnlUsd);
+    const lines = Object.entries(values)
+      .filter(([, value]) => value > 0)
+      .map(([symbol, value]) => {
+        const joint = isCash(symbol) ? undefined : a.stress.jointBetas[symbol];
+        const move = joint ? joint.a * marketShock + joint.b * cryptoShock + 0 : 0;
+        return { symbol, move, pnlUsd: move * value };
+      })
+      .sort((x, y) => x.pnlUsd - y.pnlUsd);
     const pnl = lines.reduce((s, l) => s + l.pnlUsd, 0);
     return {
       key: "custom",
       label: "Your own shock",
-      basis: `S&P 500 ${(marketShock * 100).toFixed(0)}% and crypto ${(cryptoShock * 100).toFixed(0)}% together, betas summed, the two overlap, so read it as a ceiling`,
+      basis: `S&P 500 ${(marketShock * 100).toFixed(0)}% and crypto ${(cryptoShock * 100).toFixed(0)}% together, each position's betas fit to both factors at once, so the pair's own correlation is not double-counted`,
       pnlUsd: pnl,
       pnlPct: a.total > 0 ? pnl / a.total : 0,
       lines,
     };
-  }, [values, marketShock, cryptoShock, a.stress.betaToMarket, a.stress.betaToCrypto, a.total]);
+  }, [values, marketShock, cryptoShock, a.stress.jointBetas, a.total]);
 
   const scenarios = [...a.stress.scenarios, custom];
   const active = scenarios.find((s) => s.key === selected) ?? scenarios[0];

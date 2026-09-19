@@ -33,7 +33,7 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: "Stress",
     body:
-      "Factor shocks move every position by its beta to the factor, SPYx for the index, SOL for crypto, on the same estimator as the VaR. Two rows are not hypothetical: the worst day and the worst close-to-open the window actually had, at today's weights. The custom shock sums the two betas, which overlap, so read it as a ceiling.",
+      "Factor shocks move every position by its beta to the factor, SPYx for the index, SOL for crypto, on the same estimator as the VaR. Two rows are not hypothetical: the worst day and the worst close-to-open the window actually had, at today's weights. The custom shock fits each position's betas to both factors at once, so a name correlated with both, COINx to the index and to crypto, is not double-counted.",
   },
   {
     title: "Rebalance quotes",

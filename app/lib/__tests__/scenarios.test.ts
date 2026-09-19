@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   betasTo,
+  jointBetasTo,
   factorScenario,
   worstDayScenario,
   worstGapScenario,
@@ -50,6 +51,34 @@ describe("betasTo and factorScenario", () => {
     // Worst line first.
     expect(s.lines[0].symbol).toBe("TSLAx");
     expect(s.lines.find((l) => l.symbol === "USDC")!.move).toBe(0);
+  });
+});
+
+describe("jointBetasTo", () => {
+  // A and B are correlated with each other; an asset that is an exact
+  // linear combination of both should have its true coefficients
+  // recovered by the joint fit, unlike a naive sum of single-factor betas.
+  const a = Array.from({ length: 200 }, (_, i) => 0.01 * Math.sin(i / 3));
+  const b = a.map((r, i) => 0.6 * r + 0.005 * Math.cos(i / 5));
+  const returns = {
+    A: a,
+    B: b,
+    Y: a.map((r, i) => 1.5 * r + 0.5 * b[i]),
+  };
+
+  it("recovers the true coefficients of a position built from both factors", () => {
+    const j = jointBetasTo(returns, "A", "B", 0.98);
+    expect(j.Y.a).toBeCloseTo(1.5, 6);
+    expect(j.Y.b).toBeCloseTo(0.5, 6);
+  });
+
+  it("disagrees with summing independent single-factor betas, because the factors overlap", () => {
+    const single = { a: betasTo(returns, "A", 0.98).Y, b: betasTo(returns, "B", 0.98).Y };
+    expect(Math.abs(single.a + single.b - 1.5 - 0.5)).toBeGreaterThan(0.01);
+  });
+
+  it("returns {} when either factor is missing", () => {
+    expect(jointBetasTo(returns, "MISSING", "B", 0.98)).toEqual({});
   });
 });
 

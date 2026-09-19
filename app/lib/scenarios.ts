@@ -49,6 +49,40 @@ export function betasTo(
   return out;
 }
 
+/**
+ * Betas to two factors together, by two-variable OLS rather than one
+ * single-factor regression per factor: the factors are themselves
+ * correlated (crypto-linked equity moves with both), so summing two
+ * single-factor betas double-counts that overlap. Solving the pair
+ * jointly removes it.
+ */
+export function jointBetasTo(
+  returnsBySymbol: Record<string, number[]>,
+  factorA: string,
+  factorB: string,
+  lambda: number
+): Record<string, { a: number; b: number }> {
+  const fa = returnsBySymbol[factorA];
+  const fb = returnsBySymbol[factorB];
+  const out: Record<string, { a: number; b: number }> = {};
+  if (!fa || !fb || fa.length < 2 || fb.length < 2) return out;
+  const varA = ewmaCovariance(fa, fa, lambda);
+  const varB = ewmaCovariance(fb, fb, lambda);
+  const covAB = ewmaCovariance(fa, fb, lambda);
+  const det = varA * varB - covAB * covAB;
+  if (!(Math.abs(det) > 0)) return out;
+  for (const [s, r] of Object.entries(returnsBySymbol)) {
+    if (r.length < 2) continue;
+    const covYA = ewmaCovariance(r, fa, lambda);
+    const covYB = ewmaCovariance(r, fb, lambda);
+    out[s] = {
+      a: (varB * covYA - covAB * covYB) / det,
+      b: (varA * covYB - covAB * covYA) / det,
+    };
+  }
+  return out;
+}
+
 export function factorScenario(
   key: string,
   label: string,
@@ -167,10 +201,16 @@ export function stressBook(inputs: {
   isCash: (s: string) => boolean;
   gaps: Gap[];
   equityValue: number;
-}): { scenarios: Scenario[]; betaToMarket: Record<string, number>; betaToCrypto: Record<string, number> } {
+}): {
+  scenarios: Scenario[];
+  betaToMarket: Record<string, number>;
+  betaToCrypto: Record<string, number>;
+  jointBetas: Record<string, { a: number; b: number }>;
+} {
   const lambda = scaleLambdaToFrequency(DEFAULT_LAMBDA, inputs.periodsPerDay);
   const betaToMarket = betasTo(inputs.returnsBySymbol, inputs.marketSymbol, lambda);
   const betaToCrypto = betasTo(inputs.returnsBySymbol, inputs.cryptoSymbol, lambda);
+  const jointBetas = jointBetasTo(inputs.returnsBySymbol, inputs.marketSymbol, inputs.cryptoSymbol, lambda);
   const scenarios: Scenario[] = [];
   for (const shock of MARKET_SHOCKS) {
     scenarios.push(
@@ -190,7 +230,7 @@ export function stressBook(inputs: {
     worstGap.pnlPct = total > 0 ? worstGap.pnlUsd / total : 0;
     scenarios.push(worstGap);
   }
-  return { scenarios, betaToMarket, betaToCrypto };
+  return { scenarios, betaToMarket, betaToCrypto, jointBetas };
 }
 
 // ── Value, drawdown, and the model's own record ─────────────────

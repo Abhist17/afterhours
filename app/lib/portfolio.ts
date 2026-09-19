@@ -100,7 +100,12 @@ export interface Analysis {
    */
   sessions: { book: SessionSplit | null; bySymbol: Record<string, SessionSplit>; gaps: Gap[] };
   /** Factor shocks and the window's own worst day, at today's weights. */
-  stress: { scenarios: Scenario[]; betaToMarket: Record<string, number>; betaToCrypto: Record<string, number> };
+  stress: {
+    scenarios: Scenario[];
+    betaToMarket: Record<string, number>;
+    betaToCrypto: Record<string, number>;
+    jointBetas: Record<string, { a: number; b: number }>;
+  };
   /** The book at today's amounts, priced through the window. */
   valueSeries: ValuePoint[];
   drawdown: Drawdown | null;
