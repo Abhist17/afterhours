@@ -46,17 +46,17 @@ export const SAMPLES: SampleBook[] = [
 export const REAL_BOOK = {
   address: "2Z7zhqp1eddmHNmEqexftST6DFPWmoL4QqfgiG5uJMJx",
   label: "A real xStocks wallet",
-  blurb: "An active mainnet wallet holding nine xStocks and USDC, read live, not ours.",
+  blurb: "An active mainnet wallet holding tokenized stocks, crypto and stablecoins, read live, not ours.",
 };
 
 /**
  * A real book on mainnet, found through the largest holders of a PreStocks
- * mint: six pre-IPO tokens beside SOL and USDC, not ours, read live.
+ * mint: five pre-IPO tokens beside SOL and USDC, not ours, read live.
  */
 export const REAL_PRESTOCKS_BOOK = {
   address: "6GJbPKBtovsrMEEMcic5KMi5tswh9qSyT5ZYLMqEwNgt",
   label: "A real PreStocks wallet",
-  blurb: "An active mainnet wallet holding six PreStocks pre-IPO tokens, SOL and USDC, read live, not ours.",
+  blurb: "An active mainnet wallet holding five PreStocks pre-IPO tokens, SOL and USDC, read live, not ours.",
 };
 
 /**

@@ -36,10 +36,18 @@ export function useCountUp(target: number, duration = 600): number {
   return value;
 }
 
-/** Re-renders on a timer so relative times and countdowns stay honest. */
+/**
+ * Re-renders on a timer so relative times and countdowns stay honest.
+ * Starts at 0, not `Date.now()`: this is a static export, so the initial
+ * render happens once at build time and again at hydration, at two
+ * different real instants — seeding state with the real clock would make
+ * those two renders disagree and fail hydration. Zero renders identically
+ * both times; the first effect tick replaces it with the real clock.
+ */
 export function useNow(intervalMs = 1000): number {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
   useEffect(() => {
+    setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), intervalMs);
     return () => clearInterval(timer);
   }, [intervalMs]);

@@ -21,7 +21,9 @@ Also entered for the **PreStocks bounty** ("Best Use of PreStocks"): the
 desk reads any wallet's [PreStocks](https://prestocks.com) pre-IPO tokens
 (OpenAI, SpaceX, Anthropic, Anduril, Neuralink, Figure AI, Kalshi,
 Polymarket) the same way it reads xStocks, no key and no custody, and
-prices them live from PreStocks' own API. They sit beside the risk-scored
+prices them from a snapshot of PreStocks' own API, refreshed at build time
+since its endpoint has no browser CORS for a page here to fetch live. They
+sit beside the risk-scored
 book, not inside it, on purpose: a private company has no public listing,
 so there is no thirty-day series to score it against, and folding it into
 the VaR would be a number dressed up past what it knows. Open **A real
@@ -122,7 +124,7 @@ Nothing sleeps, nothing cold-starts.
 
 - 35 xStocks (every mint verified on mainnet: Token-2022, 8 decimals) +
   SOL, cbBTC, USDC, USDT, USDG · 5 program instructions · 1 event
-- 87 app tests (quant, session split, stress, NYSE calendar, universe
+- 90 app tests (quant, session split, stress, NYSE calendar, universe
   integrity, history loading, Jupiter quotes, portfolio assembly, on-chain
   encoding) + 12 program tests on a local validator, all in CI
 - One static page; one hourly Action; one event subscriber; zero servers
@@ -146,7 +148,7 @@ Nothing sleeps, nothing cold-starts.
   grows by a snapshot a day from a workflow; no webhook is configured for
   it right now, so that step is proven by the script, not running live.
   Not a one-off test either way: replaying the program's history turns up
-  9 real snapshots and 2 real breaches over five days, transcript in the README.
+  13 real snapshots and 2 real breaches over eight days, transcript in the README.
 - Sign and swap: a rebalance order executed from the panel, Jupiter's
   transaction signed by the wallet on mainnet.
 - Watch this book: browser notifications on a move since the close or a

@@ -20,7 +20,7 @@
 ![The Afterhours desk reading a real $21M xStocks wallet on mainnet: a rail of ten numbered panels, the tape of every xStock's move since the close, risk score, book, one-day VaR, beta to the S&P 500, the move since the last NYSE close, holdings with each position's share of risk beside its weight, a what-if moving half of MSTRx into SPYx, and the book under an S&P 500 −2% shock, position by position](docs/desk.png)
 
 <div align="center">
-<sub>A real wallet, not ours, eleven xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
+<sub>A real wallet, not ours, ten xStocks, cbBTC and stablecoins, read live. MSTRx is 18% of its value and 51% of its risk.</sub>
 </div>
 
 ---
@@ -67,8 +67,10 @@ synthetic, priced live, and two real mainnet wallets, found through the
 largest holders of their tokens and labelled as not ours: one an xStocks
 book, the other [PreStocks](https://prestocks.com) — eight tokenized
 pre-IPO companies (OpenAI, SpaceX, Anthropic, Anduril, Neuralink, Figure
-AI, Kalshi, Polymarket), read from mainnet the same way, priced live from
-PreStocks' own API. They sit beside the risk-scored book under **What you
+AI, Kalshi, Polymarket), read from mainnet the same way, priced from a
+snapshot of PreStocks' own API, refreshed at build time since its endpoint
+has no browser CORS for a page here to fetch live. They sit beside the
+risk-scored book under **What you
 hold**, not inside it: a private company has no public listing, so there
 is no thirty-day series to score it against, and the desk would rather
 say so than fold it into a number that does not know that. Any view is a
@@ -131,7 +133,7 @@ policy, by its owner's own reading". The subscriber exists:
 program's logs live, or replays its history, decodes every event, and can
 POST each breach to a webhook, the margin-call bot, as a hundred lines. This
 is not a one-off test burst: the daily workflow has now been recording for
-five days straight, unattended, with two real breaches in that window —
+eight days straight, unattended, with two real breaches in that window —
 replaying the program's whole history shows it:
 
 ```
@@ -145,8 +147,12 @@ ok      2026-09-13 23:29Z  HKer…Bndp  score  14  book $17,997  VaR $161  drift
 ok      2026-09-14 23:58Z  HKer…Bndp  score  14  book $17,946  VaR $159  drift 0.7pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
 ok      2026-09-15 23:41Z  HKer…Bndp  score  14  book $17,899  VaR $159  drift 0.7pp  stocks 80%  NYSE closed  (limit 30 · band 5pp)
 ok      2026-09-16 23:49Z  HKer…Bndp  score  15  book $17,888  VaR $166  drift 0.7pp  stocks 80%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-17 23:39Z  HKer…Bndp  score  14  book $18,048  VaR $153  drift 0.5pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-18 23:34Z  HKer…Bndp  score  15  book $18,103  VaR $169  drift 0.4pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-19 23:30Z  HKer…Bndp  score  15  book $18,138  VaR $164  drift 0.3pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
+ok      2026-09-20 23:30Z  HKer…Bndp  score  14  book $18,151  VaR $160  drift 0.5pp  stocks 81%  NYSE closed  (limit 30 · band 5pp)
 
-9 snapshots recorded
+13 snapshots recorded
 ```
 
 The page prepares each transaction; the wallet signs; the page submits it to
@@ -295,7 +301,7 @@ git clone https://github.com/Abhist17/afterhours
 cd afterhours/app
 npm install
 npm run dev                 # http://localhost:3000
-npm test                    # 87 tests: quant, sessions, scenarios, market hours, universe, history, Jupiter, alerts, portfolio, on-chain
+npm test                    # 90 tests: quant, sessions, scenarios, market hours, universe, history, Jupiter, alerts, portfolio, on-chain
 npm run build               # static export to out/
 
 cd ..
